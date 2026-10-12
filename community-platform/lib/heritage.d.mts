@@ -16,4 +16,5 @@ export function textOnly(value?:unknown):string;
 export function englishText(value:unknown):string;
 export function englishTexts(values:unknown[]):string[];
 export function readHeritage():HeritageData|null;
+export function heritageDistricts():Record<string,string>;
 export const sections:Record<string,string>;

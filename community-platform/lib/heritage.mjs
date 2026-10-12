@@ -56,3 +56,5 @@ export function readHeritage() {
     };
   } finally {db.close();}
 }
+
+export function heritageDistricts(){const db=openHeritage();if(!db)return {};try{return Object.fromEntries(db.prepare("SELECT source_id,payload FROM legacy_records WHERE source_table='district'").all().map(r=>[r.source_id,textOnly(JSON.parse(r.payload).district)]));}finally{db.close();}}
