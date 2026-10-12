@@ -1,0 +1,3 @@
+export function zoomAt(t,factor,x,y){const k=Math.max(.005,Math.min(5,t.k*factor));return {x:x-(x-t.x)*k/t.k,y:y-(y-t.y)*k/t.k,k};}
+export function wheelTransform(t,e,x,y){const unit=e.deltaMode===1?16:e.deltaMode===2?600:1;const dx=e.deltaX*unit,dy=e.deltaY*unit;if(e.ctrlKey||e.metaKey)return zoomAt(t,Math.exp(-Math.max(-100,Math.min(100,dy))*.01),x,y);return {...t,x:t.x-dx,y:t.y-dy};}
+export function groupSources(sources=[]){const groups=new Map();for(const s of sources){const key=s.kind==='web'?s.id:s.kind+':'+s.source;const old=groups.get(key);if(old){if(s.text&&!old.text.includes(s.text))old.text+='\n\n'+s.text;}else groups.set(key,{...s});}return [...groups.values()];}

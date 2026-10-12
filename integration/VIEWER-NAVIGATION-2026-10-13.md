@@ -1,0 +1,9 @@
+# Viewer navigation and source presentation — 13.10.2026
+
+Repeated website citations were separate paragraphs from the same source article. Mitra now groups those by article URL into one card, retains the paragraphs as evidence, and puts all source cards inside a collapsed Sources disclosure. External web evidence markers keep their individual reference cards.
+
+A uniquely resolved person lookup supplies a viewer focus command even when the model omits a separate show-person call. A single village article can supply the corresponding village filter. Ambiguous matches still require clarification. On focus, the viewer fills the person search, selects the person's village, clears stale second-person state, focuses the branch and brings the canvas into view. Relationship tracing fills both selections and highlights the recorded path.
+
+The previous wheel handler treated deltaY equal to zero as zoom-out, so sideways trackpad scrolling shrank the tree. An explicit non-passive wheel listener now prevents page/browser wheel behavior over the canvas: ordinary two-finger scrolling pans in both axes; pinch (Ctrl wheel) or Ctrl/Command scrolling zooms around the pointer, with consistent bounds. Zoom buttons preserve the viewport-center anchor. Fit uses the selected family or path bounds. Pointer dragging captures the pointer and does not select a person unless the interaction is a click.
+
+Production build and 13 focused assistant/navigation tests pass. Browser input verification showed horizontal scroll changing pan by 40 pixels with unchanged scale; Ctrl-scroll zoomed from 0.5981 to 0.8923 and returned to 0.5981 in the reverse direction. Original source records, privacy rules and live Laravel/MySQL are unchanged.

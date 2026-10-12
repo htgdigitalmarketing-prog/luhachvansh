@@ -31,19 +31,19 @@ const declarations=[
  {name:'show_village',description:'Filter dynasty viewer to a village by its Hindi or English name.',parameters:{type:'OBJECT',properties:{village:{type:'STRING'}},required:['village']}}
 ];
 export function createMitraTools(graph,archive,selectedId){
- const sources=new Map(),matches=new Map(),resolved=new Set(selectedId?[selectedId]:[]);let action=null;
+ const sources=new Map(),matches=new Map(),resolved=new Set(selectedId?[selectedId]:[]);let action=null,lookupAction=null;
  const person=id=>{const p=graph.records.find(p=>p.id===id);if(!p)throw Error('Public person not found');return p;};
  const addPerson=id=>{const p=person(id);sources.set('person:'+id,{id:'person:'+id,title:p.nameEnglish||p.name,text:'Recorded historical family links; missing relationships are not inferred.',source:'/vanshavali?person='+encodeURIComponent(id),kind:'genealogy'});return p;};
  function run(name,args={}){try{switch(name){
- case 'find_people': {const list=searchPeople(graph,String(args.query||'').slice(0,160),String(args.village||'').slice(0,120));for(const p of list)matches.set(p.id,p);if(list.length===1)resolved.add(list[0].id);return {matches:list,ambiguous:list.length>1};}
+ case 'find_people': {const list=searchPeople(graph,String(args.query||'').slice(0,160),String(args.village||'').slice(0,120));for(const p of list)matches.set(p.id,p);lookupAction=list.length===1?{type:'focus',person:list[0].id}:null;if(list.length===1)resolved.add(list[0].id);return {matches:list,ambiguous:list.length>1};}
  case 'get_family': {addPerson(args.id);const family=publicFamily(graph,args.id);if(resolved.has(args.id))for(const p of [...family.parents,...family.spouses,...family.children,...family.siblings])resolved.add(p.id);return family;}
  case 'trace_relationship': {if(!resolved.has(args.from)||!resolved.has(args.to))return {error:'Resolve both people unambiguously first.'};addPerson(args.from);addPerson(args.to);const path=publicLineage(graph,args.from,args.to);if(path.found)action={type:'trace',person:args.from,target:args.to};return path;}
- case 'search_website': {const rows=archivePassages(archive,String(args.query||'').slice(0,200));for(const r of rows)sources.set(r.id,r);return rows;}
+ case 'search_website': {const rows=archivePassages(archive,String(args.query||'').slice(0,200));for(const r of rows)sources.set(r.id,r);if(!lookupAction){const villageIds=[...new Set(rows.filter(r=>r.source.startsWith('/heritage/villages/')).map(r=>r.source.split('/').pop()))];if(villageIds.length===1){const v=archive?.villages.find(v=>v.id===villageIds[0]),p=graph.records.find(p=>v&&villageNorm(p.villageName)===villageNorm(v.name));if(p)lookupAction={type:'village',village:p.villageName};}}return rows;}
  case 'show_person': {if(!resolved.has(args.id))return {error:'Resolve the name by village or ask the visitor to choose before focusing the viewer.'};const p=addPerson(args.id);action={type:'focus',person:p.id};return {shown:small(p)};}
  case 'show_village': {const q=villageNorm(args.village),p=graph.records.find(p=>q&&[p.villageName,p.villageEnglish].map(villageNorm).includes(q));if(!p)return {error:'No matching recorded village. Search using its original name.'};action={type:'village',village:p.villageName};return {village:p.villageName,villageEnglish:p.villageEnglish};}
  default:return {error:'Unknown tool'};
  }}catch{return {error:'This public record or relationship is unavailable. Do not infer it.'};}}
- return {run,result:()=>({sources:[...sources.values()],matches:[...matches.values()].slice(0,12),action})};
+ return {run,result:()=>({sources:[...sources.values()],matches:[...matches.values()].slice(0,12),action:action||lookupAction})};
 }
 export function groundingSources(candidate){
  const m=candidate?.groundingMetadata;const sources=(m?.groundingChunks||[]).flatMap((c,i)=>{try{const u=new URL(c.web?.uri);return u.protocol==='https:'?[{id:'web:'+i,title:`[W${i+1}] ${c.web.title||u.hostname}`,source:u.href,text:'External web source; not a verified family relationship.',kind:'web'}]:[];}catch{return[];}});

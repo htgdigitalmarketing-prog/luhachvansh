@@ -1,4 +1,5 @@
 'use client';
+import {wheelTransform,zoomAt} from '../../lib/viewer-interaction.mjs';
 import {Text,useLanguage} from "../Language";
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -48,6 +49,7 @@ const {tr}=useLanguage();
   // Viewport State
   const [transform, setTransform] = useState({ x: 0, y: 0, k: 0.1 });
   const [isDragging, setIsDragging] = useState(false);
+  const pointerStart=useRef({x:0,y:0,moved:false});
   const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
 
   // 1. Calculate Recursive Tree Layout (Forest Friendly)
@@ -327,24 +329,21 @@ const {tr}=useLanguage();
   }, [layoutNodes, transform, isLayoutReady, focusNodeId, primaryNodeId, targetNodeId, highlightedIds]);
 
   // Input Handlers
-  const handleWheel = (e: React.WheelEvent) => {
-    const scaleFactor = 1.1;
-    const newK = e.deltaY < 0 ? transform.k * scaleFactor : transform.k / scaleFactor;
+  useEffect(()=>{const canvas=canvasRef.current;if(!canvas)return;const wheel=(e:WheelEvent)=>{e.preventDefault();const rect=canvas.getBoundingClientRect();setTransform(t=>wheelTransform(t,e,e.clientX-rect.left,e.clientY-rect.top));};canvas.addEventListener('wheel',wheel,{passive:false});return()=>canvas.removeEventListener('wheel',wheel);},[]);
+  const buttonZoom=(factor:number)=>{const rect=canvasRef.current?.getBoundingClientRect();if(rect)setTransform(t=>zoomAt(t,factor,rect.width/2,rect.height/2));};
 
-    const rect = canvasRef.current!.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const newX = mouseX - (mouseX - transform.x) * (newK / transform.k);
-    const newY = mouseY - (mouseY - transform.y) * (newK / transform.k);
-
-    setTransform({ x: newX, y: newY, k: Math.max(0.005, Math.min(newK, 5)) });
+  const resetView=()=>{const rect=canvasRef.current?.getBoundingClientRect();if(!rect||!layoutNodes.length)return;const focus=layoutNodes.find(n=>n.id===focusNodeId);const nodes=highlightedIds.size?layoutNodes.filter(n=>highlightedIds.has(n.id)):focus?layoutNodes.filter(n=>n.id===focus.id||n.fatherId===focus.id||n.id===focus.fatherId||focus.spouseIds?.includes(n.id)):layoutNodes;const xs=nodes.map(n=>n.x||0),ys=nodes.map(n=>n.y||0),minX=Math.min(...xs)-90,maxX=Math.max(...xs)+90,minY=Math.min(...ys)-60,maxY=Math.max(...ys)+60;const k=Math.max(.005,Math.min(1.4,rect.width/(maxX-minX),rect.height/(maxY-minY))*.85);setTransform({x:rect.width/2-(minX+maxX)/2*k,y:rect.height/2-(minY+maxY)/2*k,k});};
+  const handleMouseDown = (e: React.PointerEvent<HTMLCanvasElement>) => {if(e.button!==0)return;pointerStart.current={x:e.clientX,y:e.clientY,moved:false};e.currentTarget.setPointerCapture(e.pointerId);setIsDragging(true);setLastPos({x:e.clientX,y:e.clientY});};
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    if(Math.hypot(e.clientX-pointerStart.current.x,e.clientY-pointerStart.current.y)>5)pointerStart.current.moved=true;
+    const dx = e.clientX - lastPos.x;
+    const dy = e.clientY - lastPos.y;
+    setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+    setLastPos({ x: e.clientX, y: e.clientY });
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setLastPos({ x: e.clientX, y: e.clientY });
-
+  const handleMouseUp = (e: React.PointerEvent<HTMLCanvasElement>) => {setIsDragging(false);if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);if(pointerStart.current.moved)return;
     if (!isLayoutReady) return;
     const rect = canvasRef.current!.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left - transform.x) / transform.k;
@@ -359,17 +358,8 @@ const {tr}=useLanguage();
     if (clickedNode && onNodeClick) {
         onNodeClick(clickedNode.id);
     }
-  };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const dx = e.clientX - lastPos.x;
-    const dy = e.clientY - lastPos.y;
-    setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
-    setLastPos({ x: e.clientX, y: e.clientY });
   };
-
-  const handleMouseUp = () => setIsDragging(false);
 
   return (
     <div ref={containerRef} className="dynasty-canvas">
@@ -382,18 +372,18 @@ const {tr}=useLanguage();
       )}
 
       <div className="dynasty-zoom">
-         <button aria-label={tr("पास से देखें")} title={tr("पास से देखें")} onClick={() => setTransform(t => ({...t, k: Math.min(4,t.k * 1.2)}))} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomIn className="w-5 h-5"/></button>
-         <button aria-label={tr("दूर से देखें")} title={tr("दूर से देखें")} onClick={() => setTransform(t => ({...t, k: Math.max(.005,t.k / 1.2)}))} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomOut className="w-5 h-5"/></button>
-         <button aria-label={tr("पूरा दृश्य देखें")} title={tr("पूरा दृश्य देखें")} onClick={() => setTransform({ x: 0, y: 0, k: 0.1 })} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><Focus className="w-5 h-5"/></button>
+         <button aria-label={tr("पास से देखें")} title={tr("पास से देखें")} onClick={() => buttonZoom(1.2)} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomIn className="w-5 h-5"/></button>
+         <button aria-label={tr("दूर से देखें")} title={tr("दूर से देखें")} onClick={() => buttonZoom(1/1.2)} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomOut className="w-5 h-5"/></button>
+         <button aria-label={tr("पूरा दृश्य देखें")} title={tr("पूरा दृश्य देखें")} onClick={resetView} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><Focus className="w-5 h-5"/></button>
       </div>
 
       <canvas
         ref={canvasRef}
-        onWheel={handleWheel}
+        data-scale={transform.k} data-pan-x={transform.x} data-pan-y={transform.y} aria-label={tr("वंशावली")}
         onPointerDown={handleMouseDown}
         onPointerMove={handleMouseMove}
         onPointerUp={handleMouseUp}
-        onPointerLeave={handleMouseUp}
+        onPointerCancel={() => setIsDragging(false)}
         className="block"
       />
     </div>
