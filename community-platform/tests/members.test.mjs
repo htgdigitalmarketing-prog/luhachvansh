@@ -64,6 +64,24 @@ const privateSettings = {
   phone: "555-test",
   city: "Test City",
 };
+test("bilingual account introductions stay private even from reviewers and genealogy search", async () => {
+  const f = await fixture();
+  try {
+    const copy = { about_hi: "मेरा निजी परिचय", about_en: "Private introduction", family_hi: "परिवार का निजी परिचय", family_en: "Private family introduction" };
+    f.db.saveIntroduction(f.member, copy);
+    assert.equal(f.db.memberState(f.member).introduction.about_hi, copy.about_hi);
+    assert.equal(f.db.memberState(f.admin).introduction, undefined);
+    assert.equal(f.db.searchFor(f.admin, "Private introduction").length, 0);
+    assert.throws(() => f.db.saveIntroduction("missing-account", copy));
+    assert.throws(() => f.db.saveIntroduction(f.member, {...copy, about_en: "x".repeat(3001)}), /3000/);
+    assert.throws(() => f.db.saveIntroduction(f.member, {...copy, family_en: {text: "unsafe"}}), /3000/);
+    assert.equal(f.db.memberState(f.member).introduction.about_en, copy.about_en);
+    assert.equal(f.db.one("SELECT COUNT(*) AS n FROM claims").n, 0);
+    assert.equal(f.db.one("SELECT detail FROM audit WHERE action='private_introduction_saved'").detail.includes(copy.about_en), false);
+    f.db.saveIntroduction(f.member, {...copy, about_en: ""});
+    assert.equal(f.db.memberState(f.member).introduction.about_en, "");
+  } finally { f.db.close(); }
+});
 test("real accounts have no persona login; bootstrap is one-time and invitations expire or revoke", async () => {
   const f = await fixture();
   try {

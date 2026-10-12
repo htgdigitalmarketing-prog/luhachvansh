@@ -5,3 +5,16 @@ const req=(host,origin)=>({headers:new Headers({host,...(origin?{origin}:{})})})
 test('local API is disabled without explicit launch flag',()=>assert.throws(()=>localGuard(req('localhost:3020'),'0'),/disabled/));
 test('remote hosts are refused including misleading subdomains',()=>{for(const host of ['example.org','localhost.evil.org','127.0.0.1.evil.org'])assert.throws(()=>localGuard(req(host),'1'),/disabled/);});
 test('mutations require exact local origin and permit both loopback spellings',()=>{for(const host of ['localhost:3020','127.0.0.1:3020']){assert.doesNotThrow(()=>localGuard(req(host,'http://'+host),'1',true));assert.throws(()=>localGuard(req(host,'https://evil.org'),'1',true),/Same-origin/);assert.throws(()=>localGuard(req(host),'1',true),/Same-origin/);}});
+test('temporary staging member access requires test mode, isolated absolute storage, HTTPS and exact origin',()=>{
+ const host='darkseagreen-newt-136595.hostingersite.com';
+ const env={LUHACH_DEPLOYMENT:'test',LUHACH_MEMBER_DB:'C:/private-staging/members.sqlite'};
+ const r=req(host,'https://'+host);r.headers.set('x-forwarded-proto','https');
+ assert.doesNotThrow(()=>localGuard(r,'0',true,env));
+ assert.throws(()=>localGuard(r,'0',true,{...env,LUHACH_MEMBER_DB:'relative.sqlite'}),/storage/);
+ r.headers.set('origin','https://test.luhachvansh.com');
+ assert.throws(()=>localGuard(r,'0',true,env),/Same-origin/);
+ r.headers.delete('x-forwarded-proto');
+ assert.throws(()=>localGuard(r,'0',false,env),/HTTPS/);
+ assert.throws(()=>localGuard(req('luhachvansh.com'),'1',false,env),/disabled/);
+ assert.throws(()=>localGuard(req(host+'.evil.org'),'1',false,env),/disabled/);
+});

@@ -2,10 +2,11 @@ import { Problem } from './store.mjs';
 import {isAbsolute} from 'node:path';
 export function localGuard(req, enabled, write=false, env=process.env){
  const host=req.headers.get('host')||'';
- if(env.LUHACH_DEPLOYMENT==='test' && host==='test.luhachvansh.com'){
+ const testHosts=['test.luhachvansh.com','darkseagreen-newt-136595.hostingersite.com'];
+ if(env.LUHACH_DEPLOYMENT==='test' && testHosts.includes(host)){
   if(!env.LUHACH_MEMBER_DB||!isAbsolute(env.LUHACH_MEMBER_DB))throw new Problem('Test storage is not configured.',503);
   if(req.headers.get('x-forwarded-proto')!=='https' && req.nextUrl?.protocol!=='https:')throw new Problem('HTTPS is required.',403);
-  if(write&&req.headers.get('origin')!=='https://test.luhachvansh.com')throw new Problem('Same-origin request required',403);
+  if(write&&req.headers.get('origin')!==`https://${host}`)throw new Problem('Same-origin request required',403);
   return;
  }
  if(enabled!=='1'||! /^(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?$/.test(host))throw new Problem('This milestone is a local preview. Hosted access is disabled.',403);

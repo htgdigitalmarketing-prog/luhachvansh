@@ -62,6 +62,7 @@ export class MemberStore extends Store {
    CREATE TABLE IF NOT EXISTS profile_privacy(person_id TEXT PRIMARY KEY REFERENCES people(id),audience TEXT NOT NULL DEFAULT 'private',life TEXT NOT NULL DEFAULT 'unknown',contact_audience TEXT NOT NULL DEFAULT 'private',email TEXT NOT NULL DEFAULT '',phone TEXT NOT NULL DEFAULT '',city TEXT NOT NULL DEFAULT '',updated INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS privacy_holds(person_id TEXT PRIMARY KEY REFERENCES people(id),reason TEXT NOT NULL);
    CREATE TABLE IF NOT EXISTS verification_details(claim_id TEXT PRIMARY KEY REFERENCES claims(id),relationship TEXT NOT NULL,method TEXT,reviewer TEXT,reviewed INTEGER);
+   CREATE TABLE IF NOT EXISTS account_introductions(account_id TEXT PRIMARY KEY REFERENCES accounts(id),about_hi TEXT NOT NULL DEFAULT '',about_en TEXT NOT NULL DEFAULT '',family_hi TEXT NOT NULL DEFAULT '',family_en TEXT NOT NULL DEFAULT '',updated INTEGER NOT NULL);
   `);
   }
   now() {
@@ -854,6 +855,20 @@ export class MemberStore extends Store {
     need(p && this.canReview(actor, p), "Proposal not available.", 404);
     return super.object(actor, id, reason);
   }
+  saveIntroduction(actor, input) {
+    this.user(actor);
+    const values = ["about_hi", "about_en", "family_hi", "family_en"].map(key => {
+      need(typeof input[key] === "string" && input[key].length <= 3000,
+        "Each introduction must contain at most 3000 characters.");
+      return input[key].trim();
+    });
+    this.transaction(() => {
+      this.run("INSERT OR REPLACE INTO account_introductions VALUES(?,?,?,?,?,?)",
+        actor, ...values, Date.now());
+      // Audit the change without duplicating private biography text in logs.
+      this.log(actor, "private_introduction_saved", actor, {});
+    });
+  }
   memberState(actor) {
     const a = this.user(actor),
       credentials = this.one(
@@ -893,6 +908,7 @@ export class MemberStore extends Store {
         handle: credentials.handle,
         verified: !!credentials.verified,
       },
+      introduction: this.one("SELECT about_hi,about_en,family_hi,family_en,updated FROM account_introductions WHERE account_id=?", actor),
       claims,
       own,
       proposals,

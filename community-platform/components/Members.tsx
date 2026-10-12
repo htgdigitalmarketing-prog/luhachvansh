@@ -76,6 +76,7 @@ type Proposal = {
 };
 type State = {
   actor: Actor;
+  introduction?: { about_hi: string; about_en: string; family_hi: string; family_en: string; updated: number };
   own: Person[];
   claims: Claim[];
   proposals: Proposal[];
@@ -671,6 +672,18 @@ export default function Members() {
                         ? "परिवार का रिश्ता सत्यापित"
                         : "सत्यापन आवश्यक"}
                   </span>
+                </section>
+                <section className="m-panel">
+                  <h2>{hi ? "मेरा परिचय और परिवार" : "About me and my family"}</h2>
+                  <p className="m-muted">{hi ? "यह निजी मसौदा केवल आपके खाते में दिखता है। इसे सहेजने से वंशावली में कोई रिश्ता नहीं जुड़ता और पहचान सत्यापित नहीं होती। घर का पता, पहचान-पत्र या पासवर्ड न लिखें।" : "This private draft is visible only in your account. Saving it does not add genealogy links or verify an identity. Leave out home addresses, identity documents and passwords."}</p>
+                  <form className="m-form-grid" key={state?.introduction?.updated || "new-introduction"}
+                    onSubmit={async e => { await run("saveIntroduction", fields(e), hi ? "आपका निजी परिचय सहेज लिया गया।" : "Your private introduction was saved."); }}>
+                    <label>{hi ? "मेरे बारे में — हिन्दी" : "About me — Hindi"}<textarea name="about_hi" maxLength={3000} rows={5} defaultValue={state?.introduction?.about_hi || ""} /></label>
+                    <label>{hi ? "मेरे बारे में — English" : "About me — English"}<textarea name="about_en" maxLength={3000} rows={5} defaultValue={state?.introduction?.about_en || ""} /></label>
+                    <label>{hi ? "परिवार का परिचय — हिन्दी" : "Family introduction — Hindi"}<textarea name="family_hi" maxLength={3000} rows={5} defaultValue={state?.introduction?.family_hi || ""} /></label>
+                    <label>{hi ? "परिवार का परिचय — English" : "Family introduction — English"}<textarea name="family_en" maxLength={3000} rows={5} defaultValue={state?.introduction?.family_en || ""} /></label>
+                    <button className="primary" disabled={busy}>{hi ? "निजी परिचय सहेजें" : "Save private introduction"}</button>
+                  </form>
                 </section>
                 <div className="m-columns">
                   <section className="m-panel">

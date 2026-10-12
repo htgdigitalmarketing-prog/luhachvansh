@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
   try {
     localGuard(req, process.env.LUHACH_LOCAL_PREVIEW, true);
     const raw = await req.text();
-    if (raw.length > 12000) throw new Problem("Request too large", 413);
+    if (raw.length > 16000) throw new Problem("Request too large", 413);
     let b;
     try {
       b = JSON.parse(raw);
@@ -97,6 +97,9 @@ export async function POST(req: NextRequest) {
     db.tick();
     let result = {};
     switch (b.action) {
+      case "saveIntroduction":
+        db.saveIntroduction(actor.id, b);
+        break;
       case "appointReviewer":
         await db.appointReviewer(actor.id, b.id, b.currentPassword, b.reason);
         break;

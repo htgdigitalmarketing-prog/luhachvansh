@@ -590,6 +590,7 @@ export class HubStore extends MemberStore {
         a,
       );
       this.run("DELETE FROM credentials WHERE account_id=?", a);
+      this.run("DELETE FROM account_introductions WHERE account_id=?", a);
       this.run("UPDATE accounts SET name='Former member' WHERE id=?", a);
       this.run(
         "UPDATE directory SET enabled=0,city=?,state=?,country=? WHERE account_id=?",
