@@ -20,4 +20,12 @@ Use the separate staging SQLite snapshot and keep `legacy-media/` and `heritage-
 
 The custom test-domain cutover remains blocked by Hostinger's destructive subdomain-removal warning. Code is prepared for local review; the live Laravel site is unchanged.
 
-The English cache was uploaded to the existing Node app's private `luhach-staging-private/snapshot/` directory, beside its SQLite snapshot and outside `public_html`. File-manager confirmation showed `heritage-en.json`, 493.09 KiB. The deployed source remains the earlier v2 until local review is accepted. The temporary app's health endpoint still returns storageReady true; hPanel still reports “Your domain can't have active subdomains” for the intended test hostname.
+The English cache was uploaded to the existing Node app's private `luhach-staging-private/snapshot/` directory, beside its SQLite snapshot and outside `public_html`. File-manager confirmation showed `heritage-en.json`, 493.09 KiB.
+
+## Isolated staging deployment
+
+On 12.10.2026, Hostinger completed `community-node-v3.zip` and marked it Current on the existing temporary Node app, `https://darkseagreen-newt-136595.hostingersite.com`. Existing Node 24, build settings and private environment configuration were preserved. No custom-domain mapping, live Laravel files or production MySQL were changed.
+
+Post-deployment verification: health 200 with storageReady true; anonymous viewer 200 with 10,061 records and 10,060 edges; English names available; family lookup 200; public Mitra correctly returned “Loonga Ram — Father: Lal Singh”; villages reader 200; direct private database URL 404; existing live root 200. Browser review confirmed Hindi-first rendering, English switch, interactive family selection and the floating companion's correct selected-person answer. The complete local test suite passed 45/45 before deployment.
+
+The intended `test.luhachvansh.com` cutover remains blocked by hPanel's “Your domain can't have active subdomains” message. The old test mapping must be safely detached by the developer/Hostinger while preserving the live database, files, emails and parent domain. The subdomain deletion flow's database-deletion warning was cancelled; it is not a safe cutover instruction.
