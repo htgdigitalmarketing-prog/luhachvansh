@@ -1,4 +1,5 @@
 "use client";
+import {Text,useLanguage} from "./Language";
 import {hiText,hiError} from "../lib/hindi.mjs";
 import { useEffect, useState, useRef, FormEvent } from "react";
 import ProfilePicker from "./ProfilePicker";
@@ -121,13 +122,15 @@ const when = (n: number) =>
     year: "numeric",
   });
 export default function Members() {
+  const {language,setLanguage,tr}=useLanguage();
+  const hi=language==="hi";
   const [actor, setActor] = useState<Actor | null>(null),
     [state, setState] = useState<State | null>(null),
     [loaded, setLoaded] = useState(false),
     [setup, setSetup] = useState(false),
     [tab, setTab] = useState("home"),
     [mode, setMode] = useState("signin"),
-    [hi, setHi] = useState(true);
+    [unusedLanguageFlag] = useState(true);
   const [error, setError] = useState(""),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
@@ -148,7 +151,7 @@ export default function Members() {
       phone: "",
       city: "",
     });
-  const t = (en: string, hindi: string) => (hi ? hindi : en);
+  const t = (en: string, hindi: string) => (hi ? hindi : tr(en));
   const secretRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!secret) return;
@@ -317,7 +320,7 @@ export default function Members() {
     return (
       <div className="loading">
         <Sprout size={40} />
-        <h1>लुहाच परिवार</h1>
+        <h1> <Text value="लुहाच परिवार"/> </h1>
         <p>{error || "सदस्य क्षेत्र खुल रहा है…"}</p>
       </div>
     );
@@ -338,12 +341,12 @@ export default function Members() {
             <Sprout size={26} />
           </span>
           <span>
-            <strong>लुहाच परिवार</strong>
-            <small> हमारा अपना परिवार </small>
+            <strong> <Text value="लुहाच परिवार"/> </strong>
+            <small> <Text value="हमारा अपना परिवार"/> </small>
           </span>
         </a>
         <div className="header-actions">
-          <button className="language" onClick={() => setHi(!hi)}>
+          <button className="language" onClick={() => setLanguage(hi?"en":"hi")}>
             <Globe size={16} />
             {hi ? "English" : "हिन्दी"}
           </button>
@@ -354,7 +357,7 @@ export default function Members() {
                 <small>@{actor.handle}</small>
               </span>
               <button
-                aria-label="लॉगआउट करें"
+                aria-label={tr("लॉगआउट करें")}
                 onClick={() => run("logout", {}, "लॉगआउट हो गया।")}
               >
                 <LogOut size={19} />
@@ -365,15 +368,15 @@ export default function Members() {
       </header>
       {error && (
         <div className="m-alert error" role="alert">
-          {hiError(error)}
-          <button aria-label="संदेश बंद करें" onClick={() => setError("")}>
+          {tr(hiError(error))}
+          <button aria-label={tr("संदेश बंद करें")} onClick={() => setError("")}>
             <X size={16} />
           </button>
         </div>
       )}
       {message && (
         <div className="m-alert success" role="status">
-          {message}
+          {tr(message)}
         </div>
       )}
       {!actor ? (
@@ -537,7 +540,7 @@ export default function Members() {
                   maxLength={128}
                 />
                 {mode !== "signin" && (
-                  <small> कम से कम 15 अक्षर रखें। याद रहने वाला लंबा वाक्य भी इस्तेमाल कर सकते हैं। </small>
+                  <small> <Text value="कम से कम 15 अक्षर रखें। याद रहने वाला लंबा वाक्य भी इस्तेमाल कर सकते हैं।"/> </small>
                 )}
               </label>
               {(mode === "register" || mode === "setup") && (
@@ -557,8 +560,8 @@ export default function Members() {
                     )}
                   </label>
                   <details>
-                    <summary> सदस्य गोपनीयता विवरण </summary>
-                    <p> आपका नाम, खाता, परिवार से रिश्ते के अनुरोध और समीक्षा का विवरण इस सेवा में रखा जाता है। प्रशासक सत्यापन अनुरोध और प्रोफ़ाइल देखते हैं। सत्यापित सदस्य केवल उनके साथ साझा की गई प्रोफ़ाइल और संपर्क देख सकते हैं। पुरानी वंशावली प्रविष्टियाँ सत्यापित सदस्यों को उपलब्ध हैं; नई प्रोफ़ाइल निजी रहती है। संपर्क विवरण पहचान का प्रमाण नहीं है। पहचान-पत्र, सरकारी पहचान संख्या या घर का पूरा पता अनुरोध में न दें। आप किसी भी समय जानकारी साझा करना बंद कर सकते हैं। परिवार के अभिलेख संबंधी विवादों के समाधान के लिए समीक्षा का इतिहास रखा जाता है। </p>
+                    <summary> <Text value="सदस्य गोपनीयता विवरण"/> </summary>
+                    <p> <Text value="आपका नाम, खाता, परिवार से रिश्ते के अनुरोध और समीक्षा का विवरण इस सेवा में रखा जाता है। प्रशासक सत्यापन अनुरोध और प्रोफ़ाइल देखते हैं। सत्यापित सदस्य केवल उनके साथ साझा की गई प्रोफ़ाइल और संपर्क देख सकते हैं। पुरानी वंशावली प्रविष्टियाँ सत्यापित सदस्यों को उपलब्ध हैं; नई प्रोफ़ाइल निजी रहती है। संपर्क विवरण पहचान का प्रमाण नहीं है। पहचान-पत्र, सरकारी पहचान संख्या या घर का पूरा पता अनुरोध में न दें। आप किसी भी समय जानकारी साझा करना बंद कर सकते हैं। परिवार के अभिलेख संबंधी विवादों के समाधान के लिए समीक्षा का इतिहास रखा जाता है।"/> </p>
                   </details>
                 </>
               )}
@@ -600,14 +603,14 @@ export default function Members() {
                     setMode("setup");
                     setError("");
                   }}
-                > प्रथम प्रशासक खाता बनाएँ </button>
+                > <Text value="प्रथम प्रशासक खाता बनाएँ"/> </button>
               )}
             </div>
           </section>
         </main>
       ) : (
         <>
-          <nav className="m-nav" aria-label="सदस्य नेविगेशन">
+          <nav className="m-nav" aria-label={tr("सदस्य नेविगेशन")}>
             {[
               ["home", "मुख्य जानकारी", "परिचय", HomeIcon],
               ["search", "परिवार खोजें", "परिवार खोजें", Search],
@@ -690,7 +693,7 @@ export default function Members() {
                             <button
                               className="outline"
                               onClick={() => editPrivacy(p)}
-                            > गोपनीयता चुनें </button>
+                            > <Text value="गोपनीयता चुनें"/> </button>
                           )}
                         </div>
                       ))
@@ -706,7 +709,7 @@ export default function Members() {
                         <button
                           className="primary"
                           onClick={() => setTab("search")}
-                        > मेरी प्रोफ़ाइल खोजें <ArrowRight size={16} />
+                        > <Text value="मेरी प्रोफ़ाइल खोजें"/> <ArrowRight size={16} />
                         </button>
                       </div>
                     )}
@@ -716,15 +719,15 @@ export default function Members() {
                     {state?.notifications.length ? (
                       state.notifications.map((n) => (
                         <p className="m-update" key={n.id}>
-                          {hiText(n.body)}
+                          {tr(n.body)}
                         </p>
                       ))
                     ) : (
-                      <p className="m-muted"> सत्यापन और आपके योगदान की जानकारी यहाँ दिखाई देगी। </p>
+                      <p className="m-muted"> <Text value="सत्यापन और आपके योगदान की जानकारी यहाँ दिखाई देगी।"/> </p>
                     )}
                     <div className="m-note">
                       <LockKeyhole size={19} />
-                      <p> आपका लंबित सत्यापन अनुरोध केवल आप और प्रशासक देख सकते हैं। </p>
+                      <p> <Text value="आपका लंबित सत्यापन अनुरोध केवल आप और प्रशासक देख सकते हैं।"/> </p>
                     </div>
                   </aside>
                 </div>
@@ -733,7 +736,7 @@ export default function Members() {
             {tab === "search" && (
               <>
                 <div className="m-title">
-                  <span className="eyebrow"> हमारी साझा वंशावली </span>
+                  <span className="eyebrow"> <Text value="हमारी साझा वंशावली"/> </span>
                   <h1>{t("Find your family", "अपना परिवार खोजें")}</h1>
                   <p>
                     {actor.verified
@@ -744,16 +747,16 @@ export default function Members() {
                 <label className="m-search">
                   <Search size={20} />
                   <input
-                    aria-label="वंशावली में खोजें"
+                    aria-label={tr("वंशावली में खोजें")}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="नाम या गाँव"
+                    placeholder={tr("नाम या गाँव")}
                     maxLength={100}
                   />
                 </label>
                 <div className="m-results">{results.map(card)}</div>
                 {query.length >= 2 && !results.length && (
-                  <p className="m-muted"> कोई नाम नहीं मिला। हिंदी नाम या दूसरी वर्तनी से खोजें। </p>
+                  <p className="m-muted"> <Text value="कोई नाम नहीं मिला। हिंदी नाम या दूसरी वर्तनी से खोजें।"/> </p>
                 )}
                 <details className="m-panel">
                   <summary>
@@ -762,7 +765,7 @@ export default function Members() {
                       "अभिलेख में नाम नहीं है? अपनी प्रोफ़ाइल बनाएँ",
                     )}
                   </summary>
-                  <p> दोहरी प्रविष्टि से बचने के लिए पहले खोजें। प्रशासक के सत्यापन तक नई प्रोफ़ाइल निजी रहेगी। </p>
+                  <p> <Text value="दोहरी प्रविष्टि से बचने के लिए पहले खोजें। प्रशासक के सत्यापन तक नई प्रोफ़ाइल निजी रहेगी।"/> </p>
                   <form
                     className="m-form-grid"
                     onSubmit={async (e) => {
@@ -779,26 +782,26 @@ export default function Members() {
                       }
                     }}
                   >
-                    <label> पूरा नाम <input
+                    <label> <Text value="पूरा नाम"/> <input
                         name="name"
                         required
                         maxLength={120}
                         defaultValue={actor.name}
                       />
                     </label>
-                    <label> हिंदी नाम / अन्य प्रचलित नाम <input name="aliases" maxLength={120} />
+                    <label> <Text value="हिंदी नाम / अन्य प्रचलित नाम"/> <input name="aliases" maxLength={120} />
                     </label>
-                    <label> पैतृक गाँव <input name="village" required maxLength={120} />
+                    <label> <Text value="पैतृक गाँव"/> <input name="village" required maxLength={120} />
                     </label>
-                    <label className="m-wide"> परिवार से रिश्ता और जाँच का तरीका <textarea
+                    <label className="m-wide"> <Text value="परिवार से रिश्ता और जाँच का तरीका"/> <textarea
                         name="reason"
                         required
                         minLength={15}
                         maxLength={1000}
-                        placeholder="माता-पिता या रिश्तेदार का नाम, गाँव और परिवार का संदर्भ दें। पहचान-पत्र या घर का पूरा पता न दें।"
+                        placeholder={tr("माता-पिता या रिश्तेदार का नाम, गाँव और परिवार का संदर्भ दें। पहचान-पत्र या घर का पूरा पता न दें।")}
                       />
                     </label>
-                    <button className="primary" disabled={busy}> सत्यापन का अनुरोध भेजें <UserCheck size={16} />
+                    <button className="primary" disabled={busy}> <Text value="सत्यापन का अनुरोध भेजें"/> <UserCheck size={16} />
                     </button>
                   </form>
                 </details>
@@ -808,7 +811,7 @@ export default function Members() {
               <section className="m-panel m-family">
                 <button
                   className="m-close"
-                  aria-label="प्रोफ़ाइल बंद करें"
+                  aria-label={tr("प्रोफ़ाइल बंद करें")}
                   onClick={() => {
                     setSelected(null);
                     setFamily(null);
@@ -816,7 +819,7 @@ export default function Members() {
                 >
                   <X size={18} />
                 </button>
-                <span className="eyebrow"> परिवार की प्रोफ़ाइल </span>
+                <span className="eyebrow"> <Text value="परिवार की प्रोफ़ाइल"/> </span>
                 <h2>{selected.name}</h2>
                 <p>{selected.village}</p>
                 {family && (
@@ -825,11 +828,11 @@ export default function Members() {
                       <button
                         className={view === "birth" ? "active" : ""}
                         onClick={() => setView("birth")}
-                      > जन्म का परिवार </button>
+                      > <Text value="जन्म का परिवार"/> </button>
                       <button
                         className={view === "married" ? "active" : ""}
                         onClick={() => setView("married")}
-                      > विवाह का परिवार </button>
+                      > <Text value="विवाह का परिवार"/> </button>
                     </div>
                     {(view === "birth"
                       ? [
@@ -847,7 +850,7 @@ export default function Members() {
                           {(persons as Person[]).map(card)}
                         </div>
                         {!(persons as Person[]).length && (
-                          <p className="m-muted"> इस खाते को कोई दर्ज रिश्ता उपलब्ध नहीं है। यहाँ नाम न दिखने का अर्थ यह नहीं कि रिश्तेदार नहीं है। </p>
+                          <p className="m-muted"> <Text value="इस खाते को कोई दर्ज रिश्ता उपलब्ध नहीं है। यहाँ नाम न दिखने का अर्थ यह नहीं कि रिश्तेदार नहीं है।"/> </p>
                         )}
                       </div>
                     ))}
@@ -862,14 +865,14 @@ export default function Members() {
                             <br />
                             {family.person.contact.city}
                             <br />
-                            <small> यह संपर्क सदस्य ने दिया है; इसका स्वतंत्र सत्यापन नहीं हुआ है। </small>
+                            <small> <Text value="यह संपर्क सदस्य ने दिया है; इसका स्वतंत्र सत्यापन नहीं हुआ है।"/> </small>
                           </p>
                         </div>
                       )}
                   </>
                 )}
                 <details>
-                  <summary> इस प्रोफ़ाइल से अपना रिश्ता सत्यापित कराएँ </summary>
+                  <summary> <Text value="इस प्रोफ़ाइल से अपना रिश्ता सत्यापित कराएँ"/> </summary>
                   <form
                     onSubmit={(e) => {
                       const d = fields(e);
@@ -880,25 +883,25 @@ export default function Members() {
                       );
                     }}
                   >
-                    <label> आपका रिश्ता <select name="relationship">
-                        <option value="self"> यह मेरी प्रोफ़ाइल है </option>
-                        <option value="guardian"> मैं माता-पिता / अभिभावक हूँ </option>
-                        <option value="relative"> मैं इस रिश्तेदार की जानकारी सँभालता/सँभालती हूँ </option>
+                    <label> <Text value="आपका रिश्ता"/> <select name="relationship">
+                        <option value="self"> <Text value="यह मेरी प्रोफ़ाइल है"/> </option>
+                        <option value="guardian"> <Text value="मैं माता-पिता / अभिभावक हूँ"/> </option>
+                        <option value="relative"> <Text value="मैं इस रिश्तेदार की जानकारी सँभालता/सँभालती हूँ"/> </option>
                       </select>
                     </label>
-                    <label> प्रशासक इसकी जाँच कैसे कर सकते हैं? <textarea
+                    <label> <Text value="प्रशासक इसकी जाँच कैसे कर सकते हैं?"/> <textarea
                         name="reason"
                         required
                         minLength={15}
                         maxLength={1000}
                       />
                     </label>
-                    <button className="primary" disabled={busy}> सत्यापन का अनुरोध भेजें </button>
+                    <button className="primary" disabled={busy}> <Text value="सत्यापन का अनुरोध भेजें"/> </button>
                   </form>
                 </details>
                 {actor.verified && family && (
                   <details>
-                    <summary> छूटा हुआ परिवार का सदस्य जोड़ें </summary>
+                    <summary> <Text value="छूटा हुआ परिवार का सदस्य जोड़ें"/> </summary>
                     <form
                       className="m-form-grid"
                       onSubmit={(e) =>
@@ -909,29 +912,29 @@ export default function Members() {
                         )
                       }
                     >
-                      <label> रिश्ता <select name="relation">
-                          <option value="daughter"> बेटी </option>
-                          <option value="mother"> माता </option>
-                          <option value="spouse"> पति / पत्नी / बहू </option>
-                          <option value="son"> बेटा </option>
-                          <option value="father"> पिता </option>
+                      <label> <Text value="रिश्ता"/> <select name="relation">
+                          <option value="daughter"> <Text value="बेटी"/> </option>
+                          <option value="mother"> <Text value="माता"/> </option>
+                          <option value="spouse"> <Text value="पति / पत्नी / बहू"/> </option>
+                          <option value="son"> <Text value="बेटा"/> </option>
+                          <option value="father"> <Text value="पिता"/> </option>
                         </select>
                       </label>
-                      <label> पूरा नाम (पहले से दर्ज व्यक्ति जोड़ रहे हों तो खाली रखें) <input name="name" maxLength={120} />
+                      <label> <Text value="पूरा नाम (पहले से दर्ज व्यक्ति जोड़ रहे हों तो खाली रखें)"/> <input name="name" maxLength={120} />
                       </label>
-                      <label> लिंग <select name="gender">
-                          <option value="female"> महिला </option>
-                          <option value="male"> पुरुष </option>
-                          <option value="unknown"> जानकारी दर्ज नहीं </option>
+                      <label> <Text value="लिंग"/> <select name="gender">
+                          <option value="female"> <Text value="महिला"/> </option>
+                          <option value="male"> <Text value="पुरुष"/> </option>
+                          <option value="unknown"> <Text value="जानकारी दर्ज नहीं"/> </option>
                         </select>
                       </label>
-                      <label> गाँव <input
+                      <label> <Text value="गाँव"/> <input
                           name="village"
                           required
                           defaultValue={selected.village}
                         />
                       </label>
-                      <label className="m-wide"> स्रोत / परिवार का संदर्भ <textarea
+                      <label className="m-wide"> <Text value="स्रोत / परिवार का संदर्भ"/> <textarea
                           name="source"
                           required
                           minLength={15}
@@ -946,7 +949,7 @@ export default function Members() {
                         name="secondId"
                         label="दूसरे परिवार का वैकल्पिक रिश्ता: पत्नी / बहू के लिए उनके जन्म के परिवार के माता या पिता चुनें। अन्य रिश्तों के लिए उस व्यक्ति के पति या पत्नी चुनें।"
                       />
-                      <button className="primary" disabled={busy}> समीक्षा के लिए भेजें </button>
+                      <button className="primary" disabled={busy}> <Text value="समीक्षा के लिए भेजें"/> </button>
                     </form>
                   </details>
                 )}
@@ -955,9 +958,9 @@ export default function Members() {
             {tab === "requests" && (
               <>
                 <div className="m-title">
-                  <span className="eyebrow"> सत्यापित रिश्ते </span>
+                  <span className="eyebrow"> <Text value="सत्यापित रिश्ते"/> </span>
                   <h1>{t("Requests & contributions", "अनुरोध और योगदान")}</h1>
-                  <p> परिवार के रिश्ते का सत्यापन प्रशासक करते हैं। यह अपने-आप स्वीकृत नहीं होता। </p>
+                  <p> <Text value="परिवार के रिश्ते का सत्यापन प्रशासक करते हैं। यह अपने-आप स्वीकृत नहीं होता।"/> </p>
                 </div>
                 {state?.claims
                   .filter((c) => c.account_id === actor.id)
@@ -965,37 +968,37 @@ export default function Members() {
                     <article className="m-panel m-request" key={c.id}>
                       <div>
                         <h3>{c.person_name}</h3>
-                        <span className="m-badge">{hiText(c.status)}</span>
+                        <span className="m-badge">{tr(c.status)}</span>
                       </div>
                       <p>{c.reason}</p>
                       {c.decision && (
-                        <p className="m-note"> समीक्षा: {c.decision}</p>
+                        <p className="m-note"> <Text value="समीक्षा:"/> {c.decision}</p>
                       )}
                     </article>
                   ))}
                 {!state?.claims.some((c) => c.account_id === actor.id) && (
                   <div className="m-panel">
-                    <p> अभी कोई सत्यापन अनुरोध नहीं है। </p>
+                    <p> <Text value="अभी कोई सत्यापन अनुरोध नहीं है।"/> </p>
                     <button
                       className="outline"
                       onClick={() => setTab("search")}
-                    > मेरी प्रोफ़ाइल खोजें </button>
+                    > <Text value="मेरी प्रोफ़ाइल खोजें"/> </button>
                   </div>
                 )}
                 {state?.proposals.map((p) => (
                   <article className="m-panel" key={p.id}>
                     <h3>
-                      {p.payload.name} · {hiText(p.payload.relation)}
+                      {p.payload.name} · {tr(p.payload.relation)}
                     </h3>
-                    <span className="m-badge">{hiText(p.status)}</span>
+                    <span className="m-badge">{tr(p.status)}</span>
                     <p>{p.payload.source}</p>
-                    <p> समीक्षा की अंतिम तिथि: {when(p.due)}</p>
+                    <p> <Text value="समीक्षा की अंतिम तिथि:"/> {when(p.due)}</p>
                     {p.decision && <p>{p.decision}</p>}
                     {p.person_id &&
                       p.author === actor.id &&
                       ["accepted", "auto_accepted"].includes(p.status) && (
                         <details>
-                          <summary> जोड़े गए व्यक्ति की जानकारी सँभालने की अनुमति माँगें </summary>
+                          <summary> <Text value="जोड़े गए व्यक्ति की जानकारी सँभालने की अनुमति माँगें"/> </summary>
                           <form
                             onSubmit={(e) =>
                               run(
@@ -1005,19 +1008,19 @@ export default function Members() {
                               )
                             }
                           >
-                            <label> रिश्ता <select name="relationship">
-                                <option value="guardian"> बच्चे के माता-पिता / अभिभावक </option>
-                                <option value="relative"> वयस्क रिश्तेदार की जानकारी सँभालने वाला सदस्य </option>
+                            <label> <Text value="रिश्ता"/> <select name="relationship">
+                                <option value="guardian"> <Text value="बच्चे के माता-पिता / अभिभावक"/> </option>
+                                <option value="relative"> <Text value="वयस्क रिश्तेदार की जानकारी सँभालने वाला सदस्य"/> </option>
                               </select>
                             </label>
-                            <label> इसकी जाँच कैसे होगी? <textarea name="reason" required minLength={15} />
+                            <label> <Text value="इसकी जाँच कैसे होगी?"/> <textarea name="reason" required minLength={15} />
                             </label>
-                            <button className="outline" disabled={busy}> सत्यापन का अनुरोध भेजें </button>
+                            <button className="outline" disabled={busy}> <Text value="सत्यापन का अनुरोध भेजें"/> </button>
                           </form>
                         </details>
                       )}
                     {p.objections.map((o, i) => (
-                      <p key={i}> आपत्ति: {o.reason}</p>
+                      <p key={i}> <Text value="आपत्ति:"/> {o.reason}</p>
                     ))}
                     {["pending", "disputed", "conflict"].includes(p.status) && (
                       <form
@@ -1029,7 +1032,7 @@ export default function Members() {
                           )
                         }
                       >
-                        <label> कारण <textarea name="reason" required minLength={15} />
+                        <label> <Text value="कारण"/> <textarea name="reason" required minLength={15} />
                         </label>
                         <button className="outline" disabled={busy}>
                           {p.author === actor.id
@@ -1045,20 +1048,20 @@ export default function Members() {
             {tab === "privacy" && (
               <>
                 <div className="m-title">
-                  <span className="eyebrow"> साझा करना आपका निर्णय </span>
+                  <span className="eyebrow"> <Text value="साझा करना आपका निर्णय"/> </span>
                   <h1>{t("गोपनीयता और खाता", "गोपनीयता और खाता")}</h1>
-                  <p> जानकारी केवल सत्यापित सदस्य समुदाय में साझा होती है। संपर्क सूची आम पाठकों को नहीं दिखाई जाती। </p>
+                  <p> <Text value="जानकारी केवल सत्यापित सदस्य समुदाय में साझा होती है। संपर्क सूची आम पाठकों को नहीं दिखाई जाती।"/> </p>
                 </div>
                 <div className="m-columns">
                   <section className="m-panel">
-                    <h2> प्रोफ़ाइल किसे दिखे </h2>
+                    <h2> <Text value="प्रोफ़ाइल किसे दिखे"/> </h2>
                     {!state?.own.some((p) =>
                       ["self", "guardian"].includes(p.relationship || ""),
                     ) ? (
-                      <p> आपकी अपनी प्रोफ़ाइल या अभिभावक का रिश्ता सत्यापित होने के बाद ये विकल्प उपलब्ध होंगे। रिश्तेदार किसी और का संपर्क प्रकाशित नहीं कर सकते। </p>
+                      <p> <Text value="आपकी अपनी प्रोफ़ाइल या अभिभावक का रिश्ता सत्यापित होने के बाद ये विकल्प उपलब्ध होंगे। रिश्तेदार किसी और का संपर्क प्रकाशित नहीं कर सकते।"/> </p>
                     ) : (
                       <>
-                        <label> प्रोफ़ाइल चुनें <select
+                        <label> <Text value="प्रोफ़ाइल चुनें"/> <select
                             value={privacyPerson}
                             onChange={(e) => {
                               const p = state.own.find(
@@ -1070,7 +1073,7 @@ export default function Members() {
                               }
                             }}
                           >
-                            <option value=""> अपनी प्रोफ़ाइल चुनें </option>
+                            <option value=""> <Text value="अपनी प्रोफ़ाइल चुनें"/> </option>
                             {state.own
                               .filter((p) =>
                                 ["self", "guardian"].includes(
@@ -1101,7 +1104,7 @@ export default function Members() {
                               );
                             }}
                           >
-                            <label> जीवन की स्थिति <select
+                            <label> <Text value="जीवन की स्थिति"/> <select
                                 name="life"
                                 value={privacy.life}
                                 onChange={(e) =>
@@ -1111,13 +1114,13 @@ export default function Members() {
                                   })
                                 }
                               >
-                                <option value="adult"> वयस्क </option>
-                                <option value="child"> बच्चा · 18 वर्ष से कम </option>
-                                <option value="unknown"> जानकारी दर्ज नहीं </option>
-                                <option value="deceased"> दिवंगत </option>
+                                <option value="adult"> <Text value="वयस्क"/> </option>
+                                <option value="child"> <Text value="बच्चा · 18 वर्ष से कम"/> </option>
+                                <option value="unknown"> <Text value="जानकारी दर्ज नहीं"/> </option>
+                                <option value="deceased"> <Text value="दिवंगत"/> </option>
                               </select>
                             </label>
-                            <label> यह प्रोफ़ाइल कौन देख सकता है? <select
+                            <label> <Text value="यह प्रोफ़ाइल कौन देख सकता है?"/> <select
                                 name="audience"
                                 value={privacy.audience}
                                 onChange={(e) =>
@@ -1127,15 +1130,15 @@ export default function Members() {
                                   })
                                 }
                               >
-                                <option value="private"> केवल सत्यापित देखभालकर्ता और प्रशासक </option>
-                                <option value="verified"> सत्यापित सदस्य </option>
+                                <option value="private"> <Text value="केवल सत्यापित देखभालकर्ता और प्रशासक"/> </option>
+                                <option value="verified"> <Text value="सत्यापित सदस्य"/> </option>
                               </select>
                             </label>
                             <label className="m-check">
-                              <input type="checkbox" name="profileConsent" /> सत्यापित सदस्य चुनने पर मैं इस प्रोफ़ाइल को उनके साथ साझा करने की सहमति देता/देती हूँ। </label>
+                              <input type="checkbox" name="profileConsent" /> <Text value="सत्यापित सदस्य चुनने पर मैं इस प्रोफ़ाइल को उनके साथ साझा करने की सहमति देता/देती हूँ।"/> </label>
                             <hr />
-                            <h3> संपर्क विवरण </h3>
-                            <p className="m-muted"> वैकल्पिक। केवल शहर लिखें, घर का पूरा पता न दें। </p>
+                            <h3> <Text value="संपर्क विवरण"/> </h3>
+                            <p className="m-muted"> <Text value="वैकल्पिक। केवल शहर लिखें, घर का पूरा पता न दें।"/> </p>
                             {(["email", "phone", "city"] as const).map(
                               (key) => (
                                 <label key={key}>
@@ -1164,7 +1167,7 @@ export default function Members() {
                                 </label>
                               ),
                             )}
-                            <label> संपर्क किसे दिखे <select
+                            <label> <Text value="संपर्क किसे दिखे"/> <select
                                 name="contactAudience"
                                 value={privacy.contact_audience}
                                 onChange={(e) =>
@@ -1174,14 +1177,14 @@ export default function Members() {
                                   })
                                 }
                               >
-                                <option value="private"> निजी रखें </option>
-                                <option value="verified"> सत्यापित सदस्य · केवल अपनी वयस्क प्रोफ़ाइल </option>
+                                <option value="private"> <Text value="निजी रखें"/> </option>
+                                <option value="verified"> <Text value="सत्यापित सदस्य · केवल अपनी वयस्क प्रोफ़ाइल"/> </option>
                               </select>
                             </label>
                             <label className="m-check">
-                              <input type="checkbox" name="contactConsent" /> यह मेरा संपर्क विवरण है। साझा करने का विकल्प चुनने पर मैं इसकी सहमति देता/देती हूँ। </label>
-                            <p className="m-note"> बच्चों की जानकारी निजी रहती है। प्रशासक सुरक्षा के लिए प्रोफ़ाइल छिपा सकते हैं, पर आपकी ओर से साझा करना शुरू नहीं कर सकते। </p>
-                            <button className="primary" disabled={busy}> गोपनीयता के विकल्प सुरक्षित करें <Check size={16} />
+                              <input type="checkbox" name="contactConsent" /> <Text value="यह मेरा संपर्क विवरण है। साझा करने का विकल्प चुनने पर मैं इसकी सहमति देता/देती हूँ।"/> </label>
+                            <p className="m-note"> <Text value="बच्चों की जानकारी निजी रहती है। प्रशासक सुरक्षा के लिए प्रोफ़ाइल छिपा सकते हैं, पर आपकी ओर से साझा करना शुरू नहीं कर सकते।"/> </p>
+                            <button className="primary" disabled={busy}> <Text value="गोपनीयता के विकल्प सुरक्षित करें"/> <Check size={16} />
                             </button>
                           </form>
                         )}
@@ -1189,8 +1192,8 @@ export default function Members() {
                     )}
                   </section>
                   <aside className="m-panel">
-                    <h2> खाते की सुरक्षा </h2>
-                    <p> 30 मिनट उपयोग न होने या 24 घंटे बाद लॉगिन समाप्त होता है। पासवर्ड बदलने पर सभी उपकरण लॉगआउट होंगे और नया पुनर्प्राप्ति कोड मिलेगा। </p>
+                    <h2> <Text value="खाते की सुरक्षा"/> </h2>
+                    <p> <Text value="30 मिनट उपयोग न होने या 24 घंटे बाद लॉगिन समाप्त होता है। पासवर्ड बदलने पर सभी उपकरण लॉगआउट होंगे और नया पुनर्प्राप्ति कोड मिलेगा।"/> </p>
                     <form
                       onSubmit={async (e) => {
                         const f = e.currentTarget;
@@ -1204,14 +1207,14 @@ export default function Members() {
                           f.reset();
                       }}
                     >
-                      <label> वर्तमान पासवर्ड <input
+                      <label> <Text value="वर्तमान पासवर्ड"/> <input
                           name="currentPassword"
                           type="password"
                           autoComplete="current-password"
                           required
                         />
                       </label>
-                      <label> नया पासवर्ड <input
+                      <label> <Text value="नया पासवर्ड"/> <input
                           name="password"
                           type="password"
                           autoComplete="new-password"
@@ -1220,17 +1223,17 @@ export default function Members() {
                           required
                         />
                       </label>
-                      <button className="outline" disabled={busy}> पासवर्ड बदलें </button>
+                      <button className="outline" disabled={busy}> <Text value="पासवर्ड बदलें"/> </button>
                     </form>
                     <button
                       className="m-danger"
                       onClick={() =>
                         run("logoutAll", {}, "सभी उपकरण लॉगआउट हो गए।")
                       }
-                    > सभी उपकरणों से लॉगआउट करें </button>
+                    > <Text value="सभी उपकरणों से लॉगआउट करें"/> </button>
                     <div className="m-note">
                       <ShieldCheck size={20} />
-                      <p> समुदाय में प्रवेश निमंत्रण और परिवार के रिश्ते की जाँच से मिलता है। यूज़रनेम और पासवर्ड से आपका खाता सुरक्षित होता है। फ़ोन या ईमेल से सत्यापन यहाँ उपलब्ध नहीं है। </p>
+                      <p> <Text value="समुदाय में प्रवेश निमंत्रण और परिवार के रिश्ते की जाँच से मिलता है। यूज़रनेम और पासवर्ड से आपका खाता सुरक्षित होता है। फ़ोन या ईमेल से सत्यापन यहाँ उपलब्ध नहीं है।"/> </p>
                     </div>
                   </aside>
                 </div>
@@ -1239,14 +1242,14 @@ export default function Members() {
             {tab === "admin" && actor.role === "admin" && (
               <>
                 <div className="m-title">
-                  <span className="eyebrow"> समुदाय की देखभाल </span>
-                  <h1> प्रशासक कक्ष </h1>
-                  <p> व्यक्ति, परिवार से रिश्ता और जानकारी का स्रोत जाँचें। केवल लॉगिन होने से वंश का रिश्ता सिद्ध नहीं होता। </p>
+                  <span className="eyebrow"> <Text value="समुदाय की देखभाल"/> </span>
+                  <h1> <Text value="प्रशासक कक्ष"/> </h1>
+                  <p> <Text value="व्यक्ति, परिवार से रिश्ता और जानकारी का स्रोत जाँचें। केवल लॉगिन होने से वंश का रिश्ता सिद्ध नहीं होता।"/> </p>
                 </div>
                 <div className="m-columns">
                   <section className="m-panel">
-                    <h2> सदस्य को निमंत्रण दें </h2>
-                    <p> एक बार उपयोग वाला निमंत्रण बनाएँ और संबंधित व्यक्ति को स्वयं दें। यहाँ से अपने-आप संदेश नहीं भेजा जाता। </p>
+                    <h2> <Text value="सदस्य को निमंत्रण दें"/> </h2>
+                    <p> <Text value="एक बार उपयोग वाला निमंत्रण बनाएँ और संबंधित व्यक्ति को स्वयं दें। यहाँ से अपने-आप संदेश नहीं भेजा जाता।"/> </p>
                     <form
                       onSubmit={async (e) => {
                         const f = e.currentTarget;
@@ -1256,15 +1259,15 @@ export default function Members() {
                           f.reset();
                       }}
                     >
-                      <label> जिसे निमंत्रण देना है <input
+                      <label> <Text value="जिसे निमंत्रण देना है"/> <input
                           name="label"
-                          placeholder="नाम / परिवार की शाखा"
+                          placeholder={tr("नाम / परिवार की शाखा")}
                           minLength={2}
                           maxLength={120}
                           required
                         />
                       </label>
-                      <button className="primary" disabled={busy}> निमंत्रण बनाएँ <Plus size={16} />
+                      <button className="primary" disabled={busy}> <Text value="निमंत्रण बनाएँ"/> <Plus size={16} />
                       </button>
                     </form>
                     {state?.invitations.map((i) => (
@@ -1289,22 +1292,22 @@ export default function Members() {
                                 "निमंत्रण रद्द कर दिया गया।",
                               )
                             }
-                          > रद्द करें </button>
+                          > <Text value="रद्द करें"/> </button>
                         )}
                       </div>
                     ))}
                   </section>
                   <aside className="m-panel">
-                    <h2> सत्यापन के नियम </h2>
+                    <h2> <Text value="सत्यापन के नियम"/> </h2>
                     <ol>
-                      <li> विश्वसनीय स्रोत से व्यक्ति और परिवार के रिश्ते की पुष्टि करें। </li>
-                      <li> जाँच का विवरण लिखें। पहचान-पत्र अपलोड न करें। </li>
-                      <li> अपनी प्रोफ़ाइल, अभिभावक और रिश्तेदार की अनुमति अलग रखें। </li>
-                      <li> परस्पर विरोधी दावों का समाधान करें। जानकारी सँभालने वाले व्यक्ति को बिना निर्णय के न बदलें। </li>
+                      <li> <Text value="विश्वसनीय स्रोत से व्यक्ति और परिवार के रिश्ते की पुष्टि करें।"/> </li>
+                      <li> <Text value="जाँच का विवरण लिखें। पहचान-पत्र अपलोड न करें।"/> </li>
+                      <li> <Text value="अपनी प्रोफ़ाइल, अभिभावक और रिश्तेदार की अनुमति अलग रखें।"/> </li>
+                      <li> <Text value="परस्पर विरोधी दावों का समाधान करें। जानकारी सँभालने वाले व्यक्ति को बिना निर्णय के न बदलें।"/> </li>
                     </ol>
                   </aside>
                 </div>
-                <h2 className="m-section-title"> प्रोफ़ाइल सत्यापन </h2>
+                <h2 className="m-section-title"> <Text value="प्रोफ़ाइल सत्यापन"/> </h2>
                 {state?.claims
                   .filter((c) => c.status === "pending")
                   .map((c) => (
@@ -1313,7 +1316,7 @@ export default function Members() {
                         <h3>
                           {c.account_name} → {c.person_name}
                         </h3>
-                        <span className="m-badge">{hiText(c.relationship)}</span>
+                        <span className="m-badge">{tr(c.relationship)}</span>
                       </div>
                       <p>{c.reason}</p>
                       <form
@@ -1327,18 +1330,18 @@ export default function Members() {
                           );
                         }}
                       >
-                        <label> जाँच का आधार <select name="method">
-                            <option value="family_knowledge"> परिवार की व्यक्तिगत जानकारी </option>
-                            <option value="contacted_member"> सदस्य / अभिभावक से सीधी बातचीत </option>
-                            <option value="family_records"> परिवार के अभिलेख / विश्वसनीय संदर्भ </option>
+                        <label> <Text value="जाँच का आधार"/> <select name="method">
+                            <option value="family_knowledge"> <Text value="परिवार की व्यक्तिगत जानकारी"/> </option>
+                            <option value="contacted_member"> <Text value="सदस्य / अभिभावक से सीधी बातचीत"/> </option>
+                            <option value="family_records"> <Text value="परिवार के अभिलेख / विश्वसनीय संदर्भ"/> </option>
                           </select>
                         </label>
-                        <label> निर्णय <select name="approve">
-                            <option value="yes"> रिश्ता स्वीकृत करें </option>
-                            <option value="no"> अनुरोध अस्वीकार करें </option>
+                        <label> <Text value="निर्णय"/> <select name="approve">
+                            <option value="yes"> <Text value="रिश्ता स्वीकृत करें"/> </option>
+                            <option value="no"> <Text value="अनुरोध अस्वीकार करें"/> </option>
                           </select>
                         </label>
-                        <label className="m-wide"> आपने क्या जाँचा? <textarea
+                        <label className="m-wide"> <Text value="आपने क्या जाँचा?"/> <textarea
                             name="reason"
                             minLength={15}
                             required
@@ -1348,25 +1351,25 @@ export default function Members() {
                         <button
                           className="primary"
                           disabled={busy || c.account_id === actor.id}
-                        > निर्णय दर्ज करें </button>
+                        > <Text value="निर्णय दर्ज करें"/> </button>
                       </form>
                     </section>
                   ))}
                 {!state?.claims.some((c) => c.status === "pending") && (
-                  <p className="m-muted"> कोई प्रोफ़ाइल अनुरोध लंबित नहीं है। </p>
+                  <p className="m-muted"> <Text value="कोई प्रोफ़ाइल अनुरोध लंबित नहीं है।"/> </p>
                 )}
-                <h2 className="m-section-title"> योगदान पर निर्णय </h2>
+                <h2 className="m-section-title"> <Text value="योगदान पर निर्णय"/> </h2>
                 {state?.proposals.map((p) => (
                   <section className="m-panel" key={p.id}>
                     <h3>
-                      {p.payload.name} · {hiText(p.payload.relation)}
+                      {p.payload.name} · {tr(p.payload.relation)}
                     </h3>
                     <p>
-                      {p.author_name} · {hiText(p.status)}
+                      {p.author_name} · {tr(p.status)}
                     </p>
                     <p>{p.payload.source}</p>
                     {p.objections.map((o, i) => (
-                      <p key={i}> आपत्ति: {o.reason}</p>
+                      <p key={i}> <Text value="आपत्ति:"/> {o.reason}</p>
                     ))}
                     {[
                       "pending",
@@ -1384,32 +1387,32 @@ export default function Members() {
                           )
                         }
                       >
-                        <label> निर्णय <select name="decision">
+                        <label> <Text value="निर्णय"/> <select name="decision">
                             {["accepted", "auto_accepted"].includes(
                               p.status,
                             ) ? (
-                              <option value="revert"> स्वीकृत बदलाव वापस लें </option>
+                              <option value="revert"> <Text value="स्वीकृत बदलाव वापस लें"/> </option>
                             ) : (
                               <>
-                                <option value="accept"> समीक्षा के बाद स्वीकार करें </option>
-                                <option value="reject"> अस्वीकार करें </option>
+                                <option value="accept"> <Text value="समीक्षा के बाद स्वीकार करें"/> </option>
+                                <option value="reject"> <Text value="अस्वीकार करें"/> </option>
                               </>
                             )}
                           </select>
                         </label>
-                        <label> कारण <textarea name="reason" minLength={15} required />
+                        <label> <Text value="कारण"/> <textarea name="reason" minLength={15} required />
                         </label>
                         <button
                           className="outline"
                           disabled={busy || p.author === actor.id}
-                        > निर्णय सुरक्षित करें </button>
+                        > <Text value="निर्णय सुरक्षित करें"/> </button>
                       </form>
                     )}
                   </section>
                 ))}
-                <h2 className="m-section-title"> दूसरा समीक्षक नियुक्त करें </h2>
+                <h2 className="m-section-title"> <Text value="दूसरा समीक्षक नियुक्त करें"/> </h2>
                 <section className="m-panel">
-                  <p> दूसरा विश्वसनीय समीक्षक मुख्य प्रशासक के परिवार के रिश्ते की जाँच कर सकता है। उसे सभी प्रोफ़ाइल और सत्यापन अनुरोधों पर प्रशासक अधिकार मिलेंगे। नियुक्ति के लिए अपना पासवर्ड दें। </p>
+                  <p> <Text value="दूसरा विश्वसनीय समीक्षक मुख्य प्रशासक के परिवार के रिश्ते की जाँच कर सकता है। उसे सभी प्रोफ़ाइल और सत्यापन अनुरोधों पर प्रशासक अधिकार मिलेंगे। नियुक्ति के लिए अपना पासवर्ड दें।"/> </p>
                   <form
                     className="m-form-grid"
                     onSubmit={async (e) => {
@@ -1424,8 +1427,8 @@ export default function Members() {
                         f.reset();
                     }}
                   >
-                    <label> सत्यापित सदस्य <select name="id" required>
-                        <option value=""> सत्यापित सदस्य चुनें </option>
+                    <label> <Text value="सत्यापित सदस्य"/> <select name="id" required>
+                        <option value=""> <Text value="सत्यापित सदस्य चुनें"/> </option>
                         {state?.members
                           .filter((m) => m.role !== "admin" && m.verified)
                           .map((m) => (
@@ -1435,23 +1438,23 @@ export default function Members() {
                           ))}
                       </select>
                     </label>
-                    <label> आपका वर्तमान पासवर्ड <input
+                    <label> <Text value="आपका वर्तमान पासवर्ड"/> <input
                         name="currentPassword"
                         type="password"
                         autoComplete="current-password"
                         required
                       />
                     </label>
-                    <label className="m-wide"> नियुक्ति का कारण <textarea name="reason" required minLength={15} />
+                    <label className="m-wide"> <Text value="नियुक्ति का कारण"/> <textarea name="reason" required minLength={15} />
                     </label>
-                    <button className="outline" disabled={busy}> प्रशासक नियुक्त करें </button>
+                    <button className="outline" disabled={busy}> <Text value="प्रशासक नियुक्त करें"/> </button>
                   </form>
                 </section>
-                <h2 className="m-section-title"> प्रवेश और गोपनीयता संबंधी कार्य </h2>
+                <h2 className="m-section-title"> <Text value="प्रवेश और गोपनीयता संबंधी कार्य"/> </h2>
                 <div className="m-columns">
                   <section className="m-panel">
-                    <h3> सदस्य का सत्यापन रद्द करें </h3>
-                    <p> सदस्य तुरंत लॉगआउट होगा और उसकी जानकारी सँभालने की अनुमति समाप्त होगी। समीक्षा का इतिहास सुरक्षित रहेगा। </p>
+                    <h3> <Text value="सदस्य का सत्यापन रद्द करें"/> </h3>
+                    <p> <Text value="सदस्य तुरंत लॉगआउट होगा और उसकी जानकारी सँभालने की अनुमति समाप्त होगी। समीक्षा का इतिहास सुरक्षित रहेगा।"/> </p>
                     <form
                       onSubmit={(e) =>
                         run(
@@ -1461,8 +1464,8 @@ export default function Members() {
                         )
                       }
                     >
-                      <label> सदस्य <select name="id" required>
-                          <option value=""> सत्यापित सदस्य चुनें </option>
+                      <label> <Text value="सदस्य"/> <select name="id" required>
+                          <option value=""> <Text value="सत्यापित सदस्य चुनें"/> </option>
                           {state?.members
                             .filter((m) => m.role !== "admin" && m.verified)
                             .map((m) => (
@@ -1472,32 +1475,32 @@ export default function Members() {
                             ))}
                         </select>
                       </label>
-                      <label> कारण <textarea name="reason" required minLength={15} />
+                      <label> <Text value="कारण"/> <textarea name="reason" required minLength={15} />
                       </label>
-                      <button className="outline" disabled={busy}> सत्यापन रद्द करें </button>
+                      <button className="outline" disabled={busy}> <Text value="सत्यापन रद्द करें"/> </button>
                     </form>
                   </section>
                   <section className="m-panel">
-                    <h3> प्रोफ़ाइल निजी करें </h3>
-                    <p> प्रोफ़ाइल और संपर्क निजी हो जाएँगे। इससे साझा करने की सहमति नहीं मिलती। </p>
+                    <h3> <Text value="प्रोफ़ाइल निजी करें"/> </h3>
+                    <p> <Text value="प्रोफ़ाइल और संपर्क निजी हो जाएँगे। इससे साझा करने की सहमति नहीं मिलती।"/> </p>
                     <form
                       onSubmit={(e) =>
                         run("restrict", fields(e), "प्रोफ़ाइल निजी कर दी गई।")
                       }
                     >
-                      <label> प्रोफ़ाइल क्रमांक <input
+                      <label> <Text value="प्रोफ़ाइल क्रमांक"/> <input
                           name="id"
                           required
-                          placeholder="सत्यापित अनुरोध का प्रोफ़ाइल क्रमांक दें"
+                          placeholder={tr("सत्यापित अनुरोध का प्रोफ़ाइल क्रमांक दें")}
                         />
                       </label>
-                      <label> कारण <textarea name="reason" required minLength={15} />
+                      <label> <Text value="कारण"/> <textarea name="reason" required minLength={15} />
                       </label>
-                      <button className="outline" disabled={busy}> प्रोफ़ाइल छिपाएँ </button>
+                      <button className="outline" disabled={busy}> <Text value="प्रोफ़ाइल छिपाएँ"/> </button>
                     </form>
                     <details>
-                      <summary> गोपनीयता रोक का समाधान करें </summary>
-                      <p> प्रशासक की रोक हट जाएगी। व्यक्ति स्वयं दोबारा साझा करने का विकल्प चुने तब तक प्रोफ़ाइल निजी रहेगी। </p>
+                      <summary> <Text value="गोपनीयता रोक का समाधान करें"/> </summary>
+                      <p> <Text value="प्रशासक की रोक हट जाएगी। व्यक्ति स्वयं दोबारा साझा करने का विकल्प चुने तब तक प्रोफ़ाइल निजी रहेगी।"/> </p>
                       <form
                         onSubmit={(e) =>
                           run(
@@ -1507,15 +1510,15 @@ export default function Members() {
                           )
                         }
                       >
-                        <label> प्रोफ़ाइल क्रमांक <input name="id" required />
+                        <label> <Text value="प्रोफ़ाइल क्रमांक"/> <input name="id" required />
                         </label>
-                        <label> समाधान का कारण <textarea name="reason" required minLength={15} />
+                        <label> <Text value="समाधान का कारण"/> <textarea name="reason" required minLength={15} />
                         </label>
-                        <button className="outline" disabled={busy}> रोक का समाधान करें </button>
+                        <button className="outline" disabled={busy}> <Text value="रोक का समाधान करें"/> </button>
                       </form>
                     </details>
                     <details>
-                      <summary> जाँचे गए अनुरोधों के प्रोफ़ाइल क्रमांक </summary>
+                      <summary> <Text value="जाँचे गए अनुरोधों के प्रोफ़ाइल क्रमांक"/> </summary>
                       {state?.claims.map((c) => (
                         <p key={c.id}>
                           {c.person_name}: <code>{c.person_id}</code>
@@ -1525,7 +1528,7 @@ export default function Members() {
                   </section>
                 </div>
                 <details className="m-panel">
-                  <summary> हाल के कार्यों का विवरण </summary>
+                  <summary> <Text value="हाल के कार्यों का विवरण"/> </summary>
                   {state?.audit.map((a) => (
                     <p key={a.id}>
                       {when(a.created)} · {a.action.replaceAll("_", " ")}
@@ -1538,14 +1541,13 @@ export default function Members() {
         </>
       )}
       <footer className="m-footer">
-        <span>
-          लुहाच परिवार ·{" "}
+        <span> <Text value="लुहाच परिवार ·"/> {" "}
           {t(
             "हमारी जड़ें। हमारी ज़िम्मेदारी।",
             "हमारी जड़ें। हमारी ज़िम्मेदारी।",
           )}
         </span>
-        <span> सदस्य क्षेत्र </span>
+        <span> <Text value="सदस्य क्षेत्र"/> </span>
       </footer>
       {secret && (
         <div className="m-secret-backdrop">
@@ -1555,18 +1557,18 @@ export default function Members() {
             className="m-panel m-secret"
             role="dialog"
             aria-modal="true"
-            aria-label={secret.label}
+            aria-label={tr(secret.label)}
           >
             <KeyRound size={30} />
-            <h2>{secret.label}</h2>
-            <p> बंद करने से पहले इसे निजी जगह सुरक्षित करें। यह केवल एक बार दिखता है और पढ़े जा सकने वाले रूप में रखा नहीं जाता। इसे परिवार के संग्रह में न डालें। </p>
+            <h2>{tr(secret.label)}</h2>
+            <p> <Text value="बंद करने से पहले इसे निजी जगह सुरक्षित करें। यह केवल एक बार दिखता है और पढ़े जा सकने वाले रूप में रखा नहीं जाता। इसे परिवार के संग्रह में न डालें।"/> </p>
             <textarea
               readOnly
-              aria-label="निजी कोड"
+              aria-label={tr("निजी कोड")}
               value={secret.value}
               onFocus={(e) => e.target.select()}
             />
-            <button className="primary" onClick={() => setSecret(null)}> मैंने इसे निजी जगह सुरक्षित कर लिया है <Check size={16} />
+            <button className="primary" onClick={() => setSecret(null)}> <Text value="मैंने इसे निजी जगह सुरक्षित कर लिया है"/> <Check size={16} />
             </button>
           </section>
         </div>

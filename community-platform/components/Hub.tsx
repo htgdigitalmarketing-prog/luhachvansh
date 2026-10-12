@@ -1,4 +1,5 @@
 "use client";
+import {Text,useLanguage} from "./Language";
 import {hiText,hiError} from "../lib/hindi.mjs";
 import { useEffect, useState, FormEvent } from "react";
 type Row = Record<string, any>;
@@ -45,7 +46,7 @@ function Form({
     >
       {children}
       <button disabled={busy} className="primary">
-        {busy ? "कृपया प्रतीक्षा करें…" : label}
+        {<Text value={busy ? "कृपया प्रतीक्षा करें…" : label}/>}
       </button>
     </form>
   );
@@ -57,6 +58,8 @@ function Finder({
   label: string;
   onPick: (p: Row) => void;
 }) {
+const {tr}=useLanguage();
+
   const [items, setItems] = useState<Row[]>([]),
     [err, setErr] = useState("");
   return (
@@ -79,12 +82,12 @@ function Finder({
         }}
       >
         <label>
-          {label}
+          {<Text value={label}/>}
           <input
             name="q"
             required
             minLength={2}
-            placeholder="नाम या गाँव"
+            placeholder={tr("नाम या गाँव")}
           />
         </label>
       </Form>
@@ -107,6 +110,8 @@ function Finder({
   );
 }
 export default function Hub() {
+  const {language,setLanguage,tr}=useLanguage();
+  const hi=language==="hi";
   const [me, setMe] = useState<Row | null>(null),
     [state, setState] = useState<Row | null>(null),
     [archive, setArchive] = useState<Row[]>([]),
@@ -115,7 +120,7 @@ export default function Hub() {
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [loading, setLoading] = useState(true),
-    [hi, setHi] = useState(true);
+    [unusedLanguageFlag] = useState(true);
   const [village, setVillage] = useState(""),
     [filter, setFilter] = useState(""),
     [people, setPeople] = useState<Row[]>([]),
@@ -127,7 +132,7 @@ export default function Hub() {
     [answer, setAnswer] = useState<Row | null>(null),
     [media, setMedia] = useState(""),
     [uploading, setUploading] = useState(false);
-  const t = (en: string, hn: string) => (hi ? hn : en);
+  const t = (en: string, hn: string) => (hi ? hn : tr(en));
   async function refresh() {
     const m = await api("/api/members?action=state");
     setMe(m);
@@ -206,32 +211,32 @@ export default function Hub() {
   if (loading)
     return (
       <main className="hub-wrap">
-        <p> सदस्य समुदाय खुल रहा है… </p>
+        <p> <Text value="सदस्य समुदाय खुल रहा है…"/> </p>
       </main>
     );
   if (!me?.actor.verified)
     return (
       <main className="hub-wrap">
         <section className="hub-card">
-          <h1> विश्वास से जुड़ा हमारा समुदाय। </h1>
+          <h1> <Text value="विश्वास से जुड़ा हमारा समुदाय।"/> </h1>
           <p>
             {me
               ? "समुदाय के अभिलेख देखने या सदस्यों से संपर्क करने से पहले परिवार के रिश्ते का सत्यापन आवश्यक है।"
               : "संग्रह देखने और सत्यापित सदस्यों से जुड़ने के लिए लॉगिन करें।"}
           </p>
-          <p role="alert">{hiError(error)}</p>
-          <a className="button primary" href="/members"> लॉगिन करें और प्रोफ़ाइल सत्यापित कराएँ </a>
+          <p role="alert">{tr(hiError(error))}</p>
+          <a className="button primary" href="/members"> <Text value="लॉगिन करें और प्रोफ़ाइल सत्यापित कराएँ"/> </a>
           {me && (
             <>
               <p>
                 <a
                   href="/api/hub?action=export"
                   download="luhach-my-records.json"
-                > मेरे खाते की जानकारी डाउनलोड करें </a>
+                > <Text value="मेरे खाते की जानकारी डाउनलोड करें"/> </a>
               </p>
               <details>
-                <summary> मेरा असत्यापित खाता बंद करें </summary>
-                <p> लॉगिन की जानकारी हट जाएगी और लंबित अनुरोध वापस होंगे। पुराने योगदान और कार्यों का विवरण सुरक्षित रहेगा। </p>
+                <summary> <Text value="मेरा असत्यापित खाता बंद करें"/> </summary>
+                <p> <Text value="लॉगिन की जानकारी हट जाएगी और लंबित अनुरोध वापस होंगे। पुराने योगदान और कार्यों का विवरण सुरक्षित रहेगा।"/> </p>
                 <Form
                   label="मेरा खाता स्थायी रूप से बंद करें"
                   onSubmit={async (b) => {
@@ -245,14 +250,14 @@ export default function Hub() {
                     }
                   }}
                 >
-                  <label> वर्तमान पासवर्ड <input
+                  <label> <Text value="वर्तमान पासवर्ड"/> <input
                       type="password"
                       name="password"
                       required
                       autoComplete="current-password"
                     />
                   </label>
-                  <label> CLOSE लिखें <input name="confirm" required pattern="CLOSE" />
+                  <label> <Text value="CLOSE लिखें"/> <input name="confirm" required pattern="CLOSE" />
                   </label>
                 </Form>
               </details>
@@ -265,8 +270,8 @@ export default function Hub() {
     <main className="hub-wrap">
       <header className="hub-title">
         <div>
-          <span className="eyebrow"> लुहाच परिवार · सदस्य समुदाय </span>
-          <p className="hub-help"> लॉगिन सदस्य {me.actor.name}</p>
+          <span className="eyebrow"> <Text value="लुहाच परिवार · सदस्य समुदाय"/> </span>
+          <p className="hub-help"> <Text value="लॉगिन सदस्य"/> {me.actor.name}</p>
           <h1>
             {t("हमारी कहानियाँ। हमारे अपने लोग।", "अपनी कहानियाँ। अपना परिवार।")}
           </h1>
@@ -277,15 +282,15 @@ export default function Hub() {
             )}
           </p>
         </div>
-        <button onClick={() => setHi(!hi)}>{hi ? "English" : "हिन्दी"}</button>
+        <button onClick={() => setLanguage(hi?"en":"hi")}>{hi ? "English" : "हिन्दी"}</button>
       </header>
-      <nav className="hub-tabs" aria-label="समुदाय के विषय">
+      <nav className="hub-tabs" aria-label={tr("समुदाय के विषय")}>
         {[
           ["villages", "गाँव", "गाँव"],
           ["stories", "कहानियाँ और तस्वीरें", "कहानियाँ और तस्वीरें"],
           ["connect", "सदस्य खोजें", "सदस्य खोजें"],
           ["inbox", "संदेश", "संदेश"],
-          ["research", "जार्विस से पूछें", "विरासत से पूछें"],
+          ["research", "लुहाच मित्र से पूछें", "विरासत से पूछें"],
           ["account", "मेरी जानकारी", "मेरा डेटा"],
           ...(admin ? [["moderate", "समीक्षा कक्ष", "समीक्षा"]] : []),
         ].map(([id, en, hn]) => (
@@ -304,12 +309,12 @@ export default function Hub() {
       </nav>
       {error && (
         <p className="hub-alert" role="alert">
-          {hiError(error)}
+          {tr(hiError(error))}
         </p>
       )}
       {notice && (
         <p className="hub-notice" role="status">
-          {notice}
+          {tr(notice)}
         </p>
       )}
       {tab === "villages" && (
@@ -318,22 +323,22 @@ export default function Hub() {
             <h2>
               {t("46 villages. A shared history.", "46 गाँव। एक साझा इतिहास।")}
             </h2>
-            <label> गाँव खोजें <input
+            <label> <Text value="गाँव खोजें"/> <input
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                placeholder="गाँव का नाम"
+                placeholder={tr("गाँव का नाम")}
               />
             </label>
           </div>
           {selected ? (
             <article className="hub-card">
-              <button onClick={() => setVillage("")}> ← सभी गाँव </button>
+              <button onClick={() => setVillage("")}> <Text value="← सभी गाँव"/> </button>
               <h2>{selected.name}</h2>
-              <p className="hub-label"> पुराने संग्रह से </p>
+              <p className="hub-label"> <Text value="पुराने संग्रह से"/> </p>
               <div className="hub-prose">{selected.text}</div>
-              <a href={selected.source} target="_blank" rel="noreferrer"> मूल वेबसाइट का पृष्ठ ↗ </a>
-              <p> गाँव की जानकारी सुधारें, स्रोत जोड़ें या स्मृति साझा करें। </p>
-              <button onClick={() => setTab("stories")}> इस गाँव के बारे में जानकारी जोड़ें </button>
+              <a href={selected.source} target="_blank" rel="noreferrer"> <Text value="मूल वेबसाइट का पृष्ठ ↗"/> </a>
+              <p> <Text value="गाँव की जानकारी सुधारें, स्रोत जोड़ें या स्मृति साझा करें।"/> </p>
+              <button onClick={() => setTab("stories")}> <Text value="इस गाँव के बारे में जानकारी जोड़ें"/> </button>
             </article>
           ) : (
             <div className="hub-grid">
@@ -354,7 +359,7 @@ export default function Hub() {
                         .slice(0, 100)}
                       …
                     </p>
-                    <strong> गाँव की कहानी पढ़ें → </strong>
+                    <strong> <Text value="गाँव की कहानी पढ़ें →"/> </strong>
                   </button>
                 ))}
             </div>
@@ -364,7 +369,7 @@ export default function Hub() {
       {tab === "stories" && (
         <>
           <h2>{t("समुदाय की स्मृतियाँ", "समुदाय का संग्रह")}</h2>
-          <p> हर स्मृति के साथ उसका स्रोत रखें। नई जानकारी पर सात दिन तक आपत्ति दी जा सकती है। </p>
+          <p> <Text value="हर स्मृति के साथ उसका स्रोत रखें। नई जानकारी पर सात दिन तक आपत्ति दी जा सकती है।"/> </p>
           <div className="hub-gallery">
             {[
               "village-road.webp",
@@ -382,12 +387,12 @@ export default function Hub() {
                     ][i]
                   }
                 />
-                <figcaption> पुरानी वेबसाइट का संग्रह </figcaption>
+                <figcaption> <Text value="पुरानी वेबसाइट का संग्रह"/> </figcaption>
               </figure>
             ))}
           </div>
           <details className="hub-card">
-            <summary> गाँव की कहानी, जीवन परिचय या तस्वीर जोड़ें </summary>
+            <summary> <Text value="गाँव की कहानी, जीवन परिचय या तस्वीर जोड़ें"/> </summary>
             <Form
               label="समुदाय की समीक्षा के लिए भेजें"
               onSubmit={async (b) => {
@@ -398,23 +403,23 @@ export default function Hub() {
                 });
               }}
             >
-              <label> योगदान का प्रकार <select name="kind">
-                  <option value="village"> गाँव की जानकारी </option>
-                  <option value="biography"> जीवन परिचय / स्मरण </option>
-                  <option value="photo"> तस्वीर </option>
+              <label> <Text value="योगदान का प्रकार"/> <select name="kind">
+                  <option value="village"> <Text value="गाँव की जानकारी"/> </option>
+                  <option value="biography"> <Text value="जीवन परिचय / स्मरण"/> </option>
+                  <option value="photo"> <Text value="तस्वीर"/> </option>
                 </select>
               </label>
-              <label> शीर्षक <input name="title" required minLength={4} maxLength={160} />
+              <label> <Text value="शीर्षक"/> <input name="title" required minLength={4} maxLength={160} />
               </label>
-              <label> गाँव <select name="village" defaultValue={village}>
-                  <option value=""> पूरे समुदाय के लिए </option>
+              <label> <Text value="गाँव"/> <select name="village" defaultValue={village}>
+                  <option value=""> <Text value="पूरे समुदाय के लिए"/> </option>
                   {archive.map((v) => (
                     <option key={v.name}>{v.name}</option>
                   ))}
                 </select>
               </label>
-              <label> संबंधित व्यक्ति (जीवन परिचय के लिए आवश्यक) <select name="person_id">
-                  <option value=""> किसी एक व्यक्ति की प्रोफ़ाइल नहीं </option>
+              <label> <Text value="संबंधित व्यक्ति (जीवन परिचय के लिए आवश्यक)"/> <select name="person_id">
+                  <option value=""> <Text value="किसी एक व्यक्ति की प्रोफ़ाइल नहीं"/> </option>
                   {me.own.map((p: Row) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -422,8 +427,8 @@ export default function Hub() {
                   ))}
                 </select>
               </label>
-              <p className="hub-help"> जीवित व्यक्ति के लिए अधिकृत देखभालकर्ता की सहमति चाहिए। बच्चों के जीवन परिचय यहाँ नहीं जोड़े जाते। लिखने से पहले परिवार क्षेत्र में अनुमति माँगें। </p>
-              <label> कहानी या विवरण <textarea
+              <p className="hub-help"> <Text value="जीवित व्यक्ति के लिए अधिकृत देखभालकर्ता की सहमति चाहिए। बच्चों के जीवन परिचय यहाँ नहीं जोड़े जाते। लिखने से पहले परिवार क्षेत्र में अनुमति माँगें।"/> </p>
+              <label> <Text value="कहानी या विवरण"/> <textarea
                   name="body"
                   required
                   minLength={20}
@@ -431,14 +436,14 @@ export default function Hub() {
                   rows={5}
                 />
               </label>
-              <label> स्रोत, पृष्ठ, तिथि या प्रत्यक्ष जानकारी <textarea
+              <label> <Text value="स्रोत, पृष्ठ, तिथि या प्रत्यक्ष जानकारी"/> <textarea
                   name="source"
                   required
                   minLength={10}
                   maxLength={1000}
                 />
               </label>
-              <label> तस्वीर (JPEG, PNG या WebP; अधिकतम 8 MB) <input
+              <label> <Text value="तस्वीर (JPEG, PNG या WebP; अधिकतम 8 MB)"/> <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   disabled={uploading}
@@ -475,7 +480,7 @@ export default function Hub() {
                 />
               )}
               <label className="hub-check">
-                <input name="consent" type="checkbox" required /> मुझे यह लेख / तस्वीर साझा करने की अनुमति है और पहचान में आने वाले जीवित व्यक्तियों की सहमति है। </label>
+                <input name="consent" type="checkbox" required /> <Text value="मुझे यह लेख / तस्वीर साझा करने की अनुमति है और पहचान में आने वाले जीवित व्यक्तियों की सहमति है।"/> </label>
             </Form>
           </details>
           <div className="hub-grid">
@@ -489,7 +494,7 @@ export default function Hub() {
                   />
                 )}
                 <span className={"hub-label " + c.status}>
-                  {hiText(c.status)} · {hiText(c.kind)}
+                  {tr(c.status)} · {tr(c.kind)}
                 </span>
                 <h3>{c.title}</h3>
                 <small>
@@ -497,24 +502,24 @@ export default function Hub() {
                 </small>
                 <p className="hub-prose">{c.body}</p>
                 <p>
-                  <strong> स्रोत: </strong> {c.source}
+                  <strong> <Text value="स्रोत:"/> </strong> {c.source}
                 </p>
                 {c.status === "pending" && (
-                  <p> आपत्ति देने की अंतिम तिथि {date(c.due)} । स्वीकृति समीक्षा का निर्णय है; ऐतिहासिक सत्यता का प्रमाण नहीं। </p>
+                  <p> <Text value="आपत्ति देने की अंतिम तिथि"/> {date(c.due)} <Text value="। स्वीकृति समीक्षा का निर्णय है; ऐतिहासिक सत्यता का प्रमाण नहीं।"/> </p>
                 )}
                 {c.decision && <p>{c.decision}</p>}
                 {c.objections.map((o: Row, i: number) => (
-                  <p key={i} className="hub-alert"> आपत्ति: {o.reason}
+                  <p key={i} className="hub-alert"> <Text value="आपत्ति:"/> {o.reason}
                   </p>
                 ))}
                 {["pending", "accepted"].includes(c.status) && (
                   <details>
-                    <summary> सुधार या आपत्ति दें </summary>
+                    <summary> <Text value="सुधार या आपत्ति दें"/> </summary>
                     <Form
                       label="समीक्षा के लिए रोकें"
                       onSubmit={(b) => act("objectContent", { ...b, id: c.id })}
                     >
-                      <label> कारण <textarea required minLength={10} name="reason" />
+                      <label> <Text value="कारण"/> <textarea required minLength={10} name="reason" />
                       </label>
                     </Form>
                   </details>
@@ -524,7 +529,7 @@ export default function Hub() {
                     label="मेरा योगदान वापस लें"
                     onSubmit={(b) => act("withdrawContent", { ...b, id: c.id })}
                   >
-                    <label> वापस लेने का कारण <input required minLength={10} name="reason" />
+                    <label> <Text value="वापस लेने का कारण"/> <input required minLength={10} name="reason" />
                     </label>
                   </Form>
                 )}
@@ -532,7 +537,7 @@ export default function Hub() {
             ))}
           </div>
           {!content.length && (
-            <p className="hub-empty"> नया संग्रह आपके योगदान के लिए तैयार है। </p>
+            <p className="hub-empty"> <Text value="नया संग्रह आपके योगदान के लिए तैयार है।"/> </p>
           )}
         </>
       )}
@@ -544,10 +549,10 @@ export default function Hub() {
               "जहाँ जाएँ, अपने समुदाय से जुड़ें।",
             )}
           </h2>
-          <p> शहर, राज्य या देश से खोजें। केवल सहमति देने वाले सत्यापित वयस्क दिखते हैं। फ़ोन और ईमेल खोज में नहीं दिखते। </p>
+          <p> <Text value="शहर, राज्य या देश से खोजें। केवल सहमति देने वाले सत्यापित वयस्क दिखते हैं। फ़ोन और ईमेल खोज में नहीं दिखते।"/> </p>
           <details className="hub-card">
-            <summary> स्थान खोज में मेरी उपलब्धता </summary>
-            <p> यह विकल्प बंद करने पर आपका नाम छिपेगा और बातचीत रुकेगी। घर का पूरा पता नहीं माँगा जाता। </p>
+            <summary> <Text value="स्थान खोज में मेरी उपलब्धता"/> </summary>
+            <p> <Text value="यह विकल्प बंद करने पर आपका नाम छिपेगा और बातचीत रुकेगी। घर का पूरा पता नहीं माँगा जाता।"/> </p>
             <Form
               label="उपलब्धता का विकल्प सुरक्षित करें"
               onSubmit={(b) =>
@@ -558,11 +563,11 @@ export default function Hub() {
                 })
               }
             >
-              <label> मेरी सत्यापित प्रोफ़ाइल <select
+              <label> <Text value="मेरी सत्यापित प्रोफ़ाइल"/> <select
                   name="person_id"
                   defaultValue={state?.directory?.person_id || ""}
                 >
-                  <option value=""> अपनी प्रोफ़ाइल चुनें </option>
+                  <option value=""> <Text value="अपनी प्रोफ़ाइल चुनें"/> </option>
                   {state?.myClaims
                     .filter((c: Row) => c.relationship === "self")
                     .map((c: Row) => (
@@ -572,19 +577,19 @@ export default function Hub() {
                     ))}
                 </select>
               </label>
-              <label> शहर <input
+              <label> <Text value="शहर"/> <input
                   name="city"
                   defaultValue={state?.directory?.city || ""}
                   maxLength={80}
                 />
               </label>
-              <label> राज्य / क्षेत्र <input
+              <label> <Text value="राज्य / क्षेत्र"/> <input
                   name="state"
                   defaultValue={state?.directory?.state || ""}
                   maxLength={80}
                 />
               </label>
-              <label> देश <input
+              <label> <Text value="देश"/> <input
                   name="country"
                   defaultValue={state?.directory?.country || ""}
                   maxLength={80}
@@ -595,11 +600,11 @@ export default function Hub() {
                   name="enabled"
                   type="checkbox"
                   defaultChecked={!!state?.directory?.enabled}
-                /> मुझे सत्यापित सदस्यों की खोज में दिखाएँ और संपर्क अनुरोध आने दें। </label>
+                /> <Text value="मुझे सत्यापित सदस्यों की खोज में दिखाएँ और संपर्क अनुरोध आने दें।"/> </label>
               <label className="hub-check">
-                <input name="consent" type="checkbox" /> मैं शहर की जानकारी साझा करने की सहमति देता/देती हूँ। मेरी प्रोफ़ाइल भी सत्यापित सदस्यों को दिखनी चाहिए। </label>
+                <input name="consent" type="checkbox" /> <Text value="मैं शहर की जानकारी साझा करने की सहमति देता/देती हूँ। मेरी प्रोफ़ाइल भी सत्यापित सदस्यों को दिखनी चाहिए।"/> </label>
             </Form>
-            <a href="/members"> परिवार की प्रोफ़ाइल की गोपनीयता चुनें → </a>
+            <a href="/members"> <Text value="परिवार की प्रोफ़ाइल की गोपनीयता चुनें →"/> </a>
           </details>
           <Form
             label="सदस्य खोजें"
@@ -615,7 +620,7 @@ export default function Hub() {
               }
             }}
           >
-            <label> शहर, राज्य, देश या सदस्य का नाम <input name="q" placeholder="जयपुर, हरियाणा, भारत…" />
+            <label> <Text value="शहर, राज्य, देश या सदस्य का नाम"/> <input name="q" placeholder={tr("जयपुर, हरियाणा, भारत…")} />
             </label>
           </Form>
           <div className="hub-grid">
@@ -627,7 +632,7 @@ export default function Hub() {
                   label="संपर्क का अनुरोध करें"
                   onSubmit={(b) => act("connect", { ...b, target: p.id })}
                 >
-                  <label> अपना परिचय दें <textarea
+                  <label> <Text value="अपना परिचय दें"/> <textarea
                       name="note"
                       required
                       minLength={10}
@@ -635,7 +640,7 @@ export default function Hub() {
                     />
                   </label>
                 </Form>
-                <button onClick={() => act("block", { target: p.id })}> सदस्य को ब्लॉक करें </button>
+                <button onClick={() => act("block", { target: p.id })}> <Text value="सदस्य को ब्लॉक करें"/> </button>
               </article>
             ))}
           </div>
@@ -644,8 +649,8 @@ export default function Hub() {
       {tab === "inbox" && (
         <>
           <h2>{t("सहमति से बातचीत।", "सहमति से बातचीत।")}</h2>
-          <p> बातचीत शुरू करने के लिए संपर्क अनुरोध स्वीकार करें। संपर्क विवरण अपनी इच्छा से दें। संदेश इस सेवा में सुरक्षित रखे जाते हैं; उनमें एंड-टू-एंड एन्क्रिप्शन नहीं है। प्रशासक केवल वे संदेश देखते हैं जिनकी शिकायत आप करते हैं। </p>
-          <button onClick={() => refresh().catch((e) => setError(hiError(e.message)))}> नए संदेश देखें </button>
+          <p> <Text value="बातचीत शुरू करने के लिए संपर्क अनुरोध स्वीकार करें। संपर्क विवरण अपनी इच्छा से दें। संदेश इस सेवा में सुरक्षित रखे जाते हैं; उनमें एंड-टू-एंड एन्क्रिप्शन नहीं है। प्रशासक केवल वे संदेश देखते हैं जिनकी शिकायत आप करते हैं।"/> </p>
+          <button onClick={() => refresh().catch((e) => setError(hiError(e.message)))}> <Text value="नए संदेश देखें"/> </button>
           <div className="hub-split">
             <aside>
               {state?.conversations.map((c: Row) => (
@@ -660,7 +665,7 @@ export default function Hub() {
                       : c.sender_name}
                   </strong>
                   <small>
-                    {hiText(c.status)}
+                    {tr(c.status)}
                     {c.blocked ? " · blocked" : ""}
                   </small>
                 </button>
@@ -686,7 +691,7 @@ export default function Hub() {
                               status: "accepted",
                             })
                           }
-                        > संपर्क स्वीकार करें </button>
+                        > <Text value="संपर्क स्वीकार करें"/> </button>
                         <button
                           onClick={() =>
                             act("connection", {
@@ -694,7 +699,7 @@ export default function Hub() {
                               status: "declined",
                             })
                           }
-                        > अस्वीकार करें </button>
+                        > <Text value="अस्वीकार करें"/> </button>
                       </div>
                     )}
                   {thread.messages.map((m: Row) => (
@@ -715,7 +720,7 @@ export default function Hub() {
                       </small>
                       <p>{m.body}</p>
                       <details>
-                        <summary> इस संदेश की शिकायत करें </summary>
+                        <summary> <Text value="इस संदेश की शिकायत करें"/> </summary>
                         <Form
                           label="शिकायत प्रशासकों को भेजें"
                           onSubmit={(b) =>
@@ -726,7 +731,7 @@ export default function Hub() {
                             })
                           }
                         >
-                          <label> शिकायत का कारण <textarea name="reason" required minLength={10} />
+                          <label> <Text value="शिकायत का कारण"/> <textarea name="reason" required minLength={10} />
                           </label>
                         </Form>
                       </details>
@@ -741,7 +746,7 @@ export default function Hub() {
                           act("message", { ...b, id: thread.id })
                         }
                       >
-                        <label> आपका संदेश <textarea name="body" required maxLength={3000} />
+                        <label> <Text value="आपका संदेश"/> <textarea name="body" required maxLength={3000} />
                         </label>
                       </Form>
                     )}
@@ -750,7 +755,7 @@ export default function Hub() {
                       onClick={() =>
                         act("connection", { id: thread.id, status: "closed" })
                       }
-                    > बातचीत बंद करें </button>
+                    > <Text value="बातचीत बंद करें"/> </button>
                     <button
                       onClick={() =>
                         act("block", {
@@ -760,16 +765,16 @@ export default function Hub() {
                               : thread.sender,
                         })
                       }
-                    > सदस्य को ब्लॉक करें </button>
+                    > <Text value="सदस्य को ब्लॉक करें"/> </button>
                   </div>
                 </>
               ) : (
-                <p> बातचीत चुनें। अन्य सदस्यों के अनुरोध यहाँ दिखेंगे। </p>
+                <p> <Text value="बातचीत चुनें। अन्य सदस्यों के अनुरोध यहाँ दिखेंगे।"/> </p>
               )}
             </section>
           </div>
           <details className="hub-card">
-            <summary> ब्लॉक किए गए सदस्य </summary>
+            <summary> <Text value="ब्लॉक किए गए सदस्य"/> </summary>
             {state?.blocked.map((b: Row) => (
               <p key={b.target}>
                 {b.name}{" "}
@@ -777,7 +782,7 @@ export default function Hub() {
                   onClick={() =>
                     act("block", { target: b.target, enabled: false })
                   }
-                > ब्लॉक हटाएँ (नया अनुरोध आवश्यक होगा) </button>
+                > <Text value="ब्लॉक हटाएँ (नया अनुरोध आवश्यक होगा)"/> </button>
               </p>
             ))}
           </details>
@@ -792,8 +797,8 @@ export default function Hub() {
             )}
           </h2>
           <div className="hub-card">
-            <h3> दो व्यक्तियों के बीच रिश्ता खोजें </h3>
-            <p> खोज दर्ज माता-पिता और पति-पत्नी के रिश्तों पर आधारित है। निजी या छूटे रिश्ते अनुमान से नहीं बनाए जाते। माताओं, बेटियों और विवाह के दोनों परिवारों को समान जगह मिलेगी। </p>
+            <h3> <Text value="दो व्यक्तियों के बीच रिश्ता खोजें"/> </h3>
+            <p> <Text value="खोज दर्ज माता-पिता और पति-पत्नी के रिश्तों पर आधारित है। निजी या छूटे रिश्ते अनुमान से नहीं बनाए जाते। माताओं, बेटियों और विवाह के दोनों परिवारों को समान जगह मिलेगी।"/> </p>
             <div className="hub-two">
               <Finder
                 label="पहला व्यक्ति"
@@ -831,7 +836,7 @@ export default function Hub() {
                   setError(hiError((e as Error).message));
                 }
               }}
-            > दर्ज रिश्ते का मार्ग देखें </button>
+            > <Text value="दर्ज रिश्ते का मार्ग देखें"/> </button>
             {path &&
               (path.found ? (
                 <ol className="hub-lineage">
@@ -841,10 +846,10 @@ export default function Hub() {
                   </li>
                   {path.steps.map((s: Row, i: number) => (
                     <li key={i}>
-                      <span>{hiText(s.relation)} → </span>
+                      <span>{tr(s.relation)} → </span>
                       <strong>{s.person.name}</strong>
                       <small>
-                        {s.person.village} · स्रोत: {s.source}
+                        {s.person.village} <Text value="· स्रोत:"/> {s.source}
                       </small>
                     </li>
                   ))}
@@ -854,39 +859,39 @@ export default function Hub() {
               ))}
           </div>
           <div className="hub-card">
-            <h3> जार्विस / समुदाय से पूछें </h3>
-            <p> Gemini पुराने संग्रह के लेखों का सार बता सकता है। इन अनुरोधों में निजी प्रोफ़ाइल, संपर्क या निजी संदेश नहीं भेजे जाते। </p>
+            <h3> <Text value="लुहाच मित्र / समुदाय से पूछें"/> </h3>
+            <p> <Text value="Gemini पुराने संग्रह के लेखों का सार बता सकता है। इन अनुरोधों में निजी प्रोफ़ाइल, संपर्क या निजी संदेश नहीं भेजे जाते।"/> </p>
             <Finder
               label="परिवार के प्रश्न के लिए व्यक्ति चुनें"
               onPick={setResearchPerson}
             />
-            {researchPerson && <p> चयनित: {researchPerson.name}</p>}
-            <Form label="जार्विस से पूछें" onSubmit={research}>
-              <label> प्रश्न का प्रकार <select name="mode">
-                  <option value="history"> गाँव का इतिहास (स्रोत खोज या वैकल्पिक AI) </option>
-                  <option value="family"> इस व्यक्ति के माता-पिता, पति-पत्नी या बच्चे कौन हैं? (दर्ज अभिलेख) </option>
-                  <option value="directory"> इस शहर, राज्य या देश में कौन है? (सहमति वाले सदस्य) </option>
+            {researchPerson && <p> <Text value="चयनित:"/> {researchPerson.name}</p>}
+            <Form label="लुहाच मित्र से पूछें" onSubmit={research}>
+              <label> <Text value="प्रश्न का प्रकार"/> <select name="mode">
+                  <option value="history"> <Text value="गाँव का इतिहास (स्रोत खोज या वैकल्पिक AI)"/> </option>
+                  <option value="family"> <Text value="इस व्यक्ति के माता-पिता, पति-पत्नी या बच्चे कौन हैं? (दर्ज अभिलेख)"/> </option>
+                  <option value="directory"> <Text value="इस शहर, राज्य या देश में कौन है? (सहमति वाले सदस्य)"/> </option>
                 </select>
               </label>
-              <label> गाँव चुनें <select name="village">
-                  <option value=""> पूरा संग्रह खोजें </option>
+              <label> <Text value="गाँव चुनें"/> <select name="village">
+                  <option value=""> <Text value="पूरा संग्रह खोजें"/> </option>
                   {archive.map((v) => (
                     <option key={v.name}>{v.name}</option>
                   ))}
                 </select>
               </label>
-              <label> प्रश्न (स्थान खोज के लिए शहर / राज्य / देश लिखें) <textarea
+              <label> <Text value="प्रश्न (स्थान खोज के लिए शहर / राज्य / देश लिखें)"/> <textarea
                   name="question"
                   required
                   minLength={4}
                   maxLength={600}
-                  placeholder="इस गाँव के बसने के बारे में क्या लिखा है?"
+                  placeholder={tr("इस गाँव के बसने के बारे में क्या लिखा है?")}
                 />
               </label>
               <label className="hub-check">
-                <input name="ai" type="checkbox" /> स्रोत का सार बताने के लिए AI इस्तेमाल करें। </label>
+                <input name="ai" type="checkbox" /> <Text value="स्रोत का सार बताने के लिए AI इस्तेमाल करें।"/> </label>
               <label className="hub-check">
-                <input name="consent" type="checkbox" /> यह प्रश्न और संबंधित संग्रह के अंश Google Gemini को भेजने की सहमति है। मैं निजी जानकारी नहीं लिखूँगा/लिखूँगी। </label>
+                <input name="consent" type="checkbox" /> <Text value="यह प्रश्न और संबंधित संग्रह के अंश Google Gemini को भेजने की सहमति है। मैं निजी जानकारी नहीं लिखूँगा/लिखूँगी।"/> </label>
             </Form>
             {answer && (
               <article>
@@ -895,15 +900,15 @@ export default function Hub() {
                     ? "AI-assisted answer"
                     : "स्रोत खोजें"}
                 </p>
-                <p className="hub-prose">{hiText(answer.answer)}</p>
-                {answer.notice && <p>{hiText(answer.notice)}</p>}
+                <p className="hub-prose">{tr(answer.answer)}</p>
+                {answer.notice && <p>{tr(answer.notice)}</p>}
                 {answer.sources.map((s: Row) => (
                   <details key={s.id}>
-                    <summary> स्रोत [ {s.id}] · {s.village}
+                    <summary> <Text value="स्रोत ["/> {s.id}] · {s.village}
                     </summary>
                     <p className="hub-prose">{s.text}</p>
-                    <a href={s.source} target="_blank" rel="noreferrer"> गाँव का मूल पृष्ठ ↗ </a>
-                    <p>{hiText(s.status)}</p>
+                    <a href={s.source} target="_blank" rel="noreferrer"> <Text value="गाँव का मूल पृष्ठ ↗"/> </a>
+                    <p>{tr(s.status)}</p>
                   </details>
                 ))}
               </article>
@@ -913,10 +918,10 @@ export default function Hub() {
       )}
       {tab === "account" && (
         <>
-          <h2> आपकी जानकारी, आपका निर्णय </h2>
+          <h2> <Text value="आपकी जानकारी, आपका निर्णय"/> </h2>
           <div className="hub-card">
-            <h3> अपने अभिलेख डाउनलोड करें </h3>
-            <p> इसमें आपकी प्रोफ़ाइल, योगदान, अनुरोध और आपके भेजे संदेश होंगे। पासवर्ड, पुनर्प्राप्ति कोड या दूसरों के निजी संदेश नहीं होंगे। </p>
+            <h3> <Text value="अपने अभिलेख डाउनलोड करें"/> </h3>
+            <p> <Text value="इसमें आपकी प्रोफ़ाइल, योगदान, अनुरोध और आपके भेजे संदेश होंगे। पासवर्ड, पुनर्प्राप्ति कोड या दूसरों के निजी संदेश नहीं होंगे।"/> </p>
             <button
               onClick={async () => {
                 try {
@@ -935,39 +940,39 @@ export default function Hub() {
                   setError(hiError((e as Error).message));
                 }
               }}
-            > मेरी जानकारी डाउनलोड करें </button>
+            > <Text value="मेरी जानकारी डाउनलोड करें"/> </button>
           </div>
           <details className="hub-card">
-            <summary> परिवार की जानकारी सँभालने की अनुमति हस्तांतरित करें </summary>
-            <p> दूसरा प्रशासक सहमति और रिश्ते की जाँच करेगा। बच्चे के वयस्क होने पर भी यह विकल्प उपयोगी है। गोपनीयता दोबारा निजी हो जाएगी। </p>
+            <summary> <Text value="परिवार की जानकारी सँभालने की अनुमति हस्तांतरित करें"/> </summary>
+            <p> <Text value="दूसरा प्रशासक सहमति और रिश्ते की जाँच करेगा। बच्चे के वयस्क होने पर भी यह विकल्प उपयोगी है। गोपनीयता दोबारा निजी हो जाएगी।"/> </p>
             <Form
               label="स्वतंत्र जाँच के लिए अनुरोध करें"
               onSubmit={(b) => act("transfer", b)}
             >
-              <label> वर्तमान अनुमति <select name="claim" required>
-                  <option value=""> चुनें </option>
+              <label> <Text value="वर्तमान अनुमति"/> <select name="claim" required>
+                  <option value=""> <Text value="चुनें"/> </option>
                   {state?.myClaims.map((c: Row) => (
                     <option key={c.id} value={c.id}>
-                      {c.name} · {hiText(c.relationship)}
+                      {c.name} · {tr(c.relationship)}
                     </option>
                   ))}
                 </select>
               </label>
-              <label> अनुमति लेने वाले सदस्य का खाता क्रमांक <input name="target" required />
+              <label> <Text value="अनुमति लेने वाले सदस्य का खाता क्रमांक"/> <input name="target" required />
               </label>
-              <label> सहमति, रिश्ता और कारण <textarea name="reason" required minLength={15} />
+              <label> <Text value="सहमति, रिश्ता और कारण"/> <textarea name="reason" required minLength={15} />
               </label>
             </Form>
-            <p> आपका खाता क्रमांक: <code>{me.actor.id}</code> (केवल अनुमति हस्तांतरण के लिए संबंधित व्यक्ति को दें)। </p>
+            <p> <Text value="आपका खाता क्रमांक:"/> <code>{me.actor.id}</code> <Text value="(केवल अनुमति हस्तांतरण के लिए संबंधित व्यक्ति को दें)।"/> </p>
             {state?.transfers.map((r: Row) => (
               <p key={r.id}>
-                {hiText(r.status)}: {r.reason}
+                {tr(r.status)}: {r.reason}
               </p>
             ))}
           </details>
           <details className="hub-card">
-            <summary> मेरा खाता बंद करें </summary>
-            <p> आप लॉगआउट होंगे, लॉगिन की जानकारी हटेगी, प्रोफ़ाइल और स्थान खोज से नाम छिपेगा तथा लंबित योगदान वापस होंगे। स्वीकृत धरोहर योगदान, वंशावली, पुराने संदेश और कार्यों का इतिहास सुरक्षित रहेगा। नाम “पूर्व सदस्य” हो जाएगा। प्रशासक को पहले अपना पद सौंपना होगा। </p>
+            <summary> <Text value="मेरा खाता बंद करें"/> </summary>
+            <p> <Text value="आप लॉगआउट होंगे, लॉगिन की जानकारी हटेगी, प्रोफ़ाइल और स्थान खोज से नाम छिपेगा तथा लंबित योगदान वापस होंगे। स्वीकृत धरोहर योगदान, वंशावली, पुराने संदेश और कार्यों का इतिहास सुरक्षित रहेगा। नाम “पूर्व सदस्य” हो जाएगा। प्रशासक को पहले अपना पद सौंपना होगा।"/> </p>
             <Form
               label="मेरा खाता स्थायी रूप से बंद करें"
               onSubmit={async (b) => {
@@ -983,14 +988,14 @@ export default function Hub() {
                 }
               }}
             >
-              <label> वर्तमान पासवर्ड <input
+              <label> <Text value="वर्तमान पासवर्ड"/> <input
                   name="password"
                   type="password"
                   autoComplete="current-password"
                   required
                 />
               </label>
-              <label> CLOSE लिखें <input name="confirm" required pattern="CLOSE" />
+              <label> <Text value="CLOSE लिखें"/> <input name="confirm" required pattern="CLOSE" />
               </label>
             </Form>
           </details>
@@ -998,42 +1003,42 @@ export default function Hub() {
       )}
       {tab === "moderate" && admin && (
         <>
-          <h2> सामुदायिक समीक्षा </h2>
-          <p> परिवार का सत्यापन और रिश्तों के निर्णय यहाँ करें: {" "}
-            <a href="/members"> प्रशासक कक्ष → </a> । अपने योगदान की समीक्षा दूसरे प्रशासक से कराएँ। </p>
+          <h2> <Text value="सामुदायिक समीक्षा"/> </h2>
+          <p> <Text value="परिवार का सत्यापन और रिश्तों के निर्णय यहाँ करें:"/> {" "}
+            <a href="/members"> <Text value="प्रशासक कक्ष →"/> </a> <Text value="। अपने योगदान की समीक्षा दूसरे प्रशासक से कराएँ।"/> </p>
           {content
             .filter((c) =>
               ["pending", "disputed", "accepted"].includes(c.status),
             )
             .map((c) => (
               <article className="hub-card" key={c.id}>
-                <span className="hub-label">{hiText(c.status)}</span>
+                <span className="hub-label">{tr(c.status)}</span>
                 <h3>{c.title}</h3>
                 <p>{c.body}</p>
-                <p> स्रोत: {c.source}</p>
+                <p> <Text value="स्रोत:"/> {c.source}</p>
                 {c.objections.map((o: Row, i: number) => (
-                  <p key={i}> आपत्ति: {o.reason}</p>
+                  <p key={i}> <Text value="आपत्ति:"/> {o.reason}</p>
                 ))}
                 <Form
                   label="समीक्षा का निर्णय दर्ज करें"
                   onSubmit={(b) => act("reviewContent", { ...b, id: c.id })}
                 >
-                  <label> निर्णय <select name="status">
-                      <option value="accepted"> स्वीकार करें </option>
-                      <option value="rejected"> अस्वीकार करें </option>
-                      <option value="removed"> संग्रह से हटाएँ </option>
+                  <label> <Text value="निर्णय"/> <select name="status">
+                      <option value="accepted"> <Text value="स्वीकार करें"/> </option>
+                      <option value="rejected"> <Text value="अस्वीकार करें"/> </option>
+                      <option value="removed"> <Text value="संग्रह से हटाएँ"/> </option>
                     </select>
                   </label>
-                  <label> जाँच का आधार और विवरण <textarea name="reason" required minLength={10} />
+                  <label> <Text value="जाँच का आधार और विवरण"/> <textarea name="reason" required minLength={10} />
                   </label>
                 </Form>
               </article>
             ))}
-          <h3> सदस्य सुरक्षा की शिकायतें </h3>
+          <h3> <Text value="सदस्य सुरक्षा की शिकायतें"/> </h3>
           {state?.reports.map((r: Row) => (
             <article className="hub-card" key={r.id}>
               <p>
-                {r.reason} · {hiText(r.status)}
+                {r.reason} · {tr(r.status)}
               </p>
               {r.reported_message && (
                 <blockquote>{r.reported_message}</blockquote>
@@ -1044,19 +1049,19 @@ export default function Hub() {
                   label="शिकायत का समाधान करें"
                   onSubmit={(b) => act("resolveReport", { ...b, id: r.id })}
                 >
-                  <label> कार्रवाई और विवरण <textarea name="reason" required minLength={10} />
+                  <label> <Text value="कार्रवाई और विवरण"/> <textarea name="reason" required minLength={10} />
                   </label>
                 </Form>
               )}
             </article>
           ))}
-          <h3> जानकारी सँभालने की अनुमति का हस्तांतरण </h3>
+          <h3> <Text value="जानकारी सँभालने की अनुमति का हस्तांतरण"/> </h3>
           {state?.transfers
             .filter((r: Row) => r.status === "pending")
             .map((r: Row) => (
               <article className="hub-card" key={r.id}>
                 <p>{r.reason}</p>
-                <p> किससे {r.author} to {r.recipient}
+                <p> <Text value="किससे"/> {r.author} <Text value="to"/> {r.recipient}
                 </p>
                 <Form
                   label="हस्तांतरण का निर्णय दर्ज करें"
@@ -1068,25 +1073,25 @@ export default function Hub() {
                     })
                   }
                 >
-                  <label> निर्णय <select name="accept">
-                      <option value="no"> अस्वीकार करें </option>
-                      <option value="yes"> सहमति जाँचकर स्वीकृत करें </option>
+                  <label> <Text value="निर्णय"/> <select name="accept">
+                      <option value="no"> <Text value="अस्वीकार करें"/> </option>
+                      <option value="yes"> <Text value="सहमति जाँचकर स्वीकृत करें"/> </option>
                     </select>
                   </label>
-                  <label> नया रिश्ता <select name="relationship">
-                      <option value="self"> स्वयं </option>
-                      <option value="guardian"> बच्चे का अभिभावक </option>
-                      <option value="relative"> जानकारी सँभालने वाला रिश्तेदार </option>
+                  <label> <Text value="नया रिश्ता"/> <select name="relationship">
+                      <option value="self"> <Text value="स्वयं"/> </option>
+                      <option value="guardian"> <Text value="बच्चे का अभिभावक"/> </option>
+                      <option value="relative"> <Text value="जानकारी सँभालने वाला रिश्तेदार"/> </option>
                     </select>
                   </label>
-                  <label> सहमति का आधार <textarea name="reason" required minLength={15} />
+                  <label> <Text value="सहमति का आधार"/> <textarea name="reason" required minLength={15} />
                   </label>
                 </Form>
               </article>
             ))}
           <details className="hub-card">
-            <summary> प्रशासक के अधिकार हटाएँ </summary>
-            <p> यह कार्य दूसरा प्रशासक करेगा। बाद में दोनों खाते लॉगआउट होंगे। </p>
+            <summary> <Text value="प्रशासक के अधिकार हटाएँ"/> </summary>
+            <p> <Text value="यह कार्य दूसरा प्रशासक करेगा। बाद में दोनों खाते लॉगआउट होंगे।"/> </p>
             <Form
               label="प्रशासक अधिकार हटाएँ"
               onSubmit={async (b) => {
@@ -1098,7 +1103,7 @@ export default function Hub() {
                 }
               }}
             >
-              <label> प्रशासक <select name="target" required>
+              <label> <Text value="प्रशासक"/> <select name="target" required>
                   {me.members
                     .filter(
                       (m: Row) => m.role === "admin" && m.id !== me.actor.id,
@@ -1110,9 +1115,9 @@ export default function Hub() {
                     ))}
                 </select>
               </label>
-              <label> कारण <textarea name="reason" required minLength={15} />
+              <label> <Text value="कारण"/> <textarea name="reason" required minLength={15} />
               </label>
-              <label> आपका वर्तमान पासवर्ड <input
+              <label> <Text value="आपका वर्तमान पासवर्ड"/> <input
                   name="password"
                   type="password"
                   autoComplete="current-password"

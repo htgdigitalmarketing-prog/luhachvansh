@@ -1,3 +1,4 @@
+import extra from "./english-ui.json" with {type:"json"};
 const words={
  "Request failed": "अनुरोध पूरा नहीं हो सका।",
  "Request failed.": "अनुरोध पूरा नहीं हो सका।",
@@ -543,3 +544,6 @@ const words={
 };
 export const hiText=value=>{const s=String(value??" ");if(words[s])return words[s];return s.replace(/Recorded mother|Recorded father|Recorded spouse|Recorded children|Recorded siblings|Visible recorded family|Your verification request was declined: |Your proposal has an objection: /g,t=>words[t]||t);};
 export const hiError=value=>{const s=hiText(value);return /[\u0900-\u097f]/.test(s)?s:"अनुरोध पूरा नहीं हो सका। जानकारी जाँचकर फिर कोशिश करें। आवश्यकता हो तो प्रशासक से संपर्क करें।";};
+
+const english=Object.fromEntries(Object.entries(words).map(([en,hi])=>[hi,en]));
+export const enText=value=>{const s=String(value??" ");if(extra[s])return extra[s];if(english[s])return english[s];return english[hiText(s)]||s;};

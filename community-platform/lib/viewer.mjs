@@ -6,6 +6,9 @@ export function viewerData(db, actor) {
   const ids = new Set(people.map(p => p.id));
   const edges = db.all('SELECT id,a,b,type,role FROM relationships WHERE active=1')
     .filter(r => ids.has(r.a) && ids.has(r.b));
+  return graphData(people,edges);
+}
+export function graphData(people,edges){
   const parents = new Map(), spouses = new Map();
   for (const r of edges) {
     if (r.type === 'parent') { const a = parents.get(r.b) || []; a.push({id:r.a,role:r.role}); parents.set(r.b,a); }

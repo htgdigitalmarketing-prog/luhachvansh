@@ -1,6 +1,18 @@
 import { DatabaseSync } from 'node:sqlite';
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync,readFileSync,statSync } from 'node:fs';
+import { resolve,dirname } from 'node:path';
+import {createHash} from 'node:crypto';
+let cachedTranslations={},cachedStamp='',cachedFile='';
+export function englishText(value){
+ const source=String(value??'');
+ const dbPath=process.env.LUHACH_HERITAGE_DB||process.env.LUHACH_MEMBER_DB||resolve('data/members.sqlite');
+ const file=resolve(dirname(dbPath),'heritage-en.json');
+ if(!existsSync(file))return source;
+ const stamp=String(statSync(file).mtimeMs);
+ if(stamp!==cachedStamp||file!==cachedFile){try{cachedTranslations=JSON.parse(readFileSync(file,'utf8'));cachedStamp=stamp;cachedFile=file;}catch{return source;}}
+ return source.split(/\n+/).map(p=>cachedTranslations[createHash('sha256').update(p).digest('hex')]||p).join('\n\n');
+}
+export function englishTexts(values){englishText('');return values.map(value=>String(value??'').split(/\n+/).map(p=>cachedTranslations[createHash('sha256').update(p).digest('hex')]||p).join('\n\n'));}
 
 // Read the captured content without opening accounts, contacts or private forms.
 export function openHeritage() {

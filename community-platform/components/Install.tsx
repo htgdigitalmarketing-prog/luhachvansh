@@ -1,4 +1,5 @@
 "use client";
+import {Text} from "./Language";
 import { useEffect, useState } from "react";
 export default function Install() {
   const [prompt, setPrompt] = useState<any>(null);
@@ -18,6 +19,6 @@ export default function Install() {
         await prompt.prompt();
         setPrompt(null);
       }}
-    > ऐप जोड़ें </button>
+    > <Text value="ऐप जोड़ें"/> </button>
   ) : null;
 }

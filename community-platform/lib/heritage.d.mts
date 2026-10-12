@@ -13,5 +13,7 @@ export type HeritageData={
 };
 export function openHeritage():DatabaseSync|null;
 export function textOnly(value?:unknown):string;
+export function englishText(value:unknown):string;
+export function englishTexts(values:unknown[]):string[];
 export function readHeritage():HeritageData|null;
 export const sections:Record<string,string>;

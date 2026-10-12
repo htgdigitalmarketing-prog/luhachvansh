@@ -3,6 +3,8 @@ export interface PersonRecord {
   id: string; // Internal UUID for graph manipulation
   genealogyId: string; // Semantic ID: Village_Page_Gen_Serial
   name: string;
+  nameEnglish?: string;
+  villageEnglish?: string;
   fatherName: string | null;
   parentIds?: string[];
   spouseIds?: string[];

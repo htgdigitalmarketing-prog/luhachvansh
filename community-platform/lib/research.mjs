@@ -2,7 +2,7 @@ import villages from "../content/villages.json" with { type: "json" };
 import { Problem } from "./store.mjs";
 import https from "node:https";
 // Native HTTPS with IPv4 avoids this workstation's intermittent fetch/TLS resets.
-function gemini(body) {
+export function gemini(body, timeoutMs = 25000) {
   return new Promise((resolve, reject) => {
     const req = https.request(
       {
@@ -36,7 +36,7 @@ function gemini(body) {
       },
     );
     req.on("error", reject);
-    req.setTimeout(25000, () => req.destroy(new Error("Provider timeout")));
+    req.setTimeout(timeoutMs, () => req.destroy(new Error("Provider timeout")));
     req.end(JSON.stringify(body));
   });
 }
