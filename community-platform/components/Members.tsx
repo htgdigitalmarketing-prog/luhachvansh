@@ -330,7 +330,7 @@ export default function Members() {
       <div className="preview-bar">
         <span>
           <LockKeyhole size={12} />
-          {t("LOCAL REVIEW · NOT PUBLISHED", "स्थानीय समीक्षा · प्रकाशित नहीं")}
+          {t("REVIEW WEBSITE · SEPARATE FROM THE LIVE SITE", "समीक्षा वेबसाइट · लाइव साइट से अलग")}
         </span>
         <a href="/demo">
           {t("Fictional family demo", "काल्पनिक परिवार नमूना")} ↗
@@ -520,6 +520,7 @@ export default function Members() {
                       : "निमंत्रण कोड"}
                   <input
                     name="code"
+                    type="password"
                     required
                     autoComplete="off"
                     maxLength={200}
@@ -667,10 +668,10 @@ export default function Members() {
                   >
                     <ShieldCheck size={17} />
                     {actor.role === "admin"
-                      ? "प्रशासक"
+                      ? t("Administrator", "प्रशासक")
                       : actor.verified
-                        ? "परिवार का रिश्ता सत्यापित"
-                        : "सत्यापन आवश्यक"}
+                        ? t("Family connection verified", "परिवार का रिश्ता सत्यापित")
+                        : t("Verification required", "सत्यापन आवश्यक")}
                   </span>
                 </section>
                 <section className="m-panel">

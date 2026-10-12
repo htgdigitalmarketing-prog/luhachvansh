@@ -9,3 +9,5 @@ The exact temporary Hostinger staging hostname now has the same HTTPS, same-orig
 Ajay and Dr. Shagun introductions are prepared in an ignored private draft, without credentials, identity documents, home addresses or personal contacts. Real account creation and persisted UI testing await the user's password entry. No archival identity or marriage link is inferred from names.
 
 Production build passed. Member/guard tests passed 20/20 after correcting a test-only audit column typo. Account closure clears introductions.
+
+Hosted verification: v8 Completed/Current on the isolated Node application. Owner setup is prepared for ajay.luhach; creation remains pending user password submission. Before enabling setup, a server-side copy of the 13.39 MiB member database was saved under the private before-profile-test-20261013 directory (the source WAL was 0 B).

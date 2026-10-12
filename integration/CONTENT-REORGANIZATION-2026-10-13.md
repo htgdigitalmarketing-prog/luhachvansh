@@ -13,3 +13,5 @@ Coverage verification checks 69 rendered routes: all 141 article/profile records
 The full suite passed 60 tests before the additional malformed-guide regression; all five targeted editorial/privacy tests passed after it. Production build passed. Browser checks confirmed Hindi/English switching, all 84 source paragraphs on the illustrated Gugaheri article, photo navigation from 1/26 to 2/26, full-resolution links, resolved Rohtak/Haryana labels and mobile layout without horizontal overflow (390px viewport, 375px document width).
 
 Only the isolated temporary Hostinger Node app is a deployment target. The original Laravel website and production MySQL remain unchanged. The test-domain mapping cutover is a separate outstanding hosting task.
+
+Hosted verification: Hostinger marked community-node-v7.zip Completed/Current at 02:48 IST on 13.10.2026; v8 also completed with member introductions and staging login. The staged Hindi history reader shows the new chapter overview and all 322 original paragraphs remain under Full story. The 69-route audit was repeated locally with zero omitted source records, paragraphs or media.
