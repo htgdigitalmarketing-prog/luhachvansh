@@ -1,4 +1,5 @@
 "use client";
+import {hiText,hiError} from "../lib/hindi.mjs";
 import { useState } from "react";
 export default function ProfilePicker({
   name,
@@ -18,7 +19,7 @@ export default function ProfilePicker({
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Name or village"
+          placeholder="नाम या गाँव"
         />
       </label>
       <input type="hidden" name={name} value={chosen?.id || ""} />
@@ -35,19 +36,15 @@ export default function ProfilePicker({
             setItems(j.people);
             setError("");
           } catch (e) {
-            setError((e as Error).message);
+            setError(hiError((e as Error).message));
           }
         }}
-      >
-        Search existing people
-      </button>
-      {error && <p role="alert">{error}</p>}
+      > पहले से दर्ज व्यक्ति खोजें </button>
+      {error && <p role="alert">{hiError(error)}</p>}
       {chosen && (
         <p className="selected-link">
           {chosen.name} · {chosen.village}
-          <button type="button" onClick={() => setChosen(null)}>
-            Clear selection
-          </button>
+          <button type="button" onClick={() => setChosen(null)}> चयन हटाएँ </button>
         </p>
       )}
       <div className="hub-results">

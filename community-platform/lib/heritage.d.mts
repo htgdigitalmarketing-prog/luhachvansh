@@ -1,0 +1,17 @@
+import {DatabaseSync} from 'node:sqlite';
+export type ArchivePhoto={id:string,mime:string,url:string};
+export type HeritageData={
+ about:{id:string,text:string,photos:ArchivePhoto[]}[];
+ history:{id:string,text:string}[];
+ villages:{id:string,name:string,state:string,district:string,text:string,document:ArchivePhoto|null,photos:ArchivePhoto[]}[];
+ gallery:{id:string,photo:ArchivePhoto}[];
+ news:{id:string,title:string,text:string,date:string}[];
+ team:{id:string,name:string,village:string,district:string,state:string,post:string,profession:string}[];
+ achievers:{id:string,name:string,village:string,profession:string,text:string,photo:ArchivePhoto|null}[];
+ shaheed:{id:string,name:string,village:string,district:string,state:string,father:string,post:string,unit:string,operation:string}[];
+ originalTree:ArchivePhoto|null;
+};
+export function openHeritage():DatabaseSync|null;
+export function textOnly(value?:unknown):string;
+export function readHeritage():HeritageData|null;
+export const sections:Record<string,string>;

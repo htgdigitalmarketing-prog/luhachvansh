@@ -373,15 +373,15 @@ export const CanvasTreeVisualizer: React.FC<CanvasTreeVisualizerProps> = ({
       {!isLayoutReady && (
          <div className="dynasty-loading">
              <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-2" />
-             <p className="font-semibold text-gray-700">Building Tree Hierarchy...</p>
-             <p className="text-xs text-gray-500">Arranging {records.length} nodes into {records.filter(r=>!r.fatherId).length} family trees</p>
+             <p className="font-semibold text-gray-700"> परिवार की शाखाएँ तैयार हो रही हैं… </p>
+             <p className="text-xs text-gray-500"> शाखाओं में व्यवस्थित हो रहे हैं: {records.length} व्यक्ति; कुल {records.filter(r=>!r.fatherId).length} परिवार के वृक्ष </p>
          </div>
       )}
 
       <div className="dynasty-zoom">
-         <button aria-label="Zoom in" onClick={() => setTransform(t => ({...t, k: Math.min(4,t.k * 1.2)}))} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomIn className="w-5 h-5"/></button>
-         <button aria-label="Zoom out" onClick={() => setTransform(t => ({...t, k: Math.max(.005,t.k / 1.2)}))} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomOut className="w-5 h-5"/></button>
-         <button aria-label="Reset view" onClick={() => setTransform({ x: 0, y: 0, k: 0.1 })} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><Focus className="w-5 h-5"/></button>
+         <button aria-label="पास से देखें" title="पास से देखें" onClick={() => setTransform(t => ({...t, k: Math.min(4,t.k * 1.2)}))} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomIn className="w-5 h-5"/></button>
+         <button aria-label="दूर से देखें" title="दूर से देखें" onClick={() => setTransform(t => ({...t, k: Math.max(.005,t.k / 1.2)}))} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><ZoomOut className="w-5 h-5"/></button>
+         <button aria-label="पूरा दृश्य देखें" title="पूरा दृश्य देखें" onClick={() => setTransform({ x: 0, y: 0, k: 0.1 })} className="p-2 bg-white rounded shadow text-gray-600 hover:text-blue-600"><Focus className="w-5 h-5"/></button>
       </div>
 
       <canvas

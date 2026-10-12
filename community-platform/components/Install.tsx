@@ -18,8 +18,6 @@ export default function Install() {
         await prompt.prompt();
         setPrompt(null);
       }}
-    >
-      Install / ऐप जोड़ें
-    </button>
+    > ऐप जोड़ें </button>
   ) : null;
 }

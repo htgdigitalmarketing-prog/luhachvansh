@@ -1,143 +1,26 @@
-import Link from "next/link";
-export default function Home() {
-  return (
-    <main className="heritage-home">
-      <section className="heritage-hero">
-        <div>
-          <span className="eyebrow">लुहाच परिवार · OUR SHARED ROOTS</span>
-          <h1>
-            Many branches.
-            <br />
-            One living story.
-          </h1>
-          <p className="heritage-hindi">
-            अपनी जड़ों से जुड़ें। हर रिश्ते को जगह दें।
-          </p>
-          <p>
-            Preserve a village memory. Find your place in the family. Carry our
-            shared story forward—with daughters, mothers and both sides of every
-            family included.
-          </p>
-          <div className="hub-actions">
-            <Link className="button primary" href="/members">
-              Find my family / अपना परिवार
-            </Link>
-            <Link className="button" href="/community">
-              Explore the community →
-            </Link>
-          </div>
-          <small>
-            Local review version · member information is shared by consent.
-          </small>
-        </div>
-        <figure>
-          <img
-            src="/heritage/gathering.webp"
-            alt="A community gathering preserved from the earlier Luhach website"
-          />
-          <figcaption>
-            From the earlier community archive · identities and date unverified
-          </figcaption>
-        </figure>
-      </section>
-      <section className="heritage-stats">
-        <div>
-          <strong>46</strong>
-          <span>Village histories / गाँव</span>
-        </div>
-        <div>
-          <strong>10,061</strong>
-          <span>Preserved family records</span>
-        </div>
-        <div>
-          <strong>Every branch</strong>
-          <span>Daughters, mothers & married families</span>
-        </div>
-      </section>
-      <section className="heritage-intro">
-        <span className="eyebrow">A FAMILY ARCHIVE THAT CAN GROW</span>
-        <h2>What would you like to discover?</h2>
-        <div className="hub-grid">
-          {[
-            [
-              "01",
-              "Our villages",
-              "Read the histories of the places our families call home.",
-              "/community",
-            ],
-            [
-              "02",
-              "Our family tree",
-              "Trace recorded connections and help fill missing branches.",
-              "/members",
-            ],
-            [
-              "03",
-              "Our people, everywhere",
-              "Find consenting members by city, state or country.",
-              "/community",
-            ],
-            [
-              "04",
-              "Stories worth keeping",
-              "Contribute photographs, biographies and village memories.",
-              "/community",
-            ],
-            [
-              "05",
-              "Ask the archive",
-              "Explore sources with the history assistant and relationship tracer.",
-              "/community",
-            ],
-            [
-              "06",
-              "Your trust matters",
-              "Choose who sees your profile. Verify before contributing.",
-              "/members",
-            ],
-          ].map(([n, title, body, href]) => (
-            <Link className="heritage-feature" key={n} href={href}>
-              <span>{n}</span>
-              <h3>{title}</h3>
-              <p>{body}</p>
-              <strong>Explore →</strong>
-            </Link>
-          ))}
-        </div>
-      </section>
-      <section className="heritage-band">
-        <h2>A daughter’s story belongs in the tree.</h2>
-        <p>
-          One person, connected to her birth family and married family. New
-          information keeps its source, receives community review and can be
-          corrected without erasing its history.
-        </p>
-        <Link className="button" href="/members">
-          Help complete your branch →
-        </Link>
-      </section>
-      <section className="heritage-intro">
-        <h2>Built with care, together.</h2>
-        <div className="hub-three">
-          <p>
-            <strong>Verify the connection.</strong>
-            <br />A trusted reviewer checks your link to a family profile.
-            Verification is independent of signing in.
-          </p>
-          <p>
-            <strong>Share by choice.</strong>
-            <br />
-            New profiles begin private. Children stay private. City discovery
-            and contacts each require consent.
-          </p>
-          <p>
-            <strong>Keep the evidence.</strong>
-            <br />
-            Sources travel with contributions. An objection pauses acceptance so
-            a reviewer can resolve the conflict.
-          </p>
-        </div>
-      </section>
-    </main>
-  );
+import Link from 'next/link';
+import {readHeritage} from '../lib/heritage.mjs';
+export const dynamic='force-dynamic';
+export default function Home(){
+ const data=readHeritage();
+ const about=data?.about.find((r:any)=>r.id==='1');
+ const hero=data?.gallery.find((r:any)=>r.photo.mime.startsWith('image/'))?.photo.url||'/heritage/gathering.webp';
+ return <main className="heritage-home">
+ <section className="heritage-hero"><div><span className="eyebrow">लुहाच परिवार · हमारी साझा धरोहर</span><h1>अपनी जड़ों से जुड़ें।<br/>हर रिश्ते को जगह दें।</h1><p className="heritage-hindi">हमारा इतिहास, हमारे गाँव और हमारे परिवार — एक साथ।</p><p>अपने पुरखों और परिवार की शाखाओं को खोजें। बेटियों, माताओं और बहुओं के छूटे हुए रिश्ते जोड़कर वंशावली पूरी करने में साथ दें।</p><div className="hub-actions"><Link className="button primary" href="/vanshavali">वंशावली देखें →</Link><Link className="button" href="/heritage/villages">अपने गाँव के बारे में पढ़ें</Link></div></div><figure><img src={hero} alt="लुहाच परिवार के पुराने संग्रह की तस्वीर"/><figcaption>लुहाच परिवार की स्मृतियों से</figcaption></figure></section>
+ <section className="heritage-stats"><div><strong>{data?.villages.length||'—'}</strong><span>गाँव के लेख और दस्तावेज़</span></div><div><strong>10,061</strong><span>वंशावली में संजोए गए नाम</span></div><div><strong>हर रिश्ता</strong><span>बेटियाँ, माताएँ और बहुएँ भी</span></div></section>
+ <section className="heritage-intro"><span className="eyebrow">हमारा परिवार</span><h2>लुहाच वंश के बारे में</h2><p className="home-story">{about?.text.slice(0,650)||'लुहाच परिवार के इतिहास, गाँव और स्मृतियों के संग्रह में आपका स्वागत है।'}</p><Link className="button" href="/heritage/about">पूरा परिचय पढ़ें →</Link><div className="hub-grid">{[
+ ['हमारा इतिहास','लुहाच वंश का इतिहास और पुराने लेख।','/heritage/history'],
+ ['हमारे गाँव','गाँव का इतिहास, तस्वीरें और मूल वंशावली दस्तावेज़।','/heritage/villages'],
+ ['वंशावली और जार्विस','परिवार की शाखाएँ देखें, रिश्ते खोजें और अपने प्रश्न पूछें।','/vanshavali'],
+ ['तस्वीरें और स्मृतियाँ','समारोहों और गाँवों की पुरानी तस्वीरें।','/heritage/gallery'],
+ ['समाज की प्रतिभाएँ','समाज के सदस्यों के परिचय और उपलब्धियाँ।','/heritage/achievers'],
+ ['हमारे शहीद','वीरता और बलिदान को नमन।','/heritage/shaheed'],
+ ['कुलदेवी','संग्रह में संजोई गई हमारी परंपरा।','/heritage/kuldevi'],
+ ['हमारी टीम','समाज को जोड़ने वाले साथी।','/heritage/team'],
+ ['सदस्य समुदाय','गाँव की जानकारी और फोटो जोड़ें; सहमति से सदस्यों से जुड़ें।','/community']
+ ].map(([title,body,href],i)=><Link className="heritage-feature" href={href} key={href}><span>{String(i+1).padStart(2,'0')}</span><h3>{title}</h3><p>{body}</p><strong>खोलें →</strong></Link>)}</div></section>
+ <section className="heritage-band"><h2>बेटी की कहानी भी वंशावली का हिस्सा है।</h2><p>एक ही व्यक्ति को जन्म के परिवार और विवाह के परिवार से जोड़ें। नया नाम जोड़ने से पहले खोजें, ताकि एक व्यक्ति की दो प्रविष्टियाँ न बनें। सदस्य जानकारी जोड़ सकते हैं; आपत्ति आने पर प्रशासक उसका समाधान करेंगे।</p><Link className="button" href="/members">अपने परिवार का छूटा रिश्ता जोड़ें →</Link></section>
+ <section className="heritage-intro"><h2>समाज के समाचार</h2><div className="hub-three">{data?.news.slice(0,3).map((r:any)=><Link href={'/heritage/news/'+r.id} key={r.id}><h3>{r.title}</h3><p>{r.text.slice(0,230)}…</p><strong>पूरा समाचार पढ़ें →</strong></Link>)}</div><Link className="button" href="/heritage/news">सभी समाचार देखें</Link></section>
+ <section className="heritage-intro"><h2>विश्वास और आपकी सहमति</h2><div className="hub-three"><p><strong>रिश्ते का सत्यापन</strong><br/>सदस्य की परिवार से पहचान की जाँच प्रशासक करते हैं।</p><p><strong>साझा करना आपका निर्णय</strong><br/>नई प्रोफ़ाइल और बच्चों की जानकारी निजी रहती है। संपर्क और स्थान के लिए अलग सहमति ली जाती है।</p><p><strong>स्रोत के साथ जानकारी</strong><br/>परिवार के अभिलेख या जानकारी देने वाले व्यक्ति का उल्लेख रखें, ताकि सुधार और विवाद का समाधान हो सके।</p></div></section>
+ </main>;
 }

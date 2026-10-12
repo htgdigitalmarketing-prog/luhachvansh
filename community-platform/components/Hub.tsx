@@ -1,4 +1,5 @@
 "use client";
+import {hiText,hiError} from "../lib/hindi.mjs";
 import { useEffect, useState, FormEvent } from "react";
 type Row = Record<string, any>;
 async function api(path: string, data?: Row) {
@@ -13,14 +14,14 @@ async function api(path: string, data?: Row) {
       : { cache: "no-store" },
   );
   const j = await r.json();
-  if (!r.ok) throw Error(j.error || "Request failed");
+  if (!r.ok) throw Error(j.error || "अनुरोध पूरा नहीं हो सका।");
   return j;
 }
-const date = (n: number) => new Date(n).toLocaleDateString("en-IN");
+const date = (n: number) => new Date(n).toLocaleDateString("hi-IN");
 function Form({
   children,
   onSubmit,
-  label = "Save",
+  label = "सुरक्षित करें",
 }: {
   children: React.ReactNode;
   onSubmit: (b: Row) => Promise<void>;
@@ -44,7 +45,7 @@ function Form({
     >
       {children}
       <button disabled={busy} className="primary">
-        {busy ? "Working…" : label}
+        {busy ? "कृपया प्रतीक्षा करें…" : label}
       </button>
     </form>
   );
@@ -61,7 +62,7 @@ function Finder({
   return (
     <div className="hub-finder">
       <Form
-        label="Search profiles"
+        label="प्रोफ़ाइल खोजें"
         onSubmit={async (b) => {
           try {
             setItems(
@@ -73,7 +74,7 @@ function Finder({
             );
             setErr("");
           } catch (e) {
-            setErr((e as Error).message);
+            setErr(hiError((e as Error).message));
           }
         }}
       >
@@ -83,11 +84,11 @@ function Finder({
             name="q"
             required
             minLength={2}
-            placeholder="Name or village / नाम या गाँव"
+            placeholder="नाम या गाँव"
           />
         </label>
       </Form>
-      {err && <p role="alert">{err}</p>}
+      {err && <p role="alert">{hiError(err)}</p>}
       <div className="hub-results">
         {items.map((p) => (
           <button
@@ -114,7 +115,7 @@ export default function Hub() {
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [loading, setLoading] = useState(true),
-    [hi, setHi] = useState(false);
+    [hi, setHi] = useState(true);
   const [village, setVillage] = useState(""),
     [filter, setFilter] = useState(""),
     [people, setPeople] = useState<Row[]>([]),
@@ -143,7 +144,7 @@ export default function Hub() {
   }
   useEffect(() => {
     refresh()
-      .catch((e) => setError(e.message))
+      .catch((e) => setError(hiError(e.message)))
       .finally(() => setLoading(false));
   }, []);
   useEffect(() => {
@@ -160,7 +161,7 @@ export default function Hub() {
         setPeople([]);
         setAnswer(null);
         setPath(null);
-        setError("Your session has been idle for 30 minutes. Sign in again.");
+        setError("30 मिनट तक उपयोग नहीं हुआ। कृपया फिर लॉगिन करें।");
         api("/api/members", { action: "logout" }).catch(() => {});
       }
     }, 15000);
@@ -178,9 +179,9 @@ export default function Hub() {
     try {
       await api("/api/hub", { action, ...b });
       await refresh();
-      setNotice("Saved. / सुरक्षित किया गया।");
+      setNotice("सुरक्षित किया गया।");
     } catch (e) {
-      setError((e as Error).message);
+      setError(hiError((e as Error).message));
     }
   }
   async function research(b: Row) {
@@ -196,7 +197,7 @@ export default function Hub() {
         }),
       );
     } catch (e) {
-      setError((e as Error).message);
+      setError(hiError((e as Error).message));
     }
   }
   const selected = archive.find((v) => v.name === village),
@@ -205,65 +206,53 @@ export default function Hub() {
   if (loading)
     return (
       <main className="hub-wrap">
-        <p>Opening your community…</p>
+        <p> सदस्य समुदाय खुल रहा है… </p>
       </main>
     );
   if (!me?.actor.verified)
     return (
       <main className="hub-wrap">
         <section className="hub-card">
-          <h1>Your community, with trust.</h1>
+          <h1> विश्वास से जुड़ा हमारा समुदाय। </h1>
           <p>
             {me
-              ? "Your family profile needs independent verification before you can browse community records or contact members."
-              : "Sign in to explore the community archive and meet verified members."}
+              ? "समुदाय के अभिलेख देखने या सदस्यों से संपर्क करने से पहले परिवार के रिश्ते का सत्यापन आवश्यक है।"
+              : "संग्रह देखने और सत्यापित सदस्यों से जुड़ने के लिए लॉगिन करें।"}
           </p>
-          <p role="alert">{error}</p>
-          <a className="button primary" href="/members">
-            Sign in & verify your profile
-          </a>
+          <p role="alert">{hiError(error)}</p>
+          <a className="button primary" href="/members"> लॉगिन करें और प्रोफ़ाइल सत्यापित कराएँ </a>
           {me && (
             <>
               <p>
                 <a
                   href="/api/hub?action=export"
                   download="luhach-my-records.json"
-                >
-                  Download my account data
-                </a>
+                > मेरे खाते की जानकारी डाउनलोड करें </a>
               </p>
               <details>
-                <summary>Close my unverified account</summary>
-                <p>
-                  Login credentials are removed and pending requests are
-                  withdrawn. Audit evidence and prior contributions are
-                  retained.
-                </p>
+                <summary> मेरा असत्यापित खाता बंद करें </summary>
+                <p> लॉगिन की जानकारी हट जाएगी और लंबित अनुरोध वापस होंगे। पुराने योगदान और कार्यों का विवरण सुरक्षित रहेगा। </p>
                 <Form
-                  label="Close my account permanently"
+                  label="मेरा खाता स्थायी रूप से बंद करें"
                   onSubmit={async (b) => {
                     try {
                       if (b.confirm !== "CLOSE")
-                        throw Error("Type CLOSE to confirm.");
+                        throw Error("पुष्टि के लिए CLOSE लिखें।");
                       await api("/api/hub", { action: "close", ...b });
                       window.location.href = "/";
                     } catch (e) {
-                      setError((e as Error).message);
+                      setError(hiError((e as Error).message));
                     }
                   }}
                 >
-                  <label>
-                    Current password
-                    <input
+                  <label> वर्तमान पासवर्ड <input
                       type="password"
                       name="password"
                       required
                       autoComplete="current-password"
                     />
                   </label>
-                  <label>
-                    Type CLOSE
-                    <input name="confirm" required pattern="CLOSE" />
+                  <label> CLOSE लिखें <input name="confirm" required pattern="CLOSE" />
                   </label>
                 </Form>
               </details>
@@ -276,10 +265,10 @@ export default function Hub() {
     <main className="hub-wrap">
       <header className="hub-title">
         <div>
-          <span className="eyebrow">लुहाच परिवार · COMMUNITY</span>
-          <p className="hub-help">Signed in as {me.actor.name}</p>
+          <span className="eyebrow"> लुहाच परिवार · सदस्य समुदाय </span>
+          <p className="hub-help"> लॉगिन सदस्य {me.actor.name}</p>
           <h1>
-            {t("Our stories. Our people.", "अपनी कहानियाँ। अपना परिवार।")}
+            {t("हमारी कहानियाँ। हमारे अपने लोग।", "अपनी कहानियाँ। अपना परिवार।")}
           </h1>
           <p>
             {t(
@@ -290,15 +279,15 @@ export default function Hub() {
         </div>
         <button onClick={() => setHi(!hi)}>{hi ? "English" : "हिन्दी"}</button>
       </header>
-      <nav className="hub-tabs" aria-label="Community sections">
+      <nav className="hub-tabs" aria-label="समुदाय के विषय">
         {[
-          ["villages", "Villages", "गाँव"],
-          ["stories", "Stories & photos", "कहानियाँ और तस्वीरें"],
-          ["connect", "Find members", "सदस्य खोजें"],
-          ["inbox", "Messages", "संदेश"],
-          ["research", "Ask the archive", "विरासत से पूछें"],
-          ["account", "My data", "मेरा डेटा"],
-          ...(admin ? [["moderate", "Review desk", "समीक्षा"]] : []),
+          ["villages", "गाँव", "गाँव"],
+          ["stories", "कहानियाँ और तस्वीरें", "कहानियाँ और तस्वीरें"],
+          ["connect", "सदस्य खोजें", "सदस्य खोजें"],
+          ["inbox", "संदेश", "संदेश"],
+          ["research", "जार्विस से पूछें", "विरासत से पूछें"],
+          ["account", "मेरी जानकारी", "मेरा डेटा"],
+          ...(admin ? [["moderate", "समीक्षा कक्ष", "समीक्षा"]] : []),
         ].map(([id, en, hn]) => (
           <button
             key={id}
@@ -315,7 +304,7 @@ export default function Hub() {
       </nav>
       {error && (
         <p className="hub-alert" role="alert">
-          {error}
+          {hiError(error)}
         </p>
       )}
       {notice && (
@@ -329,9 +318,7 @@ export default function Hub() {
             <h2>
               {t("46 villages. A shared history.", "46 गाँव। एक साझा इतिहास।")}
             </h2>
-            <label>
-              Search villages / गाँव खोजें
-              <input
+            <label> गाँव खोजें <input
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 placeholder="गाँव का नाम"
@@ -340,23 +327,13 @@ export default function Hub() {
           </div>
           {selected ? (
             <article className="hub-card">
-              <button onClick={() => setVillage("")}>
-                ← All villages / सभी गाँव
-              </button>
+              <button onClick={() => setVillage("")}> ← सभी गाँव </button>
               <h2>{selected.name}</h2>
-              <p className="hub-label">
-                Preserved archive · source review pending
-              </p>
+              <p className="hub-label"> पुराने संग्रह से </p>
               <div className="hub-prose">{selected.text}</div>
-              <a href={selected.source} target="_blank" rel="noreferrer">
-                Original website source ↗
-              </a>
-              <p>
-                Help correct a place name, add a source or preserve a memory.
-              </p>
-              <button onClick={() => setTab("stories")}>
-                Contribute to this village
-              </button>
+              <a href={selected.source} target="_blank" rel="noreferrer"> मूल वेबसाइट का पृष्ठ ↗ </a>
+              <p> गाँव की जानकारी सुधारें, स्रोत जोड़ें या स्मृति साझा करें। </p>
+              <button onClick={() => setTab("stories")}> इस गाँव के बारे में जानकारी जोड़ें </button>
             </article>
           ) : (
             <div className="hub-grid">
@@ -377,7 +354,7 @@ export default function Hub() {
                         .slice(0, 100)}
                       …
                     </p>
-                    <strong>Read the village story →</strong>
+                    <strong> गाँव की कहानी पढ़ें → </strong>
                   </button>
                 ))}
             </div>
@@ -386,11 +363,8 @@ export default function Hub() {
       )}
       {tab === "stories" && (
         <>
-          <h2>{t("The community collection", "समुदाय का संग्रह")}</h2>
-          <p>
-            Every memory keeps its source. New submissions have a seven-day
-            objection window.
-          </p>
+          <h2>{t("समुदाय की स्मृतियाँ", "समुदाय का संग्रह")}</h2>
+          <p> हर स्मृति के साथ उसका स्रोत रखें। नई जानकारी पर सात दिन तक आपत्ति दी जा सकती है। </p>
           <div className="hub-gallery">
             {[
               "village-road.webp",
@@ -402,24 +376,20 @@ export default function Hub() {
                   src={"/heritage/" + f}
                   alt={
                     [
-                      "Village road sign from the earlier website",
-                      "Community gathering from the earlier website",
-                      "Seated community gathering from the earlier website",
+                      "पुरानी वेबसाइट से गाँव का नाम-पट्ट",
+                      "पुरानी वेबसाइट से समुदाय का मिलन समारोह",
+                      "पुरानी वेबसाइट से मिलन समारोह की तस्वीर",
                     ][i]
                   }
                 />
-                <figcaption>
-                  Earlier website archive · date and identities unverified
-                </figcaption>
+                <figcaption> पुरानी वेबसाइट का संग्रह </figcaption>
               </figure>
             ))}
           </div>
           <details className="hub-card">
-            <summary>
-              Add a village story, biography or photograph / योगदान करें
-            </summary>
+            <summary> गाँव की कहानी, जीवन परिचय या तस्वीर जोड़ें </summary>
             <Form
-              label="Submit for community review"
+              label="समुदाय की समीक्षा के लिए भेजें"
               onSubmit={async (b) => {
                 await act("contribute", {
                   ...b,
@@ -428,33 +398,23 @@ export default function Hub() {
                 });
               }}
             >
-              <label>
-                Contribution type
-                <select name="kind">
-                  <option value="village">Village information</option>
-                  <option value="biography">
-                    Person’s biography / remembrance
-                  </option>
-                  <option value="photo">Photograph</option>
+              <label> योगदान का प्रकार <select name="kind">
+                  <option value="village"> गाँव की जानकारी </option>
+                  <option value="biography"> जीवन परिचय / स्मरण </option>
+                  <option value="photo"> तस्वीर </option>
                 </select>
               </label>
-              <label>
-                Title
-                <input name="title" required minLength={4} maxLength={160} />
+              <label> शीर्षक <input name="title" required minLength={4} maxLength={160} />
               </label>
-              <label>
-                Village
-                <select name="village" defaultValue={village}>
-                  <option value="">Community-wide</option>
+              <label> गाँव <select name="village" defaultValue={village}>
+                  <option value=""> पूरे समुदाय के लिए </option>
                   {archive.map((v) => (
                     <option key={v.name}>{v.name}</option>
                   ))}
                 </select>
               </label>
-              <label>
-                Linked person (required for a biography)
-                <select name="person_id">
-                  <option value="">No individual profile</option>
+              <label> संबंधित व्यक्ति (जीवन परिचय के लिए आवश्यक) <select name="person_id">
+                  <option value=""> किसी एक व्यक्ति की प्रोफ़ाइल नहीं </option>
                   {me.own.map((p: Row) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -462,14 +422,8 @@ export default function Hub() {
                   ))}
                 </select>
               </label>
-              <p className="hub-help">
-                Living people need an approved steward’s consent. Children’s
-                biographies are excluded. Request stewardship through the family
-                area before writing a biography.
-              </p>
-              <label>
-                Story or description
-                <textarea
+              <p className="hub-help"> जीवित व्यक्ति के लिए अधिकृत देखभालकर्ता की सहमति चाहिए। बच्चों के जीवन परिचय यहाँ नहीं जोड़े जाते। लिखने से पहले परिवार क्षेत्र में अनुमति माँगें। </p>
+              <label> कहानी या विवरण <textarea
                   name="body"
                   required
                   minLength={20}
@@ -477,18 +431,14 @@ export default function Hub() {
                   rows={5}
                 />
               </label>
-              <label>
-                Source, page, date or first-hand account
-                <textarea
+              <label> स्रोत, पृष्ठ, तिथि या प्रत्यक्ष जानकारी <textarea
                   name="source"
                   required
                   minLength={10}
                   maxLength={1000}
                 />
               </label>
-              <label>
-                Photograph (JPEG, PNG or WebP, up to 8 MB)
-                <input
+              <label> तस्वीर (JPEG, PNG या WebP; अधिकतम 8 MB) <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   disabled={uploading}
@@ -507,10 +457,10 @@ export default function Hub() {
                       if (!r.ok) throw Error(j.error);
                       setMedia(j.id);
                       setNotice(
-                        "Photo prepared; camera metadata removed. Submit the contribution to attach it.",
+                        "तस्वीर तैयार है। कैमरे की अतिरिक्त जानकारी हटा दी गई है। अब अपना योगदान भेजें।",
                       );
                     } catch (e) {
-                      setError((e as Error).message);
+                      setError(hiError((e as Error).message));
                     } finally {
                       setUploading(false);
                     }
@@ -521,14 +471,11 @@ export default function Hub() {
                 <img
                   className="hub-upload"
                   src={"/api/media?id=" + media}
-                  alt="Your uploaded photograph"
+                  alt="आपकी अपलोड की गई तस्वीर"
                 />
               )}
               <label className="hub-check">
-                <input name="consent" type="checkbox" required />I have
-                permission to share this text/photo and the consent of
-                identifiable living people.
-              </label>
+                <input name="consent" type="checkbox" required /> मुझे यह लेख / तस्वीर साझा करने की अनुमति है और पहचान में आने वाले जीवित व्यक्तियों की सहमति है। </label>
             </Form>
           </details>
           <div className="hub-grid">
@@ -542,7 +489,7 @@ export default function Hub() {
                   />
                 )}
                 <span className={"hub-label " + c.status}>
-                  {c.status} · {c.kind}
+                  {hiText(c.status)} · {hiText(c.kind)}
                 </span>
                 <h3>{c.title}</h3>
                 <small>
@@ -550,42 +497,34 @@ export default function Hub() {
                 </small>
                 <p className="hub-prose">{c.body}</p>
                 <p>
-                  <strong>Source:</strong> {c.source}
+                  <strong> स्रोत: </strong> {c.source}
                 </p>
                 {c.status === "pending" && (
-                  <p>
-                    Objections close {date(c.due)}. Acceptance records the
-                    review result, not historical certainty.
-                  </p>
+                  <p> आपत्ति देने की अंतिम तिथि {date(c.due)} । स्वीकृति समीक्षा का निर्णय है; ऐतिहासिक सत्यता का प्रमाण नहीं। </p>
                 )}
                 {c.decision && <p>{c.decision}</p>}
                 {c.objections.map((o: Row, i: number) => (
-                  <p key={i} className="hub-alert">
-                    Objection: {o.reason}
+                  <p key={i} className="hub-alert"> आपत्ति: {o.reason}
                   </p>
                 ))}
                 {["pending", "accepted"].includes(c.status) && (
                   <details>
-                    <summary>Raise a correction or objection</summary>
+                    <summary> सुधार या आपत्ति दें </summary>
                     <Form
-                      label="Pause for review"
+                      label="समीक्षा के लिए रोकें"
                       onSubmit={(b) => act("objectContent", { ...b, id: c.id })}
                     >
-                      <label>
-                        Reason
-                        <textarea required minLength={10} name="reason" />
+                      <label> कारण <textarea required minLength={10} name="reason" />
                       </label>
                     </Form>
                   </details>
                 )}
                 {c.author === me.actor.id && c.status !== "withdrawn" && (
                   <Form
-                    label="Withdraw my contribution"
+                    label="मेरा योगदान वापस लें"
                     onSubmit={(b) => act("withdrawContent", { ...b, id: c.id })}
                   >
-                    <label>
-                      Withdrawal reason
-                      <input required minLength={10} name="reason" />
+                    <label> वापस लेने का कारण <input required minLength={10} name="reason" />
                     </label>
                   </Form>
                 )}
@@ -593,9 +532,7 @@ export default function Hub() {
             ))}
           </div>
           {!content.length && (
-            <p className="hub-empty">
-              The new collection is ready for its first contribution.
-            </p>
+            <p className="hub-empty"> नया संग्रह आपके योगदान के लिए तैयार है। </p>
           )}
         </>
       )}
@@ -603,22 +540,16 @@ export default function Hub() {
         <>
           <h2>
             {t(
-              "Find a familiar connection, wherever you go.",
+              "जहाँ भी जाएँ, अपने समुदाय से जुड़ें।",
               "जहाँ जाएँ, अपने समुदाय से जुड़ें।",
             )}
           </h2>
-          <p>
-            Search a city, state or country. Only verified adults who opt in
-            appear here. Phone numbers and email addresses are not included.
-          </p>
+          <p> शहर, राज्य या देश से खोजें। केवल सहमति देने वाले सत्यापित वयस्क दिखते हैं। फ़ोन और ईमेल खोज में नहीं दिखते। </p>
           <details className="hub-card">
-            <summary>My directory visibility / मेरी उपलब्धता</summary>
-            <p>
-              Turning this off hides you and pauses your conversations. Exact
-              addresses are never requested.
-            </p>
+            <summary> स्थान खोज में मेरी उपलब्धता </summary>
+            <p> यह विकल्प बंद करने पर आपका नाम छिपेगा और बातचीत रुकेगी। घर का पूरा पता नहीं माँगा जाता। </p>
             <Form
-              label="Save directory preference"
+              label="उपलब्धता का विकल्प सुरक्षित करें"
               onSubmit={(b) =>
                 act("directory", {
                   ...b,
@@ -627,13 +558,11 @@ export default function Hub() {
                 })
               }
             >
-              <label>
-                My verified self-profile
-                <select
+              <label> मेरी सत्यापित प्रोफ़ाइल <select
                   name="person_id"
                   defaultValue={state?.directory?.person_id || ""}
                 >
-                  <option value="">Choose your own profile</option>
+                  <option value=""> अपनी प्रोफ़ाइल चुनें </option>
                   {state?.myClaims
                     .filter((c: Row) => c.relationship === "self")
                     .map((c: Row) => (
@@ -643,25 +572,19 @@ export default function Hub() {
                     ))}
                 </select>
               </label>
-              <label>
-                City
-                <input
+              <label> शहर <input
                   name="city"
                   defaultValue={state?.directory?.city || ""}
                   maxLength={80}
                 />
               </label>
-              <label>
-                State / region
-                <input
+              <label> राज्य / क्षेत्र <input
                   name="state"
                   defaultValue={state?.directory?.state || ""}
                   maxLength={80}
                 />
               </label>
-              <label>
-                Country
-                <input
+              <label> देश <input
                   name="country"
                   defaultValue={state?.directory?.country || ""}
                   maxLength={80}
@@ -672,19 +595,14 @@ export default function Hub() {
                   name="enabled"
                   type="checkbox"
                   defaultChecked={!!state?.directory?.enabled}
-                />
-                Show me to verified members and allow connection requests.
-              </label>
+                /> मुझे सत्यापित सदस्यों की खोज में दिखाएँ और संपर्क अनुरोध आने दें। </label>
               <label className="hub-check">
-                <input name="consent" type="checkbox" />I consent to sharing
-                this city-level location. My profile visibility must also allow
-                verified members.
-              </label>
+                <input name="consent" type="checkbox" /> मैं शहर की जानकारी साझा करने की सहमति देता/देती हूँ। मेरी प्रोफ़ाइल भी सत्यापित सदस्यों को दिखनी चाहिए। </label>
             </Form>
-            <a href="/members">Manage family profile privacy →</a>
+            <a href="/members"> परिवार की प्रोफ़ाइल की गोपनीयता चुनें → </a>
           </details>
           <Form
-            label="Find members"
+            label="सदस्य खोजें"
             onSubmit={async (b) => {
               try {
                 setPeople(
@@ -693,13 +611,11 @@ export default function Hub() {
                   ),
                 );
               } catch (e) {
-                setError((e as Error).message);
+                setError(hiError((e as Error).message));
               }
             }}
           >
-            <label>
-              City, state, country or member name
-              <input name="q" placeholder="Jaipur, Haryana, India…" />
+            <label> शहर, राज्य, देश या सदस्य का नाम <input name="q" placeholder="जयपुर, हरियाणा, भारत…" />
             </label>
           </Form>
           <div className="hub-grid">
@@ -708,12 +624,10 @@ export default function Hub() {
                 <h3>{p.name}</h3>
                 <p>{[p.city, p.state, p.country].filter(Boolean).join(", ")}</p>
                 <Form
-                  label="Request a connection"
+                  label="संपर्क का अनुरोध करें"
                   onSubmit={(b) => act("connect", { ...b, target: p.id })}
                 >
-                  <label>
-                    Introduce yourself
-                    <textarea
+                  <label> अपना परिचय दें <textarea
                       name="note"
                       required
                       minLength={10}
@@ -721,9 +635,7 @@ export default function Hub() {
                     />
                   </label>
                 </Form>
-                <button onClick={() => act("block", { target: p.id })}>
-                  Block member
-                </button>
+                <button onClick={() => act("block", { target: p.id })}> सदस्य को ब्लॉक करें </button>
               </article>
             ))}
           </div>
@@ -731,16 +643,9 @@ export default function Hub() {
       )}
       {tab === "inbox" && (
         <>
-          <h2>{t("Conversations, by invitation.", "सहमति से बातचीत।")}</h2>
-          <p>
-            Accept a request before messages can be exchanged. Share contact
-            details only when you choose. Messages are stored by this service;
-            they are not end-to-end encrypted. Administrators see messages you
-            explicitly report.
-          </p>
-          <button onClick={() => refresh().catch((e) => setError(e.message))}>
-            Refresh messages
-          </button>
+          <h2>{t("सहमति से बातचीत।", "सहमति से बातचीत।")}</h2>
+          <p> बातचीत शुरू करने के लिए संपर्क अनुरोध स्वीकार करें। संपर्क विवरण अपनी इच्छा से दें। संदेश इस सेवा में सुरक्षित रखे जाते हैं; उनमें एंड-टू-एंड एन्क्रिप्शन नहीं है। प्रशासक केवल वे संदेश देखते हैं जिनकी शिकायत आप करते हैं। </p>
+          <button onClick={() => refresh().catch((e) => setError(hiError(e.message)))}> नए संदेश देखें </button>
           <div className="hub-split">
             <aside>
               {state?.conversations.map((c: Row) => (
@@ -755,7 +660,7 @@ export default function Hub() {
                       : c.sender_name}
                   </strong>
                   <small>
-                    {c.status}
+                    {hiText(c.status)}
                     {c.blocked ? " · blocked" : ""}
                   </small>
                 </button>
@@ -781,9 +686,7 @@ export default function Hub() {
                               status: "accepted",
                             })
                           }
-                        >
-                          Accept connection
-                        </button>
+                        > संपर्क स्वीकार करें </button>
                         <button
                           onClick={() =>
                             act("connection", {
@@ -791,9 +694,7 @@ export default function Hub() {
                               status: "declined",
                             })
                           }
-                        >
-                          Decline
-                        </button>
+                        > अस्वीकार करें </button>
                       </div>
                     )}
                   {thread.messages.map((m: Row) => (
@@ -806,17 +707,17 @@ export default function Hub() {
                     >
                       <small>
                         {m.sender === me.actor.id
-                          ? "You"
+                          ? "आप"
                           : thread.sender === m.sender
                             ? thread.sender_name
                             : thread.recipient_name}{" "}
-                        · {new Date(m.created).toLocaleString("en-IN")}
+                        · {new Date(m.created).toLocaleString("hi-IN")}
                       </small>
                       <p>{m.body}</p>
                       <details>
-                        <summary>Report this message</summary>
+                        <summary> इस संदेश की शिकायत करें </summary>
                         <Form
-                          label="Send report to administrators"
+                          label="शिकायत प्रशासकों को भेजें"
                           onSubmit={(b) =>
                             act("report", {
                               ...b,
@@ -825,9 +726,7 @@ export default function Hub() {
                             })
                           }
                         >
-                          <label>
-                            Concern
-                            <textarea name="reason" required minLength={10} />
+                          <label> शिकायत का कारण <textarea name="reason" required minLength={10} />
                           </label>
                         </Form>
                       </details>
@@ -837,14 +736,12 @@ export default function Hub() {
                     !thread.blocked &&
                     thread.available && (
                       <Form
-                        label="Send message"
+                        label="संदेश भेजें"
                         onSubmit={(b) =>
                           act("message", { ...b, id: thread.id })
                         }
                       >
-                        <label>
-                          Your message
-                          <textarea name="body" required maxLength={3000} />
+                        <label> आपका संदेश <textarea name="body" required maxLength={3000} />
                         </label>
                       </Form>
                     )}
@@ -853,9 +750,7 @@ export default function Hub() {
                       onClick={() =>
                         act("connection", { id: thread.id, status: "closed" })
                       }
-                    >
-                      Close conversation
-                    </button>
+                    > बातचीत बंद करें </button>
                     <button
                       onClick={() =>
                         act("block", {
@@ -865,21 +760,16 @@ export default function Hub() {
                               : thread.sender,
                         })
                       }
-                    >
-                      Block member
-                    </button>
+                    > सदस्य को ब्लॉक करें </button>
                   </div>
                 </>
               ) : (
-                <p>
-                  Select a conversation. Requests from other members appear
-                  here.
-                </p>
+                <p> बातचीत चुनें। अन्य सदस्यों के अनुरोध यहाँ दिखेंगे। </p>
               )}
             </section>
           </div>
           <details className="hub-card">
-            <summary>Blocked members</summary>
+            <summary> ब्लॉक किए गए सदस्य </summary>
             {state?.blocked.map((b: Row) => (
               <p key={b.target}>
                 {b.name}{" "}
@@ -887,9 +777,7 @@ export default function Hub() {
                   onClick={() =>
                     act("block", { target: b.target, enabled: false })
                   }
-                >
-                  Unblock (a new request will be needed)
-                </button>
+                > ब्लॉक हटाएँ (नया अनुरोध आवश्यक होगा) </button>
               </p>
             ))}
           </details>
@@ -899,27 +787,23 @@ export default function Hub() {
         <>
           <h2>
             {t(
-              "Ask the archive. Follow the evidence.",
+              "संग्रह से पूछें। स्रोत के साथ समझें।",
               "विरासत से पूछें। स्रोत देखें।",
             )}
           </h2>
           <div className="hub-card">
-            <h3>How are two people connected? / रिश्ता खोजें</h3>
-            <p>
-              Paths use recorded parent and spouse links. Private profiles and
-              missing relationships are never guessed. Mothers, daughters and
-              both sides of a married family have equal place.
-            </p>
+            <h3> दो व्यक्तियों के बीच रिश्ता खोजें </h3>
+            <p> खोज दर्ज माता-पिता और पति-पत्नी के रिश्तों पर आधारित है। निजी या छूटे रिश्ते अनुमान से नहीं बनाए जाते। माताओं, बेटियों और विवाह के दोनों परिवारों को समान जगह मिलेगी। </p>
             <div className="hub-two">
               <Finder
-                label="First person"
+                label="पहला व्यक्ति"
                 onPick={(p) => {
                   setFrom(p);
                   setPath(null);
                 }}
               />
               <Finder
-                label="Second person"
+                label="दूसरा व्यक्ति"
                 onPick={(p) => {
                   setTo(p);
                   setPath(null);
@@ -927,8 +811,8 @@ export default function Hub() {
               />
             </div>
             <p>
-              {from?.name || "Choose first person"} →{" "}
-              {to?.name || "Choose second person"}
+              {from?.name || "पहला व्यक्ति चुनें"} →{" "}
+              {to?.name || "दूसरा व्यक्ति चुनें"}
             </p>
             <button
               className="primary"
@@ -944,12 +828,10 @@ export default function Hub() {
                     ),
                   );
                 } catch (e) {
-                  setError((e as Error).message);
+                  setError(hiError((e as Error).message));
                 }
               }}
-            >
-              Trace recorded relationship
-            </button>
+            > दर्ज रिश्ते का मार्ग देखें </button>
             {path &&
               (path.found ? (
                 <ol className="hub-lineage">
@@ -959,10 +841,10 @@ export default function Hub() {
                   </li>
                   {path.steps.map((s: Row, i: number) => (
                     <li key={i}>
-                      <span>{s.relation} → </span>
+                      <span>{hiText(s.relation)} → </span>
                       <strong>{s.person.name}</strong>
                       <small>
-                        {s.person.village} · Source: {s.source}
+                        {s.person.village} · स्रोत: {s.source}
                       </small>
                     </li>
                   ))}
@@ -972,45 +854,28 @@ export default function Hub() {
               ))}
           </div>
           <div className="hub-card">
-            <h3>Community assistant / समुदाय से पूछें</h3>
-            <p>
-              Gemini can summarize the earlier website’s archive. Family
-              profiles, contact details and private messages stay out of these
-              AI requests.
-            </p>
+            <h3> जार्विस / समुदाय से पूछें </h3>
+            <p> Gemini पुराने संग्रह के लेखों का सार बता सकता है। इन अनुरोधों में निजी प्रोफ़ाइल, संपर्क या निजी संदेश नहीं भेजे जाते। </p>
             <Finder
-              label="For a family question, select the person"
+              label="परिवार के प्रश्न के लिए व्यक्ति चुनें"
               onPick={setResearchPerson}
             />
-            {researchPerson && <p>Selected: {researchPerson.name}</p>}
-            <Form label="Ask the archive" onSubmit={research}>
-              <label>
-                Question type
-                <select name="mode">
-                  <option value="history">
-                    Village history (source search or optional AI)
-                  </option>
-                  <option value="family">
-                    Who is this person’s mother, father, spouse or child? (local
-                    records)
-                  </option>
-                  <option value="directory">
-                    Who is in this city, state or country? (opt-in directory)
-                  </option>
+            {researchPerson && <p> चयनित: {researchPerson.name}</p>}
+            <Form label="जार्विस से पूछें" onSubmit={research}>
+              <label> प्रश्न का प्रकार <select name="mode">
+                  <option value="history"> गाँव का इतिहास (स्रोत खोज या वैकल्पिक AI) </option>
+                  <option value="family"> इस व्यक्ति के माता-पिता, पति-पत्नी या बच्चे कौन हैं? (दर्ज अभिलेख) </option>
+                  <option value="directory"> इस शहर, राज्य या देश में कौन है? (सहमति वाले सदस्य) </option>
                 </select>
               </label>
-              <label>
-                Choose a village (helps Hindi/English questions)
-                <select name="village">
-                  <option value="">Search the full archive</option>
+              <label> गाँव चुनें <select name="village">
+                  <option value=""> पूरा संग्रह खोजें </option>
                   {archive.map((v) => (
                     <option key={v.name}>{v.name}</option>
                   ))}
                 </select>
               </label>
-              <label>
-                Question (for location search, enter the place name)
-                <textarea
+              <label> प्रश्न (स्थान खोज के लिए शहर / राज्य / देश लिखें) <textarea
                   name="question"
                   required
                   minLength={4}
@@ -1019,34 +884,26 @@ export default function Hub() {
                 />
               </label>
               <label className="hub-check">
-                <input name="ai" type="checkbox" />
-                Use AI to summarize the sources.
-              </label>
+                <input name="ai" type="checkbox" /> स्रोत का सार बताने के लिए AI इस्तेमाल करें। </label>
               <label className="hub-check">
-                <input name="consent" type="checkbox" />
-                Send this question and matching archive passages to Google
-                Gemini. I will not include private personal information.
-              </label>
+                <input name="consent" type="checkbox" /> यह प्रश्न और संबंधित संग्रह के अंश Google Gemini को भेजने की सहमति है। मैं निजी जानकारी नहीं लिखूँगा/लिखूँगी। </label>
             </Form>
             {answer && (
               <article>
                 <p className="hub-label">
                   {answer.mode === "ai"
                     ? "AI-assisted answer"
-                    : "Source search"}
+                    : "स्रोत खोजें"}
                 </p>
-                <p className="hub-prose">{answer.answer}</p>
-                {answer.notice && <p>{answer.notice}</p>}
+                <p className="hub-prose">{hiText(answer.answer)}</p>
+                {answer.notice && <p>{hiText(answer.notice)}</p>}
                 {answer.sources.map((s: Row) => (
                   <details key={s.id}>
-                    <summary>
-                      Source [{s.id}] · {s.village}
+                    <summary> स्रोत [ {s.id}] · {s.village}
                     </summary>
                     <p className="hub-prose">{s.text}</p>
-                    <a href={s.source} target="_blank" rel="noreferrer">
-                      Original village page ↗
-                    </a>
-                    <p>{s.status}</p>
+                    <a href={s.source} target="_blank" rel="noreferrer"> गाँव का मूल पृष्ठ ↗ </a>
+                    <p>{hiText(s.status)}</p>
                   </details>
                 ))}
               </article>
@@ -1056,14 +913,10 @@ export default function Hub() {
       )}
       {tab === "account" && (
         <>
-          <h2>Your information, your choices / आपका डेटा</h2>
+          <h2> आपकी जानकारी, आपका निर्णय </h2>
           <div className="hub-card">
-            <h3>Download your records</h3>
-            <p>
-              Includes your profile, contributions, requests and sent messages.
-              Excludes passwords, recovery codes and other members’ private
-              messages.
-            </p>
+            <h3> अपने अभिलेख डाउनलोड करें </h3>
+            <p> इसमें आपकी प्रोफ़ाइल, योगदान, अनुरोध और आपके भेजे संदेश होंगे। पासवर्ड, पुनर्प्राप्ति कोड या दूसरों के निजी संदेश नहीं होंगे। </p>
             <button
               onClick={async () => {
                 try {
@@ -1079,91 +932,65 @@ export default function Hub() {
                   a.click();
                   URL.revokeObjectURL(url);
                 } catch (e) {
-                  setError((e as Error).message);
+                  setError(hiError((e as Error).message));
                 }
               }}
-            >
-              Download my data
-            </button>
+            > मेरी जानकारी डाउनलोड करें </button>
           </div>
           <details className="hub-card">
-            <summary>Transfer family stewardship</summary>
-            <p>
-              A second administrator checks consent and the relationship. This
-              also supports a child reaching adulthood. Existing privacy
-              settings are reset to private.
-            </p>
+            <summary> परिवार की जानकारी सँभालने की अनुमति हस्तांतरित करें </summary>
+            <p> दूसरा प्रशासक सहमति और रिश्ते की जाँच करेगा। बच्चे के वयस्क होने पर भी यह विकल्प उपयोगी है। गोपनीयता दोबारा निजी हो जाएगी। </p>
             <Form
-              label="Request independent transfer review"
+              label="स्वतंत्र जाँच के लिए अनुरोध करें"
               onSubmit={(b) => act("transfer", b)}
             >
-              <label>
-                Current stewardship
-                <select name="claim" required>
-                  <option value="">Select</option>
+              <label> वर्तमान अनुमति <select name="claim" required>
+                  <option value=""> चुनें </option>
                   {state?.myClaims.map((c: Row) => (
                     <option key={c.id} value={c.id}>
-                      {c.name} · {c.relationship}
+                      {c.name} · {hiText(c.relationship)}
                     </option>
                   ))}
                 </select>
               </label>
-              <label>
-                Receiving member’s account ID
-                <input name="target" required />
+              <label> अनुमति लेने वाले सदस्य का खाता क्रमांक <input name="target" required />
               </label>
-              <label>
-                Consent, relationship and reason
-                <textarea name="reason" required minLength={15} />
+              <label> सहमति, रिश्ता और कारण <textarea name="reason" required minLength={15} />
               </label>
             </Form>
-            <p>
-              Your account ID: <code>{me.actor.id}</code> (share it with a
-              steward only if a transfer is intended).
-            </p>
+            <p> आपका खाता क्रमांक: <code>{me.actor.id}</code> (केवल अनुमति हस्तांतरण के लिए संबंधित व्यक्ति को दें)। </p>
             {state?.transfers.map((r: Row) => (
               <p key={r.id}>
-                {r.status}: {r.reason}
+                {hiText(r.status)}: {r.reason}
               </p>
             ))}
           </details>
           <details className="hub-card">
-            <summary>Close my account</summary>
-            <p>
-              This signs you out, removes login credentials, hides your profiles
-              and directory entry, and withdraws pending contributions. Accepted
-              heritage contributions, lineage records, existing messages and
-              audit evidence are retained for continuity. Your account name
-              becomes “Former member”. Administrators must first hand over their
-              role.
-            </p>
+            <summary> मेरा खाता बंद करें </summary>
+            <p> आप लॉगआउट होंगे, लॉगिन की जानकारी हटेगी, प्रोफ़ाइल और स्थान खोज से नाम छिपेगा तथा लंबित योगदान वापस होंगे। स्वीकृत धरोहर योगदान, वंशावली, पुराने संदेश और कार्यों का इतिहास सुरक्षित रहेगा। नाम “पूर्व सदस्य” हो जाएगा। प्रशासक को पहले अपना पद सौंपना होगा। </p>
             <Form
-              label="Close my account permanently"
+              label="मेरा खाता स्थायी रूप से बंद करें"
               onSubmit={async (b) => {
                 if (b.confirm !== "CLOSE") {
-                  setError("Type CLOSE to confirm.");
+                  setError("पुष्टि के लिए CLOSE लिखें।");
                   return;
                 }
                 try {
                   await api("/api/hub", { action: "close", ...b });
                   window.location.href = "/";
                 } catch (e) {
-                  setError((e as Error).message);
+                  setError(hiError((e as Error).message));
                 }
               }}
             >
-              <label>
-                Current password
-                <input
+              <label> वर्तमान पासवर्ड <input
                   name="password"
                   type="password"
                   autoComplete="current-password"
                   required
                 />
               </label>
-              <label>
-                Type CLOSE
-                <input name="confirm" required pattern="CLOSE" />
+              <label> CLOSE लिखें <input name="confirm" required pattern="CLOSE" />
               </label>
             </Form>
           </details>
@@ -1171,49 +998,42 @@ export default function Hub() {
       )}
       {tab === "moderate" && admin && (
         <>
-          <h2>Community review desk / सामुदायिक समीक्षा</h2>
-          <p>
-            Family verification and lineage decisions remain in{" "}
-            <a href="/members">Admin desk →</a>. Review your own contributions
-            through a different administrator.
-          </p>
+          <h2> सामुदायिक समीक्षा </h2>
+          <p> परिवार का सत्यापन और रिश्तों के निर्णय यहाँ करें: {" "}
+            <a href="/members"> प्रशासक कक्ष → </a> । अपने योगदान की समीक्षा दूसरे प्रशासक से कराएँ। </p>
           {content
             .filter((c) =>
               ["pending", "disputed", "accepted"].includes(c.status),
             )
             .map((c) => (
               <article className="hub-card" key={c.id}>
-                <span className="hub-label">{c.status}</span>
+                <span className="hub-label">{hiText(c.status)}</span>
                 <h3>{c.title}</h3>
                 <p>{c.body}</p>
-                <p>Source: {c.source}</p>
+                <p> स्रोत: {c.source}</p>
                 {c.objections.map((o: Row, i: number) => (
-                  <p key={i}>Objection: {o.reason}</p>
+                  <p key={i}> आपत्ति: {o.reason}</p>
                 ))}
                 <Form
-                  label="Record review decision"
+                  label="समीक्षा का निर्णय दर्ज करें"
                   onSubmit={(b) => act("reviewContent", { ...b, id: c.id })}
                 >
-                  <label>
-                    Decision
-                    <select name="status">
-                      <option value="accepted">Accept</option>
-                      <option value="rejected">Reject</option>
-                      <option value="removed">Remove from collection</option>
+                  <label> निर्णय <select name="status">
+                      <option value="accepted"> स्वीकार करें </option>
+                      <option value="rejected"> अस्वीकार करें </option>
+                      <option value="removed"> संग्रह से हटाएँ </option>
                     </select>
                   </label>
-                  <label>
-                    Evidence and explanation
-                    <textarea name="reason" required minLength={10} />
+                  <label> जाँच का आधार और विवरण <textarea name="reason" required minLength={10} />
                   </label>
                 </Form>
               </article>
             ))}
-          <h3>Member safety reports</h3>
+          <h3> सदस्य सुरक्षा की शिकायतें </h3>
           {state?.reports.map((r: Row) => (
             <article className="hub-card" key={r.id}>
               <p>
-                {r.reason} · {r.status}
+                {r.reason} · {hiText(r.status)}
               </p>
               {r.reported_message && (
                 <blockquote>{r.reported_message}</blockquote>
@@ -1221,28 +1041,25 @@ export default function Hub() {
               <p>{r.decision}</p>
               {r.status === "open" && (
                 <Form
-                  label="Resolve report"
+                  label="शिकायत का समाधान करें"
                   onSubmit={(b) => act("resolveReport", { ...b, id: r.id })}
                 >
-                  <label>
-                    Action and explanation
-                    <textarea name="reason" required minLength={10} />
+                  <label> कार्रवाई और विवरण <textarea name="reason" required minLength={10} />
                   </label>
                 </Form>
               )}
             </article>
           ))}
-          <h3>Stewardship transfers</h3>
+          <h3> जानकारी सँभालने की अनुमति का हस्तांतरण </h3>
           {state?.transfers
             .filter((r: Row) => r.status === "pending")
             .map((r: Row) => (
               <article className="hub-card" key={r.id}>
                 <p>{r.reason}</p>
-                <p>
-                  From {r.author} to {r.recipient}
+                <p> किससे {r.author} to {r.recipient}
                 </p>
                 <Form
-                  label="Record transfer decision"
+                  label="हस्तांतरण का निर्णय दर्ज करें"
                   onSubmit={(b) =>
                     act("reviewTransfer", {
                       ...b,
@@ -1251,50 +1068,37 @@ export default function Hub() {
                     })
                   }
                 >
-                  <label>
-                    Decision
-                    <select name="accept">
-                      <option value="no">Reject</option>
-                      <option value="yes">
-                        Approve after checking consent
-                      </option>
+                  <label> निर्णय <select name="accept">
+                      <option value="no"> अस्वीकार करें </option>
+                      <option value="yes"> सहमति जाँचकर स्वीकृत करें </option>
                     </select>
                   </label>
-                  <label>
-                    New relationship
-                    <select name="relationship">
-                      <option value="self">Self</option>
-                      <option value="guardian">Guardian of child</option>
-                      <option value="relative">Relative steward</option>
+                  <label> नया रिश्ता <select name="relationship">
+                      <option value="self"> स्वयं </option>
+                      <option value="guardian"> बच्चे का अभिभावक </option>
+                      <option value="relative"> जानकारी सँभालने वाला रिश्तेदार </option>
                     </select>
                   </label>
-                  <label>
-                    Evidence of consent
-                    <textarea name="reason" required minLength={15} />
+                  <label> सहमति का आधार <textarea name="reason" required minLength={15} />
                   </label>
                 </Form>
               </article>
             ))}
           <details className="hub-card">
-            <summary>Remove an administrator’s role</summary>
-            <p>
-              Another administrator must perform this action. Both accounts are
-              signed out afterward.
-            </p>
+            <summary> प्रशासक के अधिकार हटाएँ </summary>
+            <p> यह कार्य दूसरा प्रशासक करेगा। बाद में दोनों खाते लॉगआउट होंगे। </p>
             <Form
-              label="Remove administrator role"
+              label="प्रशासक अधिकार हटाएँ"
               onSubmit={async (b) => {
                 try {
                   await api("/api/hub", { action: "demote", ...b });
                   window.location.href = "/members";
                 } catch (e) {
-                  setError((e as Error).message);
+                  setError(hiError((e as Error).message));
                 }
               }}
             >
-              <label>
-                Administrator
-                <select name="target" required>
+              <label> प्रशासक <select name="target" required>
                   {me.members
                     .filter(
                       (m: Row) => m.role === "admin" && m.id !== me.actor.id,
@@ -1306,13 +1110,9 @@ export default function Hub() {
                     ))}
                 </select>
               </label>
-              <label>
-                Reason
-                <textarea name="reason" required minLength={15} />
+              <label> कारण <textarea name="reason" required minLength={15} />
               </label>
-              <label>
-                Your current password
-                <input
+              <label> आपका वर्तमान पासवर्ड <input
                   name="password"
                   type="password"
                   autoComplete="current-password"
