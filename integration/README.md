@@ -27,6 +27,8 @@ The legacy export tool has not run against the hosting database; PHP is unavaila
 
 At initial inspection the signed-in GitHub account `ajay1694-max` had READ permission and no pending invitation. Developer should grant Write access and identify the hosting/deployment account and test branch. Only `main` existed; no GitHub deployments were listed.
 
+Update 12.10.2026: GitHub WRITE permission is now verified. The prepared code is pushed to `integration/test-community-20261012` in the developer repository. Hosting/deployment access and the private database/media export remain outstanding; this push is not a website deployment.
+
 The repository has no export of business tables and no migrations defining them. The controller reads `members`, `village`, `village_gallery`, `news`, `gallery`, `history`, `about`, `team`, `shaheed`, `district`, `only_village`, `join_us`. Therefore code access alone is not the live dataset.
 
 ## Preserve and reconcile data
