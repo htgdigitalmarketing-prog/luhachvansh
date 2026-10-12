@@ -1,0 +1,306 @@
+a{
+    text-decoration:none !important;
+}
+.downloadDirectory {
+    height: 80vh;
+    background-image: url("../img/vansh_trip.jpg");
+    opacity: 1;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.downloadDirectory h2 {
+    text-shadow: 2px 2px white;
+}
+.downloadDirectory button {
+    width: 30%;
+    font-size: 32px;
+    color: white;
+    background-color: #006fbe;
+    border: white;
+}
+.downloadDirectory button span {
+    font-size: 32px;
+}
+.professionContainer .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: capitalize;
+    font-weight: 700;
+}
+.professionContainer .card-footer p {
+    margin-bottom: 0px;
+}
+.morePro {
+    margin-top: 25px;
+}
+
+.evolution {
+    margin-top: 30px;
+}
+.evolutionTree {
+    margin-top: -60px;
+}
+
+.genealogy-scroll::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+}
+.genealogy-scroll::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: #e4e4e4;
+}
+.genealogy-scroll::-webkit-scrollbar-thumb {
+    background: #212121;
+    border-radius: 10px;
+    transition: 0.5s;
+}
+.genealogy-scroll::-webkit-scrollbar-thumb:hover {
+    background: #d5b14c;
+    transition: 0.5s;
+}
+
+.genealogy-body {
+    white-space: nowrap;
+    overflow-y: hidden;
+    padding: 50px;
+    min-height: 500px;
+    padding-top: 10px;
+}
+.genealogy-tree ul {
+    padding-top: 20px;
+    position: relative;
+    padding-left: 0px;
+    display: flex;
+}
+.genealogy-tree li {
+    float: left;
+    text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 20px 5px 0 5px;
+}
+.genealogy-tree li::before,
+.genealogy-tree li::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #ccc;
+    width: 50%;
+    height: 18px;
+}
+.genealogy-tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #ccc;
+}
+.genealogy-tree li:only-child::after,
+.genealogy-tree li:only-child::before {
+    display: none;
+}
+.genealogy-tree li:only-child {
+    padding-top: 0;
+}
+.genealogy-tree li:first-child::before,
+.genealogy-tree li:last-child::after {
+    border: 0 none;
+}
+.genealogy-tree li:last-child::before {
+    border-right: 2px solid #ccc;
+    border-radius: 0 5px 0 0;
+    -webkit-border-radius: 0 5px 0 0;
+    -moz-border-radius: 0 5px 0 0;
+}
+.genealogy-tree li:first-child::after {
+    border-radius: 5px 0 0 0;
+    -webkit-border-radius: 5px 0 0 0;
+    -moz-border-radius: 5px 0 0 0;
+}
+.genealogy-tree ul ul::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 2px solid #ccc;
+    width: 0;
+    height: 20px;
+}
+.genealogy-tree li a {
+    text-decoration: none;
+    color: #666;
+    font-family: arial, verdana, tahoma;
+    font-size: 11px;
+    display: inline-block;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+.genealogy-tree li a:hover + ul li::after,
+.genealogy-tree li a:hover + ul li::before,
+.genealogy-tree li a:hover + ul::before,
+.genealogy-tree li a:hover + ul ul::before {
+    border-color: #fbba00;
+}
+
+/*--------------memeber-card-design----------*/
+.member-view-box .card-body {
+    padding: 5px 20px;
+    text-align: center;
+    border-radius: 4px;
+    position: relative;
+}
+.member-view-box .card-footer p {
+    margin-bottom: 5px;
+}
+.member-image {
+    width: 60px;
+    position: relative;
+}
+.member-image img {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    background-color: #000;
+    z-index: 1;
+}
+
+.familyTreeSearch .form-group {
+    width: 50%;
+}
+.familyTreeSearch .input-group button {
+    border: 1px solid skyblue;
+    color: white;
+    background-color: #006fbe;
+    padding: 0 10px;
+}
+
+@media (max-width: 500px) {
+    #hero {
+        padding: 0px !important;
+        height: 32vh !important;
+    }
+    .order-3 .sideImg {
+        margin-top: 0px !important;
+    }
+    .familyTreeSearch .form-group {
+        width: 90%;
+    }
+    .sideImg {
+        margin-top: 155px !important;
+        margin-bottom: 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .downloadDirectory button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    #hero {
+        padding: 0px !important;
+        height: 40vh;
+    }
+    .myHero .carousel {
+        margin-top: 0px !important;
+    }
+    .sideImg {
+        margin-top: 175px !important;
+        margin-bottom: 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.myHero .carousel {
+    margin-top: 155px;
+}
+.sideImg {
+    padding: 15px 0px 0 0;
+    margin-top: 155px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height:55vh ;
+}
+.sideImg .card-footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+#header .social-links {
+    font-size: 36px;
+}
+.numo {
+    font-family: "Courier New", Courier, monospace !important;
+    margin-left: 20px;
+    font-weight: 600;
+}
+
+.scroll-left {
+    height: 50px;
+    overflow: hidden;
+    position: relative;
+    background: #2b3c6f;
+    color: white;
+    border: 1px solid orange;
+    text-decoration:none !important;
+}
+
+.scroll-left .pot {
+    font-weight: 600;
+    display: flex;
+    flex-direction: row;
+   align-items:center;
+   justify-content:center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    line-height: 50px;
+    text-align: center;
+    transform: translateX(100%);
+    animation: scroll-left 20s linear infinite;
+}
+
+.scroll-left .pot p {
+    white-space: nowrap;
+    margin-right: 20px;
+    margin-bottom:0px !important;
+}
+
+.scroll-left .pot p span {
+    padding: 12px 10px 14px 10px;
+    background: red;
+    clip-path: ellipse(50% 22% at 50% 50%);
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@media(min-height: 700px) {
+    .sideImg{
+        height:60vh
+    }
+}
+
+.textSize{
+    font-size:20px;
+    /* font-family: 'Martel Sans', sans-serif; */
+font-family: 'Mukta', sans-serif !important;
+line-height:10px;
+}
+
