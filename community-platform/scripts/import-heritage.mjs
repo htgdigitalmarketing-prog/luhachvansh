@@ -1,0 +1,13 @@
+import { readdirSync,readFileSync,writeFileSync,mkdirSync,copyFileSync } from 'node:fs';
+import { resolve,join } from 'node:path';
+import sharp from 'sharp';
+const source=resolve(process.argv[2]||'../luhach-dynasty');
+const dir=join(source,'content/search/city');
+const strip=s=>s.replace(/\b(?:p|a:link|a:visited|span|body|h[1-6])\s*\{[^}]*\}/gi,'').replace(/^(?:\s*>)+\s*/gm,'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/@page[\s\S]*?\}/g,'').replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/<[^>]*>/g,'').replace(/[*#]/g,'').replace(/\\-/g,'-').replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi,'[contact omitted]').replace(/(?:\+91[ -]?)?\b[6-9]\d{9}\b/g,'[contact omitted]').replace(/\n\s*\n\s*\n/g,'\n\n').trim();
+const villages=readdirSync(dir).filter(f=>f.endsWith('.md')).map(f=>{const raw=readFileSync(join(dir,f),'utf8'),front=raw.match(/^---\r?\n([\s\S]*?)\r?\n---/),body=raw.slice(front?.[0].length||0);return{name:decodeURIComponent(f.slice(0,-3)),source:front?.[1].match(/^url:\s*(.+)$/m)?.[1].trim()||'https://luhachvansh.com',text:strip(body),status:'Legacy website archive; historical claims await source review.'};});
+mkdirSync('content',{recursive:true});writeFileSync('content/villages.json',JSON.stringify(villages,null,2));
+mkdirSync('public/heritage',{recursive:true});
+const files=[['asset_1767152786266_559.jpg','gathering.webp'],['asset_1767152789272_495.jpg','village-road.webp'],['asset_1767152834547_839.jpg','community-event.webp']];
+for(const [original,file] of files)await sharp(join(source,'public/images',original)).rotate().resize({width:1600,withoutEnlargement:true}).webp({quality:85}).toFile(join('public/heritage',file));
+writeFileSync('content/heritage-sources.json',JSON.stringify({imported:'10.10.2026',source:'Recovered Luhach Dynasty project, original village markdown and original website photographs.',villages:villages.length,photos:files.map(file=>({file,caption:'Photograph preserved from the earlier Luhach website. Date and individual identities have not been independently verified.'}))},null,2));
+console.log(`Imported ${villages.length} village histories and ${files.length} original photographs. No family relationships modified.`);

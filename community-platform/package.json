@@ -1,0 +1,39 @@
+{
+  "name": "luhach-community",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "next build",
+    "start": "node scripts/dev.mjs --production",
+    "test": "node --test tests/*.test.mjs",
+    "import": "node scripts/import.mjs",
+    "backup": "node scripts/backup.mjs",
+    "setup:members": "node scripts/setup-members.mjs",
+    "backup:protected": "node scripts/protected-backup.mjs",
+    "demo:seed": "node scripts/seed-walkthrough.mjs"
+  },
+  "dependencies": {
+    "csv-parse": "7.0.3",
+    "lucide-react": "0.562.0",
+    "next": "15.5.27",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "^8.5.23",
+    "nanoid": "^3.3.18",
+    "source-map-js": "^1.2.2"
+  }
+}

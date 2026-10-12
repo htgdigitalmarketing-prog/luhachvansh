@@ -11,3 +11,11 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+/.local-integration/
+/community-platform/node_modules/
+/community-platform/.next*/
+/community-platform/data/
+/community-platform/backups/
+/community-platform/.env.local
+
+__pycache__/

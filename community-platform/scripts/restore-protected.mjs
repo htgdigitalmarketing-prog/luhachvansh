@@ -1,0 +1,15 @@
+import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
+import {resolve,join} from 'node:path';
+import {createDecipheriv} from 'node:crypto';
+import {DatabaseSync} from 'node:sqlite';
+const [input,keyFile,destination]=process.argv.slice(2);
+if(!input||!keyFile||!destination)throw Error('Usage: node scripts/restore-protected.mjs <encrypted-backup.json> <key-file> <new-output-directory>');
+const output=resolve(destination);if(existsSync(output))throw Error('Destination already exists. Choose a new directory; running data is never overwritten.');
+const e=JSON.parse(readFileSync(resolve(input),'utf8'));if(e.version!==1||e.algorithm!=='AES-256-GCM')throw Error('Unsupported backup.');
+const key=Buffer.from(readFileSync(resolve(keyFile),'utf8').trim(),'hex'),d=createDecipheriv('aes-256-gcm',key,Buffer.from(e.iv,'hex'));d.setAuthTag(Buffer.from(e.tag,'hex'));
+const bundle=JSON.parse(Buffer.concat([d.update(Buffer.from(e.data,'base64')),d.final()]));
+if(bundle.version!==1||!Array.isArray(bundle.media))throw Error('Invalid bundle.');for(const m of bundle.media)if(!/^[a-f0-9-]+\.webp$/.test(m.name))throw Error('Invalid media filename.');
+mkdirSync(output,{recursive:true});const dbPath=join(output,'members.sqlite');writeFileSync(dbPath,Buffer.from(bundle.database,'base64'),{flag:'wx'});const db=new DatabaseSync(dbPath);const check=db.prepare('PRAGMA integrity_check').get();if(Object.values(check)[0]!=='ok')throw Error('Integrity check failed. Restored files are isolated; do not activate them.');
+const people=db.prepare('SELECT COUNT(*) n FROM people').get().n;db.exec('DELETE FROM member_sessions; DELETE FROM sessions;');db.close();
+mkdirSync(join(output,'members.sqlite.media'),{recursive:true});for(const m of bundle.media)writeFileSync(join(output,'members.sqlite.media',m.name),Buffer.from(m.data,'base64'),{flag:'wx'});
+console.log(JSON.stringify({integrity:'ok',people,media:bundle.media.length,database:dbPath,note:'Restore is isolated. To review it locally, set LUHACH_MEMBER_DB to this database path before npm start. Sessions and invitations must be renewed.'},null,2));

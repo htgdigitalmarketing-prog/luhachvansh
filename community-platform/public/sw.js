@@ -1,0 +1,4 @@
+// Network-only application: never cache member pages, API responses or photographs.
+self.addEventListener('install',()=>self.skipWaiting());
+self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
+self.addEventListener('fetch',event=>{if(event.request.mode==='navigate')event.respondWith(fetch(event.request).catch(()=>new Response('<!doctype html><html lang="en"><meta name="viewport" content="width=device-width"><title>Luhach Parivar · Offline</title><body style="font:20px system-ui;padding:40px;background:#f8f5ef;color:#234b3e"><h1>You are offline.</h1><p>Reconnect to open the family archive. Private member information is not stored offline.</p><a href="/">Try again</a></body></html>',{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}})));});

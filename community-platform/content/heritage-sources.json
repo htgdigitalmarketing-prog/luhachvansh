@@ -1,0 +1,28 @@
+{
+  "imported": "10.10.2026",
+  "source": "Recovered Luhach Dynasty project, original village markdown and original website photographs.",
+  "villages": 46,
+  "photos": [
+    {
+      "file": [
+        "asset_1767152786266_559.jpg",
+        "gathering.webp"
+      ],
+      "caption": "Photograph preserved from the earlier Luhach website. Date and individual identities have not been independently verified."
+    },
+    {
+      "file": [
+        "asset_1767152789272_495.jpg",
+        "village-road.webp"
+      ],
+      "caption": "Photograph preserved from the earlier Luhach website. Date and individual identities have not been independently verified."
+    },
+    {
+      "file": [
+        "asset_1767152834547_839.jpg",
+        "community-event.webp"
+      ],
+      "caption": "Photograph preserved from the earlier Luhach website. Date and individual identities have not been independently verified."
+    }
+  ]
+}
