@@ -2,14 +2,16 @@
 import {createContext,useContext,useEffect,useState} from 'react';
 import {hiText,enText} from '../lib/hindi.mjs';
 type Language='hi'|'en';
+export type ViewerAction={type:'focus'|'trace'|'village',person?:string,target?:string,village?:string};
 type PublicPerson={id:string,name?:string,nameEnglish?:string};
-const Context=createContext<{language:Language,setLanguage:(l:Language)=>void,tr:(v:unknown,en?:string)=>string,person:PublicPerson|null,setPerson:(p:PublicPerson|null)=>void}>({language:'hi',setLanguage:()=>{},tr:v=>hiText(v),person:null,setPerson:()=>{}});
+const Context=createContext<{language:Language,setLanguage:(l:Language)=>void,tr:(v:unknown,en?:string)=>string,viewerAction:ViewerAction|null,setViewerAction:(a:ViewerAction|null)=>void,person:PublicPerson|null,setPerson:(p:PublicPerson|null)=>void}>({language:'hi',setLanguage:()=>{},tr:v=>hiText(v),viewerAction:null,setViewerAction:()=>{},person:null,setPerson:()=>{}});
 export function LanguageProvider({children}:{children:React.ReactNode}){
  const [language,setLanguage]=useState<Language>('hi');
  const [person,setPerson]=useState<PublicPerson|null>(null);
+ const [viewerAction,setViewerAction]=useState<ViewerAction|null>(null);
  useEffect(()=>{const stored=localStorage.getItem('luhach-language');if(stored==='en'||stored==='hi')setLanguage(stored);},[]);
  useEffect(()=>{document.documentElement.lang=language;document.title=language==="hi"?"लुहाच परिवार — इतिहास, गाँव और वंशावली":"Luhach Family — History, Villages and Family Tree";localStorage.setItem('luhach-language',language);},[language]);
- return <Context.Provider value={{language,setLanguage,person,setPerson,tr:(v,en)=>language==='hi'?hiText(v):(en&&en!==String(v)?en:enText(v))}}>{children}</Context.Provider>;
+ return <Context.Provider value={{language,setLanguage,person,setPerson,viewerAction,setViewerAction,tr:(v,en)=>language==='hi'?hiText(v):(en&&en!==String(v)?en:enText(v))}}>{children}</Context.Provider>;
 }
 export const useLanguage=()=>useContext(Context);
 export function Text({value,en}:{value:unknown,en?:string}){const {tr}=useLanguage();return <>{tr(value,en)}</>;}
