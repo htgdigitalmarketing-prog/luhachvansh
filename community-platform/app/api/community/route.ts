@@ -4,6 +4,7 @@ import { localGuard } from '../../../lib/guard.mjs';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 function guard(req:NextRequest,write=false){
+ if(process.env.LUHACH_DEPLOYMENT==='test')throw new Problem('The fictional sandbox is available only in local review.',403);
  localGuard(req,process.env.LUHACH_LOCAL_PREVIEW,write);
 }
 function response(data:unknown,status=200){return NextResponse.json(data,{status,headers:{'Cache-Control':'no-store'}});}
