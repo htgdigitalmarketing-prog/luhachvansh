@@ -13,3 +13,5 @@ Validation: completed render inventory, representative contact sheets and poster
 Media archive retained locally and on test storage: reels-public-20261013.zip. GitHub contains the source, catalogue, tests and review records; working audio and private data are excluded.
 
 The endpoint's catalogue is bundled with the app rather than read from a temporary build directory: Hostinger relocates deployments and removes that directory. The original history/viewer media URLs redirect to the corrected narration, captions and posters. The read-only verification script checks all 48 asset sets, seeking, both original video URLs, and the matching reel block on every one of the 56 village articles.
+
+Hostinger also serves existing public files before Next redirects, so the original public MP4s, posters and captions are replaced with the male-voice copies as well. The history MP4 uses Claude's smaller upload variant to keep the source package below 10 MB; the separate media API serves the full-quality version. Both use the same narration and timing.
