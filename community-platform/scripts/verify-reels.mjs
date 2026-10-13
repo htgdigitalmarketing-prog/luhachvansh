@@ -2,7 +2,8 @@
 import {readFileSync,writeFileSync} from 'node:fs';
 const origin=process.argv[2],output=process.argv[3];
 if(!origin||!/^https:\/\/test\.luhachvansh\.com$|^http:\/\/(?:127\.0\.0\.1|localhost):\d+$/.test(origin))throw Error('Use the local preview or the test domain only.');
-const list=['reels.json','village-reels.json'].flatMap(f=>JSON.parse(readFileSync(new URL('../content/'+f,import.meta.url),'utf8')).reels);
+const list=['reels.json','village-reels.json'].flatMap(f=>JSON.parse(readFileSync(new URL('../content/'+f,import.meta.url),'utf8')).reels).filter(r=>!process.env.LUHACH_VERIFY_SLUGS||process.env.LUHACH_VERIFY_SLUGS.split(',').includes(r.slug));
+if(!list.length)throw Error('No catalogue reels selected.');
 const results=[];
 for(let i=0;i<list.length;i+=4)await Promise.all(list.slice(i,i+4).map(async r=>{
  const result={slug:r.slug,assets:[],pages:[],ok:true};
