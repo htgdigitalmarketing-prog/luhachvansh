@@ -218,7 +218,30 @@ A synthetic test with the same structure checks two things:
 
 ## Commits, remotes and package
 
-These are recorded below after the commit.
+**Commit.** `785f0dc`: "Voice input, node-linked signup, family explorer and consent-based publication". This result document is committed separately; see `git log`.
+
+**Remotes.** The commit is pushed to both remotes, on branch `integration/test-community-20261012`:
+- `origin` (htgdigitalmarketing-prog/luhachvansh): `685215f..785f0dc`
+- `review` (ajay1694-max/luhach-community): `685215f..785f0dc`
+
+**Not committed.** Codex's `TEST-DOMAIN-MOVE-2026-10-13.md` is left uncommitted because it contains a hosting account path.
+
+**Package.** `C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/community-node-v13.zip`
+- 9,079,684 bytes, under the 10 MB upload limit.
+- Built with `git archive` from `HEAD:community-platform`, the same layout as v12, so it holds git-tracked source and public assets only.
+- Checked to contain no `.env.local`, no `.sqlite`, no recovery key, no `node_modules` and no `.next`.
+
+**Not deployed.**
+
+**Deployment notes for Codex**
+- Keep the existing environment variables. `LUHACH_DEPLOYMENT=test` and an absolute, existing `LUHACH_MEMBER_DB` are now strictly required.
+- After deploying, check that `/api/health` reports `storageReady: true` and `contentReady: true`.
+- On first start the app makes additive schema changes:
+  - the `people.public_code` column and its unique index
+  - the `claim_context` table
+  - codes for any existing member-added people
+
+  Nothing is dropped or rewritten.
 
 ## Human input still needed
 
