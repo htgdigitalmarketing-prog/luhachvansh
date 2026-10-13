@@ -2,9 +2,11 @@ import {answerMitra} from './mitra.mjs';
 import {publicViewerData,publicFamily,publicLineage} from './public-viewer.mjs';
 import {readHeritage,englishText} from './heritage.mjs';
 import {gemini} from './research.mjs';
+import {villageKey} from './villages.mjs';
 
 const norm=v=>String(v||'').normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}]/gu,' ').replace(/\s+/g,' ').trim();
-const villageNorm=v=>{const n=norm(v);return ['gugaheri','gugahedi','guga heri','गूगाहेड़ी','गुगाहेड़ी','गुगाहेड़ी','गुगाहेरी'].map(norm).includes(n)?'gugahedi':n;};
+// Typed Gugaheri variants are kept; every other spelling comes from the source-backed alias table.
+const villageNorm=v=>{const n=norm(v);return ['gugaheri','gugahedi','guga heri','गूगाहेड़ी','गुगाहेड़ी','गुगाहेड़ी','गुगाहेरी'].map(norm).includes(n)?villageKey('गुगाहेड़ी'):villageKey(v);};
 const small=p=>({id:p.id,name:p.name,nameEnglish:p.nameEnglish,village:p.villageName,villageEnglish:p.villageEnglish});
 export function searchPeople(data,query,village=''){
  const q=norm(query).replace(/\s+(?:luhach|लुहाच)$/u,''),v=villageNorm(village);if(!q&&!v)return[];

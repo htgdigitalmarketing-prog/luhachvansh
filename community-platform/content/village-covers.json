@@ -1,0 +1,165 @@
+{
+ "reviewed": "13.10.2026",
+ "policy": "Village covers use only communal scenes (gatherings, temples, landscapes, memorial sites) chosen after viewing every public village photograph. Individual portraits are never a village cover. Villages without a suitable communal photograph show a neutral place card. Every original photograph remains in the village Photos tab and the gallery.",
+ "villages": {
+  "104": {
+   "name": "नान्धा",
+   "slides": [
+    {
+     "id": "0fd86b7b953b96f5ed57c5973e0bfb59758e80b97c6102b492aad5d6dfc19ab2",
+     "scene": "gathering"
+    },
+    {
+     "id": "17d00bb87fa615fd4fedc16516073352a494003c7cfb1b7297afbf1e02c6ba09",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "105": {
+   "name": "गिरावड़",
+   "slides": [
+    {
+     "id": "890043cb0f3a125b83626fde983ebb72cf3f0ceecce72e65ab8b4881ef6cca07",
+     "scene": "temple"
+    },
+    {
+     "id": "bf10c7fb4ae60401d4c62ae4771472e7bcec6131d22e880f80b0e27aa6d033e6",
+     "scene": "gathering"
+    },
+    {
+     "id": "cb580fc6e49b7cf00955a23204f1fee6b2cd262d5f72157e2c6122e0db25b9ba",
+     "scene": "gathering"
+    },
+    {
+     "id": "20ba4628c13019329fe92b556ef280f60de771a9aef8150712d449b73a76126d",
+     "scene": "gathering"
+    },
+    {
+     "id": "338e0bfad55aa945afc0d81ef0768c71dbf4ef9341a45ffbcd73f72b3f99154d",
+     "scene": "landscape"
+    }
+   ]
+  },
+  "106": {
+   "name": "गुगाहेड़ी",
+   "slides": [
+    {
+     "id": "66857963146a0e83612a2837eac57465e5d5fa405ec8b712404d6a832172eacf",
+     "scene": "gathering"
+    },
+    {
+     "id": "64258df985365da03be7a36e6e116dd97d937767748a1349e189aa22d5b35b40",
+     "scene": "gathering"
+    },
+    {
+     "id": "1be99978f6cbcf5315214be566295a1474c69739c51fcd0339b5f6894b19c245",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "107": {
+   "name": "नीमली",
+   "slides": [
+    {
+     "id": "3839d1fe53d56297d815b1f3397ac320a0ae04c2500c3aa873fd4f9f7937e933",
+     "scene": "gathering"
+    },
+    {
+     "id": "99a3a33afced7bb6b0adc1d1fcc5a17700aded58a64afebcb0452b489b2a7a96",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "109": {
+   "name": "रानीला",
+   "slides": [
+    {
+     "id": "44bc73ec3f1813fbb33ccb05d5149f4e8194dce8b369236c44a6403c505b8df7",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "112": {
+   "name": "रीवाड़ी खेड़ा",
+   "slides": [
+    {
+     "id": "33331bf6bc9114fd0097812dff89334370df00c36e9c3679a86147bb12675639",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "113": {
+   "name": "रिटौली",
+   "slides": [
+    {
+     "id": "00ef1960a7055c955c399a23fe32e4d6509b5a3b62f9d68f2d06b06576fedfc5",
+     "scene": "gathering"
+    },
+    {
+     "id": "61cc6b751d1afc811707ff678a9884c357b5254811de3f0a297d974cf5e13079",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "121": {
+   "name": "नली हुसैनपुर",
+   "slides": [
+    {
+     "id": "0c9098b0730eccbf908633e1657dbc89b8c7f059bbb76309a650ed1d3ee44a6b",
+     "scene": "gathering"
+    },
+    {
+     "id": "f870b52314a5567cedf9979feebd72e54f4f46eaa94e3ea2588b2b9737baee52",
+     "scene": "gathering"
+    },
+    {
+     "id": "6150221d833d483fd65805988e525a26db3dc06af2a6e7667dd037bbc5eeb987",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "122": {
+   "name": "नंगला उगरसैन",
+   "slides": [
+    {
+     "id": "008434798162da7983301feabef156d9d290ef3bba713eea2edc251abc2ac933",
+     "scene": "gathering"
+    },
+    {
+     "id": "c7bc2939be0dee9bd6d2c76e732ceeb7b123c61b999d178a2d3936798cf97e37",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "127": {
+   "name": "भंडोली",
+   "slides": [
+    {
+     "id": "bb7830e724adcdc97a929fa39b245636581ec82f03da5956bc87cdc308b7ad92",
+     "scene": "gathering"
+    },
+    {
+     "id": "a7b33b426d895ba3d171a090e287055a2a1ee6c7c78376b94a8a7d3a4959d89c",
+     "scene": "gathering"
+    },
+    {
+     "id": "bb6654df7eeec04a6185bba3665a721a1ad46748c632145f154efc9f2b5623ba",
+     "scene": "gathering"
+    }
+   ]
+  },
+  "144": {
+   "name": "भींवपुरा",
+   "slides": [
+    {
+     "id": "7c1d59b237e0bbd36f185857f0ecb842c9ff677928c2834759bcce2c2d1c7699",
+     "scene": "memorial"
+    },
+    {
+     "id": "c55b24c415cccca245711c98e9ef06c074152d39dadb9120dfc7cce8189cd542",
+     "scene": "memorial"
+    }
+   ]
+  }
+ }
+}

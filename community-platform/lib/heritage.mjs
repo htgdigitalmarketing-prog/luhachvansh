@@ -2,17 +2,23 @@ import { DatabaseSync } from 'node:sqlite';
 import { existsSync,readFileSync,statSync } from 'node:fs';
 import { resolve,dirname } from 'node:path';
 import {createHash} from 'node:crypto';
-let cachedTranslations={},cachedStamp='',cachedFile='';
-export function englishText(value){
- const source=String(value??'');
+let cachedTranslations={},cachedStamp='',cachedFile='',checkedAt=0;
+// The translation file is re-checked at most once a second instead of on every paragraph.
+function translations(){
  const dbPath=process.env.LUHACH_HERITAGE_DB||process.env.LUHACH_MEMBER_DB||resolve('data/members.sqlite');
- const file=resolve(dirname(dbPath),'heritage-en.json');
- if(!existsSync(file))return source;
+ const file=resolve(dirname(dbPath),'heritage-en.json'),now=Date.now();
+ if(file===cachedFile&&now-checkedAt<1000)return cachedTranslations;
+ checkedAt=now;if(!existsSync(file)){cachedTranslations={};cachedFile=file;cachedStamp='';return cachedTranslations;}
  const stamp=String(statSync(file).mtimeMs);
- if(stamp!==cachedStamp||file!==cachedFile){try{cachedTranslations=JSON.parse(readFileSync(file,'utf8'));cachedStamp=stamp;cachedFile=file;}catch{return source;}}
- return source.split(/\n+/).map(p=>cachedTranslations[createHash('sha256').update(p).digest('hex')]||p).join('\n\n');
+ if(stamp!==cachedStamp||file!==cachedFile){try{cachedTranslations=JSON.parse(readFileSync(file,'utf8'));cachedStamp=stamp;cachedFile=file;}catch{cachedTranslations={};}}
+ return cachedTranslations;
 }
-export function englishTexts(values){englishText('');return values.map(value=>String(value??'').split(/\n+/).map(p=>cachedTranslations[createHash('sha256').update(p).digest('hex')]||p).join('\n\n'));}
+const lookup=(t,p)=>t[createHash('sha256').update(p).digest('hex')];
+export function englishText(value){const t=translations();return String(value??'').split(/\n+/).map(p=>lookup(t,p)||p).join('\n\n');}
+export function englishTexts(values){const t=translations();return values.map(value=>String(value??'').split(/\n+/).map(p=>lookup(t,p)||p).join('\n\n'));}
+// English with provenance: `fallback` marks Hindi source text shown because no translation exists yet.
+const devanagari=/[ऀ-ॿ]/;
+export function englishWithStatus(value){const t=translations(),source=String(value??'');let fallback=false;const text=source.split(/\n+/).map(p=>{const hit=lookup(t,p);if(!hit&&devanagari.test(p))fallback=true;return hit||p;}).join('\n\n');return {text,fallback};}
 
 // Read the captured content without opening accounts, contacts or private forms.
 export function openHeritage() {

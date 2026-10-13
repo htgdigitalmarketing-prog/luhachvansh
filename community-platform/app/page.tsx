@@ -2,6 +2,7 @@ import {Text} from "../components/Language";
 import Link from 'next/link';
 import {editorialFor} from '../lib/editorial.mjs';
 import {readHeritage,englishText} from '../lib/heritage.mjs';
+import {villageCounts} from '../lib/villages.mjs';
 export const dynamic='force-dynamic';
 export default function Home(){
  const data=readHeritage();
@@ -10,7 +11,7 @@ export default function Home(){
  const hero=data?.gallery.find((r:any)=>r.photo.mime.startsWith('image/'))?.photo.url||'/heritage/gathering.webp';
  return <main className="heritage-home">
  <section className="heritage-hero"><div><span className="eyebrow"> <Text value="लुहाच परिवार · हमारी साझा धरोहर"/> </span><h1> <Text value="अपनी जड़ों से जुड़ें।"/> <br/> <Text value="हर रिश्ते को जगह दें।"/> </h1><p className="heritage-hindi"> <Text value="हमारा इतिहास, हमारे गाँव और हमारे परिवार — एक साथ।"/> </p><p> <Text value="अपने पुरखों और परिवार की शाखाओं को खोजें। बेटियों, माताओं और बहुओं के छूटे हुए रिश्ते जोड़कर वंशावली पूरी करने में साथ दें।"/> </p><div className="hub-actions"><Link className="button primary" href="/vanshavali"> <Text value="वंशावली देखें →"/> </Link><Link className="button" href="/heritage/villages"> <Text value="अपने गाँव के बारे में पढ़ें"/> </Link></div></div><figure><img src={hero} alt="लुहाच परिवार के पुराने संग्रह की तस्वीर"/><figcaption> <Text value="लुहाच परिवार की स्मृतियों से"/> </figcaption></figure></section>
- <section className="heritage-stats"><div><strong>{data?.villages.length||'—'}</strong><span> <Text value="गाँव के लेख और दस्तावेज़"/> </span></div><div><strong>10,061</strong><span> <Text value="वंशावली में संजोए गए नाम"/> </span></div><div><strong> <Text value="हर रिश्ता"/> </strong><span> <Text value="बेटियाँ, माताएँ और बहुएँ भी"/> </span></div></section>
+ <section className="heritage-stats"><div><strong>{data?villageCounts(data.villages).places:'—'}</strong><span> <Text value={`गाँव · वेबसाइट पर ${data?.villages.length||0} गाँव-लेख`} en={`villages · ${data?.villages.length||0} village articles on the website`}/> </span></div><div><strong>10,061</strong><span> <Text value="वंशावली में संजोए गए नाम"/> </span></div><div><strong> <Text value="हर रिश्ता"/> </strong><span> <Text value="बेटियाँ, माताएँ और बहुएँ भी"/> </span></div></section>
  <section className="heritage-intro"><span className="eyebrow"> <Text value="हमारा परिवार"/> </span><h2> <Text value="लुहाच वंश के बारे में"/> </h2><p className="home-story"><Text value={introduction?.lead.hi||about?.text.split(/\n+/)[0]||'अपने परिवार की कहानी खोजिए।'} en={introduction?.lead.en||'Discover the stories that connect our family.'}/></p><Link className="button" href="/heritage/about"><Text value="पूरा परिचय पढ़ें →"/></Link><div className="home-collections">{[
  {hi:'जड़ें और आस्था',en:'Roots & traditions',bodyHi:'हमारा इतिहास, परिचय और पीढ़ियों से संजोई परंपरा।',bodyEn:'Our history, identity and traditions passed through generations.',links:[['हमारा परिचय','Our story','/heritage/about'],['हमारा इतिहास','History','/heritage/history'],['कुलदेवी','Kuldevi','/heritage/kuldevi']]},
  {hi:'गाँव और रिश्ते',en:'Villages & family ties',bodyHi:'अपनी मिट्टी की कहानी पढ़िए। परिवार की शाखाएँ खोजिए।',bodyEn:'Read the story of home. Explore the branches of your family.',links:[['हमारे गाँव','Our villages','/heritage/villages'],['वंशावली और लुहाच मित्र','Family tree & Mitra','/vanshavali']]},

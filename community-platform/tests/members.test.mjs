@@ -618,6 +618,34 @@ test("reviewer appointment requires verified target, admin password and independ
     f.db.close();
   }
 });
+test("owner identity claim waits for a separately appointed second reviewer", async () => {
+  const f = await fixture();
+  try {
+    const own = f.db.requestClaim(
+      f.admin,
+      "archive-b",
+      "The owner's own family connection, awaiting independent review.",
+      "self",
+    );
+    assert.throws(
+      () => f.db.verifyClaim(f.admin, own, true, "Trying to approve my own identity claim.", "family_records"),
+      /separate reviewer/,
+    );
+    verified(f);
+    await f.db.appointReviewer(f.admin, f.member, password, "Verified relative appointed as second reviewer.");
+    const reviewer = await f.db.authenticate("member", password);
+    f.db.verifyClaim(
+      f.db.actor(reviewer.token).id,
+      own,
+      true,
+      "Second reviewer checked the owner's family connection.",
+      "family_knowledge",
+    );
+    assert.equal(f.db.one("SELECT status FROM claims WHERE id=?", own).status, "approved");
+  } finally {
+    f.db.close();
+  }
+});
 test("accepted private addition can request guardian stewardship without becoming visible to all", async () => {
   const f = await fixture();
   try {

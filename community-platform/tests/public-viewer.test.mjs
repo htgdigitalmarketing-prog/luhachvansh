@@ -13,3 +13,21 @@ test('anonymous archive exposes recorded family links but excludes private peopl
  assert.equal(publicLineage(data,'a','b').steps[0].relation,'child');assert.throws(()=>publicFamily(data,'hidden'),/not found/);assert.throws(()=>publicLineage(data,'a','child'),/not found/);
  assert.deepEqual(publicGraph(db.db,new Set(['b'])).records.map(p=>p.id),['a']);db.close();
 });
+test('viewer cache is reused until any WAL commit, and a privacy withdrawal hides the person on the next request',async()=>{
+ const {mkdtempSync,rmSync}=await import('node:fs');const {tmpdir}=await import('node:os');const {join}=await import('node:path');
+ const {publicViewerData,resetViewerCache}=await import('../lib/public-viewer.mjs');
+ const dir=mkdtempSync(join(tmpdir(),'viewer-cache-')),saved={h:process.env.LUHACH_HERITAGE_DB,m:process.env.LUHACH_MEMBER_DB};
+ const archive=new HubStore(join(dir,'archive.sqlite')),members=new HubStore(join(dir,'members.sqlite'));
+ try{
+  for(const id of ['a','b'])archive.run("INSERT INTO people(id,name,gender,village,source,kind) VALUES(?,?,?,?,?,'archive')",id,id,'unknown','Village','Synthetic archive');
+  archive.run("INSERT INTO relationships(id,a,b,type,role,source) VALUES('ab','a','b','parent','father','Synthetic archive')");
+  process.env.LUHACH_HERITAGE_DB=join(dir,'archive.sqlite');process.env.LUHACH_MEMBER_DB=join(dir,'members.sqlite');resetViewerCache();
+  const first=publicViewerData();assert.deepEqual(first.records.map(p=>p.id),['a','b']);assert.equal(publicViewerData(),first,'unchanged data is served from cache');
+  // Written through the still-open writer connection, so the change lives only in the WAL file.
+  members.run("INSERT INTO people(id,name,gender,village,source,kind) VALUES('b','b','unknown','Village','Synthetic archive','archive')");
+  assert.notEqual(publicViewerData(),first,'any member-database commit invalidates the cache');
+  members.run("INSERT INTO profile_privacy(person_id,audience,life,contact_audience,email,phone,city,updated) VALUES('b','private','adult','private','','','',0)");
+  assert.deepEqual(publicViewerData().records.map(p=>p.id),['a'],'privacy withdrawal is never served from a stale cache');
+  archive.run("UPDATE people SET active=0 WHERE id='a'");assert.deepEqual(publicViewerData().records.map(p=>p.id),[]);
+ }finally{resetViewerCache();archive.close();members.close();process.env.LUHACH_HERITAGE_DB=saved.h;process.env.LUHACH_MEMBER_DB=saved.m;if(saved.h===undefined)delete process.env.LUHACH_HERITAGE_DB;if(saved.m===undefined)delete process.env.LUHACH_MEMBER_DB;rmSync(dir,{recursive:true,force:true});}
+});

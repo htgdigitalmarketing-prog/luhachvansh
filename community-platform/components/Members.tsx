@@ -1443,6 +1443,16 @@ export default function Members() {
                 <h2 className="m-section-title"> <Text value="दूसरा समीक्षक नियुक्त करें"/> </h2>
                 <section className="m-panel">
                   <p> <Text value="दूसरा विश्वसनीय समीक्षक मुख्य प्रशासक के परिवार के रिश्ते की जाँच कर सकता है। उसे सभी प्रोफ़ाइल और सत्यापन अनुरोधों पर प्रशासक अधिकार मिलेंगे। नियुक्ति के लिए अपना पासवर्ड दें।"/> </p>
+                  <ol className="m-steps">
+                    <li><Text value="परिवार का कोई वास्तविक, भरोसेमंद व्यक्ति सदस्य खाता बनाए और अपनी पहचान का अनुरोध भेजे।" en="A real, trusted family member creates a member account and submits their own identity request."/></li>
+                    <li><Text value="आप उनकी पहचान स्वयं जाँचकर ऊपर 'प्रोफ़ाइल सत्यापन' में स्वीकृत करें।" en="You check their identity yourself and approve it under 'Profile verification' above."/></li>
+                    <li><Text value="फिर यहाँ उन्हें दूसरा समीक्षक नियुक्त करें। वे दोबारा लॉगिन करेंगे।" en="Then appoint them here as the second reviewer. They will sign in again."/></li>
+                    <li><Text value="वे आपके अपने पहचान अनुरोध की जाँच करके निर्णय दर्ज करें। अपना अनुरोध आप स्वयं स्वीकृत नहीं कर सकते।" en="They review your own identity request and record the decision. You cannot approve your own request."/></li>
+                  </ol>
+                  <p className="m-muted"><Text value="समीक्षक का चयन आपका निर्णय है। प्रणाली कोई समीक्षक अपने-आप नियुक्त नहीं करती और कोई काल्पनिक खाता नहीं बनाती।" en="Choosing the reviewer is your decision. The system never appoints a reviewer automatically or creates a placeholder account."/></p>
+                  {!state?.members.some((m) => m.role !== "admin" && m.verified) && (
+                    <p className="m-muted" role="status"><Text value="अभी कोई सत्यापित सदस्य नहीं है। पहले ऊपर के चरण 1 और 2 पूरे करें।" en="No verified member is available yet. Complete steps 1 and 2 above first."/></p>
+                  )}
                   <form
                     className="m-form-grid"
                     onSubmit={async (e) => {

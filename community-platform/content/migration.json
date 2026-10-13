@@ -1,0 +1,170 @@
+{
+ "source": {
+  "titleHi": "लुहाच वंश का इतिहास",
+  "titleEn": "History of the Luhach lineage",
+  "authorHi": "कर्नल कर्मबीर सिंह लुहाच",
+  "authorEn": "Col. Karambir Singh Luhach",
+  "date": "21 May 2025",
+  "citation": "Paragraph numbers (P) count the book's non-empty paragraphs from P0."
+ },
+ "table": {
+  "cite": "P114–P130",
+  "rows": [
+   {
+    "year": 1500,
+    "from": "नाँधा",
+    "to": "मोहला",
+    "migrant": "भैराज लुहाच",
+    "cite": "P115"
+   },
+   {
+    "year": 1500,
+    "from": "नाँधा",
+    "to": "गिरावड़",
+    "migrant": "गुगन लुहाच",
+    "cite": "P116"
+   },
+   {
+    "year": 1700,
+    "from": "नाँधा",
+    "to": "सिवाड़ा",
+    "migrant": "लोदी राम व सावल राम",
+    "cite": "P117"
+   },
+   {
+    "year": 1775,
+    "from": "नाँधा",
+    "to": "नंगला उग्रसेन",
+    "migrant": "उग्रसैन लुहाच",
+    "cite": "P118"
+   },
+   {
+    "year": 1775,
+    "from": "नाँधा",
+    "to": "भंडोली",
+    "migrant": "होराम लुहाच",
+    "cite": "P119"
+   },
+   {
+    "year": 1775,
+    "from": "नाँधा",
+    "to": "ज्ञानपुर",
+    "migrant": "जोहरी लुहाच",
+    "cite": "P120"
+   },
+   {
+    "year": 1775,
+    "from": "नाँधा",
+    "to": "उझाना",
+    "migrant": "किशाली लुहाच",
+    "cite": "P121"
+   },
+   {
+    "year": 1775,
+    "from": "नाँधा",
+    "to": "ढुँढवा",
+    "migrant": "किशाली लुहाच",
+    "cite": "P122"
+   },
+   {
+    "year": 1775,
+    "from": "नाँधा",
+    "to": "पाढ़ला",
+    "migrant": "बागपत लुहाच",
+    "cite": "P123"
+   },
+   {
+    "year": 1775,
+    "from": "नाँधा",
+    "to": "भड़ताना",
+    "migrant": "हीरा लाल लुहाच",
+    "cite": "P124"
+   },
+   {
+    "year": 1800,
+    "from": "नाँधा",
+    "to": "नली हुसैनपुर",
+    "migrant": "भगवाना राम लुहाच",
+    "cite": "P125"
+   },
+   {
+    "year": 1800,
+    "from": "नाँधा",
+    "to": "सेहरा",
+    "migrant": "राधा राम लुहाच",
+    "cite": "P126"
+   },
+   {
+    "year": 1800,
+    "from": "नाँधा",
+    "to": "भैंसाखुर",
+    "migrant": "साधु राम लुहाच",
+    "cite": "P127"
+   },
+   {
+    "year": 1800,
+    "from": "नाँधा",
+    "to": "खाद मोहन नगर",
+    "migrant": "ज्ञाना राम लुहाच",
+    "cite": "P128"
+   },
+   {
+    "year": 1850,
+    "from": "नाँधा",
+    "to": "अलखपुरा",
+    "migrant": "राम सिंह लुहाच",
+    "cite": "P129"
+   },
+   {
+    "year": 1875,
+    "from": "नाँधा",
+    "to": "सालहेवाला",
+    "migrant": "छीदा राम लुहाच",
+    "cite": "P130"
+   }
+  ]
+ },
+ "route": {
+  "cite": "P113",
+  "hi": "पहला विस्थापन 20वीं पीढ़ी के तीन भाइयों ने किया: पहाड़ सिंह पैंतावास गए; भैराज और गूगन नाँधा से महम होते हुए फरमाना, फिर मोहला आए; बाद में गूगन गिरावड़ (रोहतक) गए।",
+  "en": "The first migration was by three brothers of the 20th generation: Pahad Singh went to Paintawas; Bhairaj and Gugan went from Nandha via Meham to Farmana, then Mohla; Gugan later moved to Giravad (Rohtak)."
+ },
+ "secondHops": [
+  {
+   "from": "गिरावड़",
+   "to": "गुगाहेड़ी",
+   "yearText": "1956 (बाद में 1965, 1978, 1982)",
+   "yearEn": "1956 (further moves 1965, 1978, 1982)",
+   "cite": "P153–P155, P138"
+  },
+  {
+   "from": "गिरावड़",
+   "to": "कादराबाद",
+   "yearText": "1954; 10 जून 1971",
+   "yearEn": "1954; 10 June 1971",
+   "cite": "P157–P159"
+  }
+ ],
+ "variants": [
+  {
+   "id": "founder",
+   "hi": "संस्थापक की तिथि: पुस्तक में 865 ईस्वी (वि.सं. 922) को नाँधा की नींव बताया गया है (P5, P104, P105, P110), जबकि 860 ईस्वी को लाल सिंह के सिधमुख से जड़वा जाने और 1165 वर्ष की गणना के आरंभ के रूप में लिखा गया है (P84, P87, P99)। दोनों मूल रूप में रखे गए हैं; लेखक से स्पष्टीकरण बाकी है।",
+   "en": "Founder date: the book gives 865 CE (VS 922) for the founding of Nandha (P5, P104, P105, P110), and 860 CE for Lal Singh leaving Sidhmukh for Jadwa and as the start of its 1165-year count (P84, P87, P99). Both are kept as written; clarification from the author is pending."
+  },
+  {
+   "id": "farmana",
+   "hi": "फरमाना पड़ाव: गिरावड़ अध्याय इसे लगभग 1525 ईस्वी बताता है (P134), जबकि सारणी मोहला और गिरावड़ की निकासी 1500 ईस्वी में दर्ज करती है (P115–P116)।",
+   "en": "Farmana stop: the Giravad chapter dates it to about 1525 CE (P134), while the table records the Mohla and Giravad departures in 1500 CE (P115–P116)."
+  },
+  {
+   "id": "ujhana",
+   "hi": "उझाणा और ढुँढवा: दोनों अध्यायों में एक ही मूल अंश है (P167=P171, P168=P172)। उसके अनुसार परिवार लगभग 1775 में उझाणा बसा और 1875 में पास के ढुँढवा में ज़मीन खरीदकर कुछ वंशज वहाँ रहने लगे—यानी दोनों गाँवों की साझा जड़। सारणी दोनों को 1775 की अलग पंक्तियों में दिखाती है (P121–P122)।",
+   "en": "Ujhana and Dhundhwa: both chapters share the same original passage (P167=P171, P168=P172). It says the family settled in Ujhana around 1775 and, after buying land in nearby Dhundhwa in 1875, some descendants moved there—a shared origin. The table lists both as separate 1775 rows (P121–P122)."
+  },
+  {
+   "id": "generations",
+   "hi": "पीढ़ी-संख्या से तिथि नहीं निकाली जाती। पुस्तक अलग-अलग अध्यायों में अलग पीढ़ी-गणना देती है (जैसे P112, P113, P137), और मास्टर वंशावली की पीढ़ी-संख्या संस्थापक से गिनी गई है।",
+   "en": "Dates are never derived from generation numbers. The book uses different generation counts in different chapters (e.g. P112, P113, P137), and the master genealogy counts generations from the founder."
+  }
+ ]
+}

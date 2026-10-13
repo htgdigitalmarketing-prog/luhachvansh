@@ -1,0 +1,1766 @@
+{
+ "prepared": "13.10.2026",
+ "method": "Spellings are included only when literally attested in the book (Col. Karambir Singh Luhach, 21 May 2025; paragraphs numbered from P0 over non-empty paragraphs), the master genealogy CSV (2025-12-31), the website village records or the archive people table, or when they are pure Unicode normalization variants (labelled normalization:). Same names in different districts are kept as separate entries and flagged as ambiguous, never merged.",
+ "villages": [
+  {
+   "canonical": "नान्धा",
+   "english": "Nandha",
+   "district": "चरखी दादरी",
+   "state": "Haryana",
+   "records": [
+    "104"
+   ],
+   "spellings": [
+    {
+     "spelling": "नान्धा",
+     "sources": [
+      "website:village:104"
+     ]
+    },
+    {
+     "spelling": "नाँधा",
+     "sources": [
+      "book:P4",
+      "book:P5",
+      "book:P10"
+     ],
+     "moreSources": 62
+    },
+    {
+     "spelling": "नानधा",
+     "sources": [
+      "book:P276"
+     ]
+    },
+    {
+     "spelling": "नाँ धा",
+     "sources": [
+      "master:Notes/Migration (1 rows)"
+     ]
+    },
+    {
+     "spelling": "नांधा",
+     "sources": [
+      "normalization:chandrabindu->anusvara of \"नाँधा\""
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "नान्धा",
+     "candidates": [
+      "नान्धा|चरखी दादरी",
+      "नान्धा|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P110 places नाँधा in चरखी दादरी; record 230 says रोहतक."
+    }
+   ],
+   "archiveSpelling": "नाँधा"
+  },
+  {
+   "canonical": "नान्धा",
+   "english": "Nandha",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "230"
+   ],
+   "spellings": [
+    {
+     "spelling": "नान्धा",
+     "sources": [
+      "website:village:230"
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "नान्धा",
+     "candidates": [
+      "नान्धा|चरखी दादरी",
+      "नान्धा|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P110 places नाँधा in चरखी दादरी; record 230 says रोहतक."
+    }
+   ],
+   "archiveSpelling": null
+  },
+  {
+   "canonical": "गिरावड़",
+   "english": "Girawad",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "105"
+   ],
+   "spellings": [
+    {
+     "spelling": "गिरावड़",
+     "sources": [
+      "book:P113",
+      "book:P116",
+      "book:P131"
+     ],
+     "moreSources": 27
+    },
+    {
+     "spelling": "गिरावड",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"गिरावड़\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "गिरावड़"
+  },
+  {
+   "canonical": "गुगाहेड़ी",
+   "english": "Gugaheri",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "106"
+   ],
+   "spellings": [
+    {
+     "spelling": "गुगाहेड़ी",
+     "sources": [
+      "book:P13",
+      "book:P138",
+      "book:P151"
+     ],
+     "moreSources": 8
+    },
+    {
+     "spelling": "गुगाहेडी",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"गुगाहेड़ी\""
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "गुगाहेड़ी",
+     "candidates": [
+      "गुगाहेड़ी|रोहतक",
+      "गुगाहेड़ी|1"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Records 178 and 180 have placeholder district \"1\" (state \"1\" / null); book P152 places गुगाहेड़ी in रोहतक."
+    }
+   ],
+   "archiveSpelling": "गुगाहेड़ी"
+  },
+  {
+   "canonical": "गुगाहेड़ी",
+   "english": "Gugaheri",
+   "district": "1",
+   "state": "1",
+   "records": [
+    "178",
+    "180"
+   ],
+   "spellings": [
+    {
+     "spelling": "गुगाहेड़ी",
+     "sources": [
+      "website:village:178",
+      "website:village:180"
+     ]
+    },
+    {
+     "spelling": "गुगाहेडी",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"गुगाहेड़ी\""
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "गुगाहेड़ी",
+     "candidates": [
+      "गुगाहेड़ी|रोहतक",
+      "गुगाहेड़ी|1"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Records 178 and 180 have placeholder district \"1\" (state \"1\" / null); book P152 places गुगाहेड़ी in रोहतक."
+    }
+   ],
+   "archiveSpelling": null
+  },
+  {
+   "canonical": "नीमली",
+   "english": "Nimli",
+   "district": "चरखी दादरी",
+   "state": "Haryana",
+   "records": [
+    "107"
+   ],
+   "spellings": [
+    {
+     "spelling": "नीमली",
+     "sources": [
+      "book:P194",
+      "book:P197",
+      "book:P199"
+     ],
+     "moreSources": 16
+    },
+    {
+     "spelling": "निमली",
+     "sources": [
+      "book:P197",
+      "book:P198",
+      "master:Notes/Migration (1 rows)"
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "नीमली",
+     "candidates": [
+      "नीमली|चरखी दादरी",
+      "नीमली|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P208 places नीमली in चरखी दादरी; record 236 says रोहतक."
+    }
+   ],
+   "archiveSpelling": "नीमली"
+  },
+  {
+   "canonical": "नीमली",
+   "english": "Nimli",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "236"
+   ],
+   "spellings": [
+    {
+     "spelling": "नीमली",
+     "sources": [
+      "website:village:236"
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "नीमली",
+     "candidates": [
+      "नीमली|चरखी दादरी",
+      "नीमली|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P208 places नीमली in चरखी दादरी; record 236 says रोहतक."
+    }
+   ],
+   "archiveSpelling": null
+  },
+  {
+   "canonical": "मारोत",
+   "english": "Marot",
+   "district": "झज्जर",
+   "state": "Haryana",
+   "records": [
+    "108"
+   ],
+   "spellings": [
+    {
+     "spelling": "मारोत",
+     "sources": [
+      "book:P203",
+      "book:P214",
+      "book:P218"
+     ],
+     "moreSources": 11
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "मारोत",
+     "candidates": [
+      "मारोत|झज्जर",
+      "मारोत|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P219 places मारोत in झज्जर; record 202 says रोहतक."
+    }
+   ],
+   "archiveSpelling": "मारोत"
+  },
+  {
+   "canonical": "मारोत",
+   "english": "Marot",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "202"
+   ],
+   "spellings": [
+    {
+     "spelling": "मारोत",
+     "sources": [
+      "website:village:202"
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "मारोत",
+     "candidates": [
+      "मारोत|झज्जर",
+      "मारोत|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P219 places मारोत in झज्जर; record 202 says रोहतक."
+    }
+   ],
+   "archiveSpelling": null
+  },
+  {
+   "canonical": "रानीला",
+   "english": "Ranila",
+   "district": "चरखी दादरी",
+   "state": "Haryana",
+   "records": [
+    "109"
+   ],
+   "spellings": [
+    {
+     "spelling": "रानीला",
+     "sources": [
+      "book:P192",
+      "book:P193",
+      "book:P194"
+     ],
+     "moreSources": 5
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "रानीला"
+  },
+  {
+   "canonical": "रीवाड़ी खेड़ा",
+   "english": "Rewari Khera",
+   "district": "झज्जर",
+   "state": "Haryana",
+   "records": [
+    "112"
+   ],
+   "spellings": [
+    {
+     "spelling": "रीवाड़ी खेड़ा",
+     "sources": [
+      "website:village:112"
+     ]
+    },
+    {
+     "spelling": "रिवाड़ी खेड़ा",
+     "sources": [
+      "master:Village Name (99 rows)",
+      "master:Villages List",
+      "people.village (99 archive rows)"
+     ]
+    },
+    {
+     "spelling": "रेवाड़ी खेड़ा",
+     "sources": [
+      "book:P195",
+      "book:P196",
+      "book:P197"
+     ],
+     "moreSources": 3
+    },
+    {
+     "spelling": "रीवाडी खेडा",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"रीवाड़ी खेड़ा\""
+     ]
+    },
+    {
+     "spelling": "रिवाडी खेडा",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"रिवाड़ी खेड़ा\""
+     ]
+    },
+    {
+     "spelling": "रेवाडी खेडा",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"रेवाड़ी खेड़ा\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "रिवाड़ी खेड़ा"
+  },
+  {
+   "canonical": "रिटौली",
+   "english": "Ritoli",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "113"
+   ],
+   "spellings": [
+    {
+     "spelling": "रिटौली",
+     "sources": [
+      "website:village:113"
+     ]
+    },
+    {
+     "spelling": "रिटोली",
+     "sources": [
+      "book:P201",
+      "book:P202",
+      "book:P203"
+     ],
+     "moreSources": 5
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "रिटोली"
+  },
+  {
+   "canonical": "मोहला",
+   "english": "Mohla",
+   "district": "हिसार",
+   "state": "Haryana",
+   "records": [
+    "114"
+   ],
+   "spellings": [
+    {
+     "spelling": "मोहला",
+     "sources": [
+      "book:P113",
+      "book:P115",
+      "book:P134"
+     ],
+     "moreSources": 13
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "मोहला"
+  },
+  {
+   "canonical": "अलखपुरा",
+   "english": "Alakhpura",
+   "district": "भिवानी",
+   "state": "Haryana",
+   "records": [
+    "115"
+   ],
+   "spellings": [
+    {
+     "spelling": "अलखपुरा",
+     "sources": [
+      "book:P129",
+      "book:P185",
+      "book:P186"
+     ],
+     "moreSources": 6
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "अलखपुरा"
+  },
+  {
+   "canonical": "सिवाड़ा",
+   "english": "Siwara",
+   "district": "भिवानी",
+   "state": "Haryana",
+   "records": [
+    "116"
+   ],
+   "spellings": [
+    {
+     "spelling": "सिवाड़ा",
+     "sources": [
+      "book:P117",
+      "book:P182",
+      "book:P183"
+     ],
+     "moreSources": 6
+    },
+    {
+     "spelling": "सिवाडा",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"सिवाड़ा\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "सिवाड़ा"
+  },
+  {
+   "canonical": "भड़ताना",
+   "english": "Bhadtana",
+   "district": "जिन्द",
+   "state": "Haryana",
+   "records": [
+    "117"
+   ],
+   "spellings": [
+    {
+     "spelling": "भड़ताना",
+     "sources": [
+      "book:P124",
+      "book:P178",
+      "book:P179"
+     ],
+     "moreSources": 6
+    },
+    {
+     "spelling": "भडताना",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"भड़ताना\""
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "भड़ताना",
+     "candidates": [
+      "भड़ताना|जिन्द",
+      "भड़ताना|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P179 places भड़ताना in जींद; record 234 says रोहतक."
+    }
+   ],
+   "archiveSpelling": "भड़ताना"
+  },
+  {
+   "canonical": "भड़ताना",
+   "english": "Bhadtana",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "234"
+   ],
+   "spellings": [
+    {
+     "spelling": "भड़ताना",
+     "sources": [
+      "website:village:234"
+     ]
+    },
+    {
+     "spelling": "भडताना",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"भड़ताना\""
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "भड़ताना",
+     "candidates": [
+      "भड़ताना|जिन्द",
+      "भड़ताना|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P179 places भड़ताना in जींद; record 234 says रोहतक."
+    }
+   ],
+   "archiveSpelling": null
+  },
+  {
+   "canonical": "उझाणा",
+   "english": "Ujhana",
+   "district": "जिन्द",
+   "state": "Haryana",
+   "records": [
+    "118"
+   ],
+   "spellings": [
+    {
+     "spelling": "उझाणा",
+     "sources": [
+      "book:P165",
+      "book:P166",
+      "book:P167"
+     ],
+     "moreSources": 6
+    },
+    {
+     "spelling": "उझाना",
+     "sources": [
+      "book:P121",
+      "master:Notes/Migration (3 rows)",
+      "master:Village Name (99 rows)"
+     ],
+     "moreSources": 2
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "उझाना"
+  },
+  {
+   "canonical": "ढूँढवा",
+   "english": "Dhundhwa",
+   "district": "कैथल",
+   "state": "Haryana",
+   "records": [
+    "119"
+   ],
+   "spellings": [
+    {
+     "spelling": "ढूँढवा",
+     "sources": [
+      "master:Notes/Migration (2 rows)",
+      "website:village:119"
+     ]
+    },
+    {
+     "spelling": "ढुँढ़वा",
+     "sources": [
+      "book:P168",
+      "book:P172",
+      "master:Notes/Migration (5 rows)"
+     ],
+     "moreSources": 3
+    },
+    {
+     "spelling": "ढुँढवा",
+     "sources": [
+      "book:P122",
+      "book:P168",
+      "book:P169"
+     ],
+     "moreSources": 2
+    },
+    {
+     "spelling": "ढूँढ़वा",
+     "sources": [
+      "book:P166"
+     ]
+    },
+    {
+     "spelling": "डुंढ़वा",
+     "sources": [
+      "master:Notes/Migration (6 rows)"
+     ]
+    },
+    {
+     "spelling": "ढूंढवा",
+     "sources": [
+      "normalization:chandrabindu->anusvara of \"ढूँढवा\""
+     ]
+    },
+    {
+     "spelling": "ढुंढ़वा",
+     "sources": [
+      "normalization:chandrabindu->anusvara of \"ढुँढ़वा\""
+     ]
+    },
+    {
+     "spelling": "ढुंढवा",
+     "sources": [
+      "normalization:chandrabindu->anusvara of \"ढुँढवा\""
+     ]
+    },
+    {
+     "spelling": "ढूंढ़वा",
+     "sources": [
+      "normalization:chandrabindu->anusvara of \"ढूँढ़वा\""
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "ढूँढवा",
+     "candidates": [
+      "ढूँढवा|कैथल",
+      "ढूँढवा|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P170 places ढुँढवा in कैथल; record 237 says रोहतक."
+    }
+   ],
+   "archiveSpelling": "ढुँढ़वा"
+  },
+  {
+   "canonical": "ढूँढवा",
+   "english": "Dhundhwa",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "237"
+   ],
+   "spellings": [
+    {
+     "spelling": "ढूँढवा",
+     "sources": [
+      "website:village:237"
+     ]
+    },
+    {
+     "spelling": "ढूंढवा",
+     "sources": [
+      "normalization:chandrabindu->anusvara of \"ढूँढवा\""
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "ढूँढवा",
+     "candidates": [
+      "ढूँढवा|कैथल",
+      "ढूँढवा|रोहतक"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P170 places ढुँढवा in कैथल; record 237 says रोहतक."
+    }
+   ],
+   "archiveSpelling": null
+  },
+  {
+   "canonical": "पाढ़ला",
+   "english": "Padla",
+   "district": "कैथल",
+   "state": "Haryana",
+   "records": [
+    "120"
+   ],
+   "spellings": [
+    {
+     "spelling": "पाढ़ला",
+     "sources": [
+      "book:P123",
+      "website:village:120"
+     ]
+    },
+    {
+     "spelling": "पाडला",
+     "sources": [
+      "book:P173",
+      "book:P174",
+      "book:P175"
+     ],
+     "moreSources": 4
+    },
+    {
+     "spelling": "पाढला",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"पाढ़ला\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "पाडला"
+  },
+  {
+   "canonical": "नली हुसैनपुर",
+   "english": "Nali Husainpur",
+   "district": "हापुड़",
+   "state": "UttarPradesh",
+   "records": [
+    "121"
+   ],
+   "spellings": [
+    {
+     "spelling": "नली हुसैनपुर",
+     "sources": [
+      "book:P125",
+      "book:P261",
+      "book:P265"
+     ],
+     "moreSources": 29
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "नली हुसैनपुर"
+  },
+  {
+   "canonical": "नंगला उगरसैन",
+   "english": "Nangla Ugrasen",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "122",
+    "242"
+   ],
+   "spellings": [
+    {
+     "spelling": "नंगला उगरसैन",
+     "sources": [
+      "website:village:122"
+     ]
+    },
+    {
+     "spelling": "Nagla Ugersain",
+     "sources": [
+      "website:village:242"
+     ]
+    },
+    {
+     "spelling": "नंगला उग्रसैन",
+     "sources": [
+      "book:P7",
+      "book:P262",
+      "book:P264"
+     ],
+     "moreSources": 8
+    },
+    {
+     "spelling": "नंगला उग्रसेन",
+     "sources": [
+      "book:P118"
+     ]
+    },
+    {
+     "spelling": "उग्रसेन",
+     "sources": [
+      "book:P395",
+      "book:P396"
+     ]
+    },
+    {
+     "spelling": "नगंला उग्रसेन",
+     "sources": [
+      "master:Notes/Migration (1 rows)"
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "नंगला उगरसैन",
+     "candidates": [
+      "नंगला उगरसैन|बुलन्दशहर",
+      "नंगला उगरसैन|हापुड़"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P396 places उग्रसेन/नंगला उग्रसैन in बुलन्दशहर (सियाना तहसील); record 197 says हापुड़. Records 122 and 242 say Bulandshahr."
+    },
+    {
+     "spelling": "उग्रसैन",
+     "candidates": [
+      "नंगला उगरसैन|बुलन्दशहर",
+      "PERSON:उग्रसैन लुहाच (founder)"
+     ],
+     "reason": "Standalone \"उग्रसैन\" in the book is the founder's personal name (P118 migrant column; P260-262, P379, P398); village short form in the book is \"उग्रसेन\" (P395, P396). Not added as an alias."
+    },
+    {
+     "spelling": "Nagla Ugersain",
+     "candidates": [
+      "नंगला उगरसैन|बुलन्दशहर",
+      "नंगला उगरसैन|हापुड़"
+     ],
+     "reason": "English record 242 says Bulandshahr, so grouped with 122; Hapur record 197 is a competing duplicate."
+    }
+   ],
+   "archiveSpelling": "नंगला उग्रसैन"
+  },
+  {
+   "canonical": "नंगला उगरसैन",
+   "english": "Nangla Ugrasen",
+   "district": "हापुड़",
+   "state": "UttarPradesh",
+   "records": [
+    "197"
+   ],
+   "spellings": [
+    {
+     "spelling": "नंगला उगरसैन",
+     "sources": [
+      "website:village:197"
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "नंगला उगरसैन",
+     "candidates": [
+      "नंगला उगरसैन|बुलन्दशहर",
+      "नंगला उगरसैन|हापुड़"
+     ],
+     "reason": "Same village name on two website records with different districts; not merged. Book P396 places उग्रसेन/नंगला उग्रसैन in बुलन्दशहर (सियाना तहसील); record 197 says हापुड़. Records 122 and 242 say Bulandshahr."
+    }
+   ],
+   "archiveSpelling": null
+  },
+  {
+   "canonical": "सेहरा",
+   "english": "Sehra",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "123"
+   ],
+   "spellings": [
+    {
+     "spelling": "सेहरा",
+     "sources": [
+      "book:P126",
+      "book:P275",
+      "book:P276"
+     ],
+     "moreSources": 15
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "सेहरा"
+  },
+  {
+   "canonical": "सालहेवाला",
+   "english": "Salhewala",
+   "district": "भिवानी",
+   "state": "Haryana",
+   "records": [
+    "124"
+   ],
+   "spellings": [
+    {
+     "spelling": "सालहेवाला",
+     "sources": [
+      "book:P130",
+      "book:P188",
+      "book:P189"
+     ],
+     "moreSources": 6
+    },
+    {
+     "spelling": "सलहेवाला",
+     "sources": [
+      "master:Notes/Migration (1 rows)"
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "सालहेवाला"
+  },
+  {
+   "canonical": "भैसाखुर",
+   "english": "Bhainsakhur",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "125"
+   ],
+   "spellings": [
+    {
+     "spelling": "भैसाखुर",
+     "sources": [
+      "book:P276",
+      "book:P365",
+      "book:P369"
+     ],
+     "moreSources": 7
+    },
+    {
+     "spelling": "भैंसाखुर",
+     "sources": [
+      "book:P127",
+      "book:P275",
+      "book:P392"
+     ],
+     "moreSources": 1
+    },
+    {
+     "spelling": "भैंसाखूर",
+     "sources": [
+      "book:P361",
+      "book:P362",
+      "book:P364"
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "भैसाखुर"
+  },
+  {
+   "canonical": "खाद मोहननगर",
+   "english": "Khad Mohan Nagar",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "126"
+   ],
+   "spellings": [
+    {
+     "spelling": "खाद मोहननगर",
+     "sources": [
+      "website:village:126"
+     ]
+    },
+    {
+     "spelling": "खाद मोहन नगर",
+     "sources": [
+      "book:P128",
+      "book:P269",
+      "book:P273"
+     ],
+     "moreSources": 17
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "खाद मोहन नगर"
+  },
+  {
+   "canonical": "गहना",
+   "english": "Gahna",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "128",
+    "240"
+   ],
+   "spellings": [
+    {
+     "spelling": "गहना",
+     "sources": [
+      "book:P262",
+      "book:P380",
+      "book:P381"
+     ],
+     "moreSources": 12
+    },
+    {
+     "spelling": "Gahna",
+     "sources": [
+      "website:village:240"
+     ]
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "Gahna",
+     "candidates": [
+      "गहना|बुलन्दशहर"
+     ],
+     "reason": "Website record 240 \"Gahna\" has district \"Buland Sahar\" but state \"Haryana\"; book P382 places गहना in बुलन्दशहर (UP). Grouped with record 128 (same village + district); state on 240 looks wrong."
+    }
+   ],
+   "archiveSpelling": "गहना"
+  },
+  {
+   "canonical": "भंडोली",
+   "english": "Bhandoli",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "127"
+   ],
+   "spellings": [
+    {
+     "spelling": "भंडोली",
+     "sources": [
+      "book:P119",
+      "book:P262",
+      "book:P269"
+     ],
+     "moreSources": 11
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "भंडोली"
+  },
+  {
+   "canonical": "बदरखा सिरवास",
+   "english": "Badarkha Sirwas",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "129"
+   ],
+   "spellings": [
+    {
+     "spelling": "बदरखा सिरवास",
+     "sources": [
+      "book:P366",
+      "book:P367",
+      "book:P368"
+     ],
+     "moreSources": 2
+    },
+    {
+     "spelling": "बदरखा सिरवाश",
+     "sources": [
+      "master:Village Name (29 rows)",
+      "master:Villages List",
+      "people.village (29 archive rows)"
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "बदरखा सिरवाश"
+  },
+  {
+   "canonical": "सियाल्ली",
+   "english": "Syarli",
+   "district": "बुलन्दशहर",
+   "state": "UttarPradesh",
+   "records": [
+    "130"
+   ],
+   "spellings": [
+    {
+     "spelling": "सियाल्ली",
+     "sources": [
+      "website:village:130"
+     ]
+    },
+    {
+     "spelling": "स्यारली",
+     "sources": [
+      "book:P385",
+      "book:P386",
+      "book:P387"
+     ],
+     "moreSources": 3
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "सियाल्ली",
+     "candidates": [
+      "सियाल्ली|बुलन्दशहर"
+     ],
+     "reason": "Website record 130 \"सियाल्ली\" (बुलन्दशहर) is matched to book/master \"स्यारली\" (बुलन्दशहर, P386) by elimination only; the spellings differ (र vs ल्ल). Treat as probable, needs confirmation."
+    }
+   ],
+   "archiveSpelling": "स्यारली"
+  },
+  {
+   "canonical": "इगलास",
+   "english": "Iglas",
+   "district": "अलीगढ",
+   "state": "UttarPradesh",
+   "records": [
+    "131"
+   ],
+   "spellings": [
+    {
+     "spelling": "इगलास",
+     "sources": [
+      "book:P388",
+      "book:P389",
+      "book:P390"
+     ],
+     "moreSources": 4
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "इगलास"
+  },
+  {
+   "canonical": "अमरपुर",
+   "english": "Amarpur",
+   "district": "मेरठ",
+   "state": "UttarPradesh",
+   "records": [
+    "132"
+   ],
+   "spellings": [
+    {
+     "spelling": "अमरपुर",
+     "sources": [
+      "book:P273",
+      "book:P278",
+      "book:P348"
+     ],
+     "moreSources": 12
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "अमरपुर"
+  },
+  {
+   "canonical": "भडंग़पुर",
+   "english": "Bhadangpur",
+   "district": "हापुड़",
+   "state": "UttarPradesh",
+   "records": [
+    "133"
+   ],
+   "spellings": [
+    {
+     "spelling": "भडंग़पुर",
+     "sources": [
+      "website:village:133"
+     ]
+    },
+    {
+     "spelling": "भडंगपुर",
+     "sources": [
+      "master:Village Name (350 rows)",
+      "master:Villages List",
+      "people.village (350 archive rows)"
+     ]
+    },
+    {
+     "spelling": "भड़ंगपुर",
+     "sources": [
+      "book:P266",
+      "book:P270",
+      "book:P273"
+     ],
+     "moreSources": 18
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "भडंग़पुर",
+     "candidates": [
+      "भडंग़पुर|हापुड़"
+     ],
+     "reason": "Website record 133 spells it with a stray nukta on ग (ग़, U+095A); master/people \"भडंगपुर\", book \"भड़ंगपुर\" (nukta on ड). Same village."
+    }
+   ],
+   "archiveSpelling": "भडंगपुर"
+  },
+  {
+   "canonical": "गढ़ी गुलडहर",
+   "english": "Garhi Guldhar",
+   "district": "गाजियाबाद",
+   "state": "UttarPradesh",
+   "records": [
+    "134"
+   ],
+   "spellings": [
+    {
+     "spelling": "गढ़ी गुलडहर",
+     "sources": [
+      "book:P272",
+      "book:P273",
+      "book:P278"
+     ],
+     "moreSources": 14
+    },
+    {
+     "spelling": "गढ़ीगुलडहर",
+     "sources": [
+      "book:P278"
+     ]
+    },
+    {
+     "spelling": "गढी गुलडहर",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"गढ़ी गुलडहर\""
+     ]
+    },
+    {
+     "spelling": "गढीगुलडहर",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"गढ़ीगुलडहर\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "गढ़ी गुलडहर"
+  },
+  {
+   "canonical": "ज्ञानपुर",
+   "english": "Gyanpur",
+   "district": "मुरादाबाद",
+   "state": "UttarPradesh",
+   "records": [
+    "135"
+   ],
+   "spellings": [
+    {
+     "spelling": "ज्ञानपुर",
+     "sources": [
+      "book:P120",
+      "book:P262",
+      "book:P380"
+     ],
+     "moreSources": 16
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "ज्ञानपुर"
+  },
+  {
+   "canonical": "छज्जा नगला",
+   "english": "Chhajja Nangla",
+   "district": "मुरादाबाद",
+   "state": "UttarPradesh",
+   "records": [
+    "136"
+   ],
+   "spellings": [
+    {
+     "spelling": "छज्जा नगला",
+     "sources": [
+      "master:Village Name (57 rows)",
+      "master:Villages List",
+      "people.village (57 archive rows)"
+     ],
+     "moreSources": 1
+    },
+    {
+     "spelling": "छज्जा नंगला",
+     "sources": [
+      "book:P406",
+      "book:P413",
+      "book:P419"
+     ],
+     "moreSources": 5
+    },
+    {
+     "spelling": "छज्जा नंगल",
+     "sources": [
+      "master:Notes/Migration (1 rows)"
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "छज्जा नगला"
+  },
+  {
+   "canonical": "मुण्डाखेड़ी",
+   "english": "Munda Kheri",
+   "district": "मुरादाबाद",
+   "state": "UttarPradesh",
+   "records": [
+    "137"
+   ],
+   "spellings": [
+    {
+     "spelling": "मुण्डाखेड़ी",
+     "sources": [
+      "website:village:137"
+     ]
+    },
+    {
+     "spelling": "मुंडा  खेड़ी",
+     "sources": [
+      "master:Village Name (6 rows)",
+      "master:Villages List",
+      "people.village (6 archive rows)"
+     ]
+    },
+    {
+     "spelling": "मुंडा खेड़ी",
+     "sources": [
+      "book:P406",
+      "book:P412",
+      "book:P413"
+     ],
+     "moreSources": 3
+    },
+    {
+     "spelling": "मुण्डाखेडी",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"मुण्डाखेड़ी\""
+     ]
+    },
+    {
+     "spelling": "मुंडा खेडी",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"मुंडा खेड़ी\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "मुंडा  खेड़ी"
+  },
+  {
+   "canonical": "दांशाह मलिक",
+   "english": "Danshah Milak",
+   "district": "मुरादाबाद",
+   "state": "UttarPradesh",
+   "records": [
+    "138"
+   ],
+   "spellings": [
+    {
+     "spelling": "दांशाह मलिक",
+     "sources": [
+      "website:village:138"
+     ]
+    },
+    {
+     "spelling": "दांशाह मिल्क",
+     "sources": [
+      "master:Village Name (13 rows)",
+      "master:Villages List",
+      "people.village (13 archive rows)"
+     ]
+    },
+    {
+     "spelling": "दानशाह मिलक",
+     "sources": [
+      "book:P406"
+     ]
+    },
+    {
+     "spelling": "दानशाह मिल्क",
+     "sources": [
+      "book:P407",
+      "book:P408"
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "दांशाह मिल्क"
+  },
+  {
+   "canonical": "घरोट",
+   "english": "Gharot",
+   "district": "अमरोहा",
+   "state": "UttarPradesh",
+   "records": [
+    "140"
+   ],
+   "spellings": [
+    {
+     "spelling": "घरोट",
+     "sources": [
+      "master:Village Name (6 rows)",
+      "master:Villages List",
+      "people.village (6 archive rows)"
+     ],
+     "moreSources": 1
+    },
+    {
+     "spelling": "घरोंट",
+     "sources": [
+      "book:P406",
+      "book:P423",
+      "book:P424"
+     ],
+     "moreSources": 2
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "घरोट"
+  },
+  {
+   "canonical": "बाबूखेड़ा",
+   "english": "Babu Khera",
+   "district": "सम्भल",
+   "state": "UttarPradesh",
+   "records": [
+    "141"
+   ],
+   "spellings": [
+    {
+     "spelling": "बाबूखेड़ा",
+     "sources": [
+      "website:village:141"
+     ]
+    },
+    {
+     "spelling": "बाबू खेड़ा",
+     "sources": [
+      "book:P406",
+      "book:P410",
+      "book:P416"
+     ],
+     "moreSources": 5
+    },
+    {
+     "spelling": "बाबूखेडा",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"बाबूखेड़ा\""
+     ]
+    },
+    {
+     "spelling": "बाबू खेडा",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"बाबू खेड़ा\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "बाबू खेड़ा"
+  },
+  {
+   "canonical": "दरियापुर",
+   "english": "Dariyapur",
+   "district": "सम्भल",
+   "state": "UttarPradesh",
+   "records": [
+    "142"
+   ],
+   "spellings": [
+    {
+     "spelling": "दरियापुर",
+     "sources": [
+      "book:P406",
+      "book:P409",
+      "book:P410"
+     ],
+     "moreSources": 6
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "दरियापुर"
+  },
+  {
+   "canonical": "कादराबाद",
+   "english": "Kadrabad",
+   "district": "बिजनौर",
+   "state": "UttarPradesh",
+   "records": [
+    "143"
+   ],
+   "spellings": [
+    {
+     "spelling": "कादराबाद",
+     "sources": [
+      "book:P138",
+      "book:P156",
+      "book:P157"
+     ],
+     "moreSources": 6
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "कादराबाद"
+  },
+  {
+   "canonical": "भींवपुरा",
+   "english": "Bhinwpura",
+   "district": "नागौर",
+   "state": "Rajasthan",
+   "records": [
+    "144"
+   ],
+   "spellings": [
+    {
+     "spelling": "भींवपुरा",
+     "sources": [
+      "book:P227",
+      "book:P228",
+      "book:P229"
+     ],
+     "moreSources": 10
+    },
+    {
+     "spelling": "भीवपुरा",
+     "sources": [
+      "master:Notes/Migration (1 rows)"
+     ]
+    },
+    {
+     "spelling": "भीवपूरा",
+     "sources": [
+      "master:Notes/Migration (1 rows)"
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "भींवपुरा"
+  },
+  {
+   "canonical": "किशनगढ़ रेनवाल",
+   "english": "Kishangarh Renwal",
+   "district": "जयपुर",
+   "state": "Rajasthan",
+   "records": [
+    "145"
+   ],
+   "spellings": [
+    {
+     "spelling": "किशनगढ़ रेनवाल",
+     "sources": [
+      "book:P229",
+      "book:P236",
+      "book:P237"
+     ],
+     "moreSources": 4
+    },
+    {
+     "spelling": "किशनगढ रेनवाल",
+     "sources": [
+      "normalization:nukta removed (e.g. ड़->ड) of \"किशनगढ़ रेनवाल\""
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "किशनगढ़ रेनवाल"
+  },
+  {
+   "canonical": "सारगोथ",
+   "english": "Sargoth",
+   "district": "सीकर",
+   "state": "Rajasthan",
+   "records": [
+    "146"
+   ],
+   "spellings": [
+    {
+     "spelling": "सारगोथ",
+     "sources": [
+      "book:P242",
+      "book:P243",
+      "book:P244"
+     ],
+     "moreSources": 2
+    },
+    {
+     "spelling": "सारगोठ",
+     "sources": [
+      "book:P248",
+      "master:Notes/Migration (1 rows)",
+      "master:Village Name (33 rows)"
+     ],
+     "moreSources": 2
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "सारगोठ"
+  },
+  {
+   "canonical": "पुण्याना",
+   "english": "Punana",
+   "district": "सीकर",
+   "state": "Rajasthan",
+   "records": [
+    "147"
+   ],
+   "spellings": [
+    {
+     "spelling": "पुण्याना",
+     "sources": [
+      "website:village:147"
+     ]
+    },
+    {
+     "spelling": "पुनाना",
+     "sources": [
+      "book:P232",
+      "book:P233",
+      "book:P234"
+     ],
+     "moreSources": 4
+    }
+   ],
+   "ambiguous": [
+    {
+     "spelling": "पुण्याना",
+     "candidates": [
+      "पुण्याना|सीकर"
+     ],
+     "reason": "Website record 147 \"पुण्याना\" says district सीकर, but book P234 places पुनाना in जयपुर जिले की जालसू तहसील. Matched by elimination; district conflict unresolved."
+    }
+   ],
+   "archiveSpelling": "पुनाना"
+  },
+  {
+   "canonical": "धींगपुर",
+   "english": "Dhingpur",
+   "district": "सीकर",
+   "state": "Rajasthan",
+   "records": [
+    "148"
+   ],
+   "spellings": [
+    {
+     "spelling": "धींगपुर",
+     "sources": [
+      "book:P232",
+      "book:P239",
+      "book:P240"
+     ],
+     "moreSources": 7
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "धींगपुर"
+  },
+  {
+   "canonical": "खाटू श्याम",
+   "english": "Khatu Shyam",
+   "district": "सीकर",
+   "state": "Rajasthan",
+   "records": [
+    "149"
+   ],
+   "spellings": [
+    {
+     "spelling": "खाटू श्याम",
+     "sources": [
+      "book:P232",
+      "book:P240",
+      "book:P244"
+     ],
+     "moreSources": 10
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "खाटू श्याम"
+  },
+  {
+   "canonical": "मोहम्मद पुर जाटान",
+   "english": "Mohammadpur Jatan",
+   "district": "बरेली",
+   "state": "UttarPradesh",
+   "records": [
+    "245"
+   ],
+   "spellings": [
+    {
+     "spelling": "मोहम्मद पुर जाटान",
+     "sources": [
+      "website:village:245"
+     ]
+    },
+    {
+     "spelling": "मोहम्मदपुर जाटान",
+     "sources": [
+      "book:P380",
+      "book:P427",
+      "book:P428"
+     ],
+     "moreSources": 5
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "मोहम्मदपुर जाटान"
+  },
+  {
+   "canonical": "कबूलपुर",
+   "english": "Kabulpur",
+   "district": "रोहतक",
+   "state": "Haryana",
+   "records": [
+    "246"
+   ],
+   "spellings": [
+    {
+     "spelling": "कबूलपुर",
+     "sources": [
+      "book:P202",
+      "book:P204",
+      "book:P205"
+     ],
+     "moreSources": 3
+    },
+    {
+     "spelling": "कबूल पुर",
+     "sources": [
+      "master:Village Name (30 rows)",
+      "master:Villages List",
+      "people.village (30 archive rows)"
+     ]
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "कबूल पुर"
+  },
+  {
+   "canonical": "समस पुर",
+   "english": "Samaspur",
+   "district": "मेरठ",
+   "state": "UttarPradesh",
+   "records": [
+    "247"
+   ],
+   "spellings": [
+    {
+     "spelling": "समस पुर",
+     "sources": [
+      "website:village:247"
+     ]
+    },
+    {
+     "spelling": "समसपुर",
+     "sources": [
+      "book:P353",
+      "book:P357",
+      "book:P358"
+     ],
+     "moreSources": 5
+    }
+   ],
+   "ambiguous": [],
+   "archiveSpelling": "समसपुर"
+  }
+ ]
+}

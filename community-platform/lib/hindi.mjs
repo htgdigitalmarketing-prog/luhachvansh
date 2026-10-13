@@ -522,6 +522,7 @@ const words={
  "spouse": "पति / पत्नी",
  "parent": "माता-पिता",
  "child": "बच्चा",
+ "sibling": "भाई / बहन",
  "pending": "लंबित",
  "approved": "स्वीकृत",
  "accepted": "स्वीकृत",
