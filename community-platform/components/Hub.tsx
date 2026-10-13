@@ -369,7 +369,7 @@ export default function Hub() {
       {tab === "stories" && (
         <>
           <h2>{t("समुदाय की स्मृतियाँ", "समुदाय का संग्रह")}</h2>
-          <p> <Text value="हर स्मृति के साथ उसका स्रोत रखें। नई जानकारी पर सात दिन तक आपत्ति दी जा सकती है।"/> </p>
+          <p> <Text value="हर स्मृति के साथ उसका स्रोत रखें। सदस्य योगदान पर सात दिन तक आपत्ति दी जा सकती है; प्रशासक के योगदान तुरंत स्वीकार होते हैं।" en="Keep a source with each memory. Member contributions have a seven-day objection window; administrator contributions are accepted immediately."/> </p>
           <div className="hub-gallery">
             {[
               "village-road.webp",

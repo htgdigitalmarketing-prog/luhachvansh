@@ -116,11 +116,15 @@ export class HubStore extends MemberStore {
         clean(b.body, 12000),
         clean(b.source),
         b.media_id || null,
-        "pending",
+        this.user(a).role === "admin" ? "accepted" : "pending",
         this.now(),
         this.now() + 7 * DAY,
       );
       this.log(a, "content_submitted", id, { kind: b.kind });
+      if (this.user(a).role === "admin") {
+        this.run("UPDATE contributions SET decision=? WHERE id=?", "Administrator entry: accepted immediately with the recorded source.", id);
+        this.log(a, "admin_content_accepted", id, { kind: b.kind });
+      }
     });
     return { id };
   }
@@ -188,11 +192,6 @@ export class HubStore extends MemberStore {
       );
     } else {
       this.admin(a);
-      need(
-        c.author !== a,
-        "Another administrator must review your own contribution.",
-        403,
-      );
       need(
         ["accepted", "rejected", "removed"].includes(b.status),
         "Invalid decision.",

@@ -782,7 +782,7 @@ export class MemberStore extends Store {
   // Each proposal carries its source and explicit birth or marriage link. It follows the seven-day objection
   // window (the user's chosen policy): once the author's own identity claim is approved, a valid proposal with no
   // objection or conflict is accepted when the window ends. It waits while the identity is unverified, pauses on
-  // any objection or conflict, and a child's record always needs an administrator. Authors never accept their own.
+  // any objection or conflict. Verified administrators apply their valid entries immediately, with an audit record.
   proposeRelative(actor, input = {}) {
     this.user(actor);
     const own = this.personalClaim(actor);
@@ -840,6 +840,8 @@ export class MemberStore extends Store {
       });
       this.notify("admin", id, "A sourced relative proposal is open for objections.");
       this.notify(actor, id, "Your relative proposal is open for seven days of review.");
+      if (this.user(actor).role === "admin" && this.identityApproved(actor, anchor.id))
+        this.accept(actor, id, false, "Administrator entry: accepted immediately with the recorded family source.");
     });
     return id;
   }
@@ -876,6 +878,21 @@ export class MemberStore extends Store {
       account,
       person,
     );
+  }
+  // Administrator publication applies to adult/deceased genealogy only: no contacts, children or held profiles.
+  publishGenealogy(actor, proposalId, reason, confirm) {
+    this.admin(actor);
+    need(confirm === true, "Confirm public publication of the adult's name and family links.");
+    need(text(reason).length >= 15, "Record the reason for public genealogy publication.");
+    const p = this.one("SELECT * FROM proposals WHERE id=?", proposalId);
+    need(p && ["accepted", "auto_accepted"].includes(p.status) && p.person_id, "Accept the family entry before publishing it.", 409);
+    const person = this.person(p.person_id), settings = this.privacy(p.person_id);
+    need(person && person.kind === "community", "This action applies only to a member-added genealogy entry.");
+    need(["adult", "deceased"].includes(settings.life), "Only an adult or deceased genealogy entry can be published.", 403);
+    need(!this.one("SELECT person_id FROM privacy_holds WHERE person_id=?", person.id), "A privacy hold prevents public publication.", 403);
+    need(!this.one("SELECT id FROM claims WHERE person_id=? AND status='approved'", person.id), "This person's verified account manages its own sharing preference.", 403);
+    this.run("UPDATE profile_privacy SET audience='public',updated=? WHERE person_id=?", Date.now(), person.id);
+    this.log(actor, "admin_genealogy_published", person.id, { proposal: p.id, reason: text(reason), scope: "name_and_family_links_only" });
   }
   // Store.tick plus two holds for relative proposals: they stay pending (not "conflict") while the author's
   // identity is unverified, and a child's record is never accepted by the clock.
@@ -1410,7 +1427,10 @@ export class MemberStore extends Store {
     this.requireVisible(actor, id);
     for (const p of [payload.existingId, payload.secondId].filter(Boolean))
       this.requireVisible(actor, p);
-    return super.propose(actor, id, payload);
+    const proposal = super.propose(actor, id, payload);
+    if (this.user(actor).role === "admin")
+      this.transaction(() => this.accept(actor, proposal, false, "Administrator entry: accepted immediately with the recorded source."));
+    return proposal;
   }
   canReview(actor, p) {
     if (this.user(actor).role === "admin" || p.author === actor) return true;
@@ -1476,6 +1496,7 @@ export class MemberStore extends Store {
         ...p,
         payload: JSON.parse(p.payload),
         anchor_name: this.person(p.anchor)?.name || "",
+        public_audience: p.person_id ? this.privacy(p.person_id).audience : null,
         // The author can pass this code privately to the added adult so they can claim their own entry.
         person_code:
           p.person_id && (p.author === actor || a.role === "admin")

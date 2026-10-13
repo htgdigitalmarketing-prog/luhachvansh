@@ -40,6 +40,38 @@ async function fixture() {
 const approve = (f, reviewer, claim) =>
   f.db.verifyClaim(reviewer, claim, true, "Checked with a known synthetic relative.", "family_knowledge");
 
+test("admin relatives apply immediately; public genealogy excludes contacts and refuses children, holds and non-admins", async () => {
+  const f = await fixture();
+  try {
+    const own=f.db.requestNodeClaim(f.admin,{searchName:"राम कुमार",searchVillage:"गाँव-क",id:"m1",reason:"Synthetic owner's exact family entry.",confirm:true});
+    f.db.confirmOwnNode(f.admin,own,{confirm:true,statement:"Synthetic owner explicitly confirms their recorded identity."});
+    const spouse=f.db.proposeRelative(f.admin,{relation:"spouse",name:"Synthetic Immediate Wife",gender:"female",life:"adult",villageUnknown:true,sourceType:"family_knowledge",source:"Synthetic owner confirms this marriage for the test."});
+    const row=f.db.one("SELECT status,person_id FROM proposals WHERE id=?",spouse);
+    assert.equal(row.status,"accepted");
+    assert.ok(f.db.memberTree(f.admin).records.some(p=>p.id===row.person_id));
+    assert.equal(publicGraph(f.db.db).records.some(p=>p.id===row.person_id),false,"acceptance does not silently publish private people");
+    assert.throws(()=>f.db.publishGenealogy(f.member,spouse,"Synthetic publication request.",true),e=>e.status===403);
+    assert.throws(()=>f.db.publishGenealogy(f.admin,spouse,"Synthetic publication request.",false),/Confirm public/);
+    f.db.run("UPDATE profile_privacy SET email='private@example.invalid',phone='private-phone' WHERE person_id=?",row.person_id);
+    f.db.transaction(()=>f.db.publishGenealogy(f.admin,spouse,"Explicit administrator instruction to publish name and family links.",true));
+    const graph=publicGraph(f.db.db);
+    assert.ok(graph.records.some(p=>p.id===row.person_id));
+    assert.ok(graph.edges.some(e=>e.type==='spouse'&&(e.a===row.person_id||e.b===row.person_id)));
+    assert.equal(JSON.stringify(graph).includes('private@example.invalid'),false);
+    assert.equal(JSON.stringify(graph).includes('private-phone'),false);
+    assert.equal(f.db.privacy(row.person_id).contact_audience,'private');
+    f.db.restrict(f.admin,row.person_id,"Synthetic privacy hold for testing.");
+    assert.throws(()=>f.db.publishGenealogy(f.admin,spouse,"Trying a held synthetic entry.",true),/privacy hold/);
+    const child=f.db.proposeRelative(f.admin,{relation:"daughter",name:"Synthetic Immediate Child",gender:"female",life:"child",villageUnknown:true,sourceType:"family_knowledge",source:"Synthetic child entry supplied by the administrator."});
+    assert.equal(f.db.one("SELECT status FROM proposals WHERE id=?",child).status,'accepted');
+    assert.throws(()=>f.db.publishGenealogy(f.admin,child,"Trying to publish a synthetic child.",true),/adult or deceased/);
+    approve(f,f.admin,f.db.requestNodeClaim(f.member,{searchName:"राम कुमार",searchVillage:"गाँव-ख",id:"m2",reason:"Synthetic second administrator's identity.",confirm:true}));
+    await f.db.appointReviewer(f.admin,f.member,password,"Synthetic appointed administrator for this test.");
+    const added=f.db.proposeRelative(f.member,{relation:"spouse",name:"Synthetic Reviewer Spouse",gender:"female",life:"adult",villageUnknown:true,sourceType:"family_knowledge",source:"Synthetic marriage confirmed by the appointed administrator."});
+    assert.equal(f.db.one("SELECT status FROM proposals WHERE id=?",added).status,'accepted',"appointed admins also bypass the wait");
+  } finally {f.db.close();}
+});
+
 test("signup leaves the account unlinked until an explicit candidate is chosen and claimed", async () => {
   const f = await fixture();
   try {
@@ -118,7 +150,7 @@ test("structured relative proposals are sourced, wait for identity approval, the
     f.db.run("UPDATE proposals SET due=0");
     f.db.tick();
     assert.equal(status(f, proposal), "pending", "waits (not a conflict) while the proposer's identity is unverified");
-    assert.throws(() => f.db.decide(f.admin, proposal, "accept", "Owner tries to accept own proposal."), /separate reviewer/);
+    assert.throws(() => f.db.decide(f.admin, proposal, "accept", "Owner tries before identity approval."), /identity claim must be approved/);
     // A verified relative becomes the second reviewer.
     const reviewerClaim = f.db.requestNodeClaim(f.member, { searchName: "राम कुमार", searchVillage: "गाँव-ख", id: "m2", reason: "Reviewer's own synthetic node for review.", confirm: true });
     approve(f, f.admin, reviewerClaim);
@@ -128,7 +160,9 @@ test("structured relative proposals are sourced, wait for identity approval, the
     assert.ok(f.db.one("SELECT due FROM proposals WHERE id=?", proposal).due > Date.now() + 6 * 86400000, "a full objection window starts after identity approval");
     f.db.tick();
     assert.equal(status(f, proposal), "pending");
-    const objected = f.db.proposeRelative(f.admin, { ...spouse, relation: "mother", name: "Synthetic Mother", source: "Second synthetic proposal used to test objections." });
+    const contributor = await account(f.db, f.admin, "contributor", "Synthetic Contributor");
+    approve(f, f.admin, f.db.requestNodeClaim(contributor.id, {searchName:"हरि सिंह",searchVillage:"गाँव-क",id:"f1",reason:"Synthetic contributor's own record for review.",confirm:true}));
+    const objected = f.db.proposeRelative(contributor.id, { ...spouse, relation: "mother", name: "Synthetic Mother", source: "Second synthetic proposal used to test objections." });
     f.db.object(f.member, objected, "This synthetic mother is disputed by a relative.");
     f.db.run("UPDATE proposals SET due=0");
     f.db.tick();

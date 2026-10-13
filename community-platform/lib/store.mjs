@@ -101,7 +101,7 @@ export class Store {
  accept(actor,id,automatic=false,reason=''){
   const p=this.one('SELECT * FROM proposals WHERE id=?',id);need(p&&['pending','disputed','conflict'].includes(p.status),'This proposal is no longer open.',409);
   if(automatic){need(p.status==='pending'&&p.due<=this.now(),'Not eligible for automatic acceptance');need(!this.one('SELECT id FROM objections WHERE proposal_id=?',id),'An objection prevents automatic acceptance');}
-  else {this.admin(actor);need(actor!==p.author,'A separate reviewer must decide your own proposal.',403);need(text(reason).length>=8,'Record a decision reason.');}
+  else {this.admin(actor);need(text(reason).length>=8,'Record a decision reason.');}
   const anchor=this.person(p.anchor);need(anchor,'Anchor no longer exists',409);need(!automatic||anchor.version===p.version,'Family changed during review; an administrator must reconcile the proposal.',409);
   const payload=this.validatePayload(anchor,JSON.parse(p.payload));const personId=payload.existingId||randomUUID();const edges=this.edgesFor(p.anchor,personId,payload);this.validateEdges(edges);
   if(!payload.existingId)this.run('INSERT INTO people(id,name,aliases,gender,village,source,notes,kind,proposal_id) VALUES(?,?,?,?,?,?,?,?,?)',personId,payload.name,payload.aliases,payload.gender,payload.village,payload.source,'',anchor.kind==='demo'?'demo':'community',id);
@@ -110,12 +110,12 @@ export class Store {
   this.run('UPDATE proposals SET status=?,decision=?,person_id=? WHERE id=?',automatic?'auto_accepted':'accepted',automatic?'Accepted after seven days with no objection.':text(reason,1000),personId,id);
   this.log(actor,automatic?'proposal_auto_accepted':'proposal_accepted',p.anchor,{proposal:id,person:personId,reason});this.notify(p.author,id,'Your family addition has been accepted.');
  }
- decide(actor,id,decision,reason){
+ decide(actor,id,decision,reason,afterAccept){
   return this.transaction(()=>{
    const p=this.one('SELECT * FROM proposals WHERE id=?',id);need(p,'Proposal not found',404);
    if(decision==='withdraw'){need(p.author===actor&&['pending','disputed','conflict'].includes(p.status),'Only the author may withdraw an open proposal',403);this.run("UPDATE proposals SET status='withdrawn',decision=? WHERE id=?",text(reason)||'Withdrawn by author',id);this.log(actor,'proposal_withdrawn',p.anchor,{proposal:id});return;}
-   this.admin(actor);need(text(reason).length>=8,'Record a decision reason.');need(actor!==p.author,'A separate reviewer must decide your proposal.',403);
-   if(decision==='accept')return this.accept(actor,id,false,reason);
+   this.admin(actor);need(text(reason).length>=8,'Record a decision reason.');
+   if(decision==='accept'){this.accept(actor,id,false,reason);afterAccept?.();return;}
    if(decision==='reject'){need(['pending','disputed','conflict'].includes(p.status),'Proposal is no longer open',409);this.run("UPDATE proposals SET status='rejected',decision=? WHERE id=?",text(reason,1000),id);}
    else if(decision==='revert'){
     need(['accepted','auto_accepted'].includes(p.status),'Only accepted changes can be reverted',409);

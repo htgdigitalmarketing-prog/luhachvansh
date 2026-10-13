@@ -82,6 +82,7 @@ type Proposal = {
   anchor_name?: string;
   identity_verified?: boolean;
   person_code?: string | null;
+  public_audience?: string | null;
   payload: { name: string; relation: string; source: string; relative?: boolean; villageUnknown?: boolean; life?: string; sourceType?: string; birthFamily?: string; marriage?: string; existingId?: string; secondId?: string };
   status: string;
   decision?: string;
@@ -815,6 +816,7 @@ export default function Members() {
                 )}
                 {personal && (
                   <RelativeForm
+                    administrator={actor.role === "admin"}
                     anchorName={personal.person_name}
                     identityVerified={personal.status === "approved"}
                     busy={busy}
@@ -822,9 +824,9 @@ export default function Members() {
                       run(
                         "proposeRelative",
                         d,
-                        hi
-                          ? "प्रस्ताव सुरक्षित हुआ। आपत्ति अवधि पूरी होने और स्वीकार होने तक यह वंशावली में नहीं जुड़ेगा।"
-                          : "Proposal saved. It joins the family tree only after its objection window ends and it is accepted.",
+                        actor.role === "admin" && personal.status === "approved"
+                          ? hi ? "प्रशासक की प्रविष्टि तुरंत स्वीकार हो गई और परिवार में जुड़ गई।" : "Administrator entry accepted immediately and linked to the family."
+                          : hi ? "प्रस्ताव सुरक्षित हुआ। स्वीकार होने पर वंशावली में जुड़ेगा।" : "Proposal saved. It joins the family tree when accepted.",
                       )
                     }
                   />
@@ -1602,10 +1604,20 @@ export default function Members() {
                         </label>
                         <label> <Text value="कारण"/> <textarea name="reason" minLength={15} required />
                         </label>
+                        {!["accepted", "auto_accepted"].includes(p.status) && p.payload.life === "adult" && !p.payload.existingId && (
+                          <label className="m-check"><input type="checkbox" name="publicGenealogy" />{hi ? "इस वयस्क का नाम और परिवार की कड़ी सार्वजनिक वंशावली में भी दिखाएँ — संपर्क विवरण नहीं।" : "Also publish this adult's name and family links in the public tree; no contact details."}</label>
+                        )}
                         <button
                           className="outline"
-                          disabled={busy || p.author === actor.id}
+                          disabled={busy}
                         > <Text value="निर्णय सुरक्षित करें"/> </button>
+                      </form>
+                    )}
+                    {["accepted", "auto_accepted"].includes(p.status) && p.person_id && p.public_audience !== "public" && ["adult", "deceased"].includes(p.payload.life || "") && (
+                      <form onSubmit={e => run("publishGenealogy", {...fields(e), id:p.id}, hi ? "नाम और रिश्ते सार्वजनिक वंशावली में प्रकाशित हो गए।" : "Name and family links are now published in the public tree.")}>
+                        <label>{hi ? "प्रकाशन का कारण" : "Publication reason"}<textarea name="reason" required minLength={15} /></label>
+                        <label className="m-check"><input type="checkbox" name="confirm" required />{hi ? "मैं प्रशासक के रूप में इस वयस्क का नाम और परिवार की कड़ी प्रकाशित कर रहा/रही हूँ; संपर्क निजी रहेगा।" : "As administrator I confirm publication of this adult's name and family links; contacts stay private."}</label>
+                        <button className="outline" disabled={busy}>{hi ? "सार्वजनिक वंशावली में प्रकाशित करें" : "Publish in the public family tree"}</button>
                       </form>
                     )}
                   </section>

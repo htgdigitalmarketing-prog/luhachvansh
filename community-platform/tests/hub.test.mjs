@@ -85,16 +85,13 @@ test("archive objections pause auto acceptance; independent review records decis
     });
     assert.equal(d.content("bob")[0].status, "accepted");
     const own = d.contribute("admin", entry);
-    assert.throws(
-      () =>
-        d.reviewContent("admin", {
+    assert.equal(d.content("admin").find(c=>c.id===own.id).status, "accepted", "administrator content is live immediately");
+    d.reviewContent("admin", {
           id: own.id,
           action: "reviewContent",
           status: "accepted",
-          reason: "Trying to approve my own contribution",
-        }),
-      /Another administrator/,
-    );
+          reason: "Administrator confirms their own sourced contribution",
+        });
   } finally {
     d.close();
   }

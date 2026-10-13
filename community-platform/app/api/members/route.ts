@@ -164,7 +164,11 @@ export async function POST(req: NextRequest) {
         db.object(actor.id, b.id, b.reason);
         break;
       case "decide":
-        db.decide(actor.id, b.id, b.decision, b.reason);
+        db.decide(actor.id, b.id, b.decision, b.reason,
+          b.publicGenealogy === "on" ? () => db.publishGenealogy(actor.id, b.id, b.reason, true) : undefined);
+        break;
+      case "publishGenealogy":
+        db.transaction(() => db.publishGenealogy(actor.id, b.id, b.reason, b.confirm === "on"));
         break;
       case "password":
         return signedResponse(
