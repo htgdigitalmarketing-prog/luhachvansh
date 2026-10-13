@@ -31,6 +31,8 @@ type Actor = {
   role: string;
   handle: string;
   verified: boolean;
+  remembered?: boolean;
+  rememberedUntil?: number | null;
 };
 type Person = {
   id: string;
@@ -239,7 +241,7 @@ export default function Members() {
     document.documentElement.lang = hi ? "hi" : "en";
   }, [hi]);
   useEffect(() => {
-    if (!actor) return;
+    if (!actor || actor.remembered) return;
     let timer: ReturnType<typeof setTimeout>;
     const reset = () => {
       clearTimeout(timer);
@@ -264,7 +266,7 @@ export default function Members() {
       window.removeEventListener("pointerdown", reset);
       window.removeEventListener("keydown", reset);
     };
-  }, [actor?.id]);
+  }, [actor?.id, actor?.remembered]);
   useEffect(() => {
     if (!actor || tab !== "search") return;
     let active = true;
@@ -544,6 +546,7 @@ export default function Members() {
                   setTab("home");
               }}
             >
+              {mode === "signin" && <label className="m-check"><input type="checkbox" name="remember" />{hi ? "इस डिवाइस पर 7 दिन तक लॉगिन बनाए रखें" : "Keep me signed in on this device for 7 days"}</label>}
               {(mode === "register" || mode === "setup") && (
                 <label>
                   {t("Your name", "आपका नाम")}
@@ -1351,7 +1354,9 @@ export default function Members() {
                   </section>
                   <aside className="m-panel">
                     <h2> <Text value="खाते की सुरक्षा"/> </h2>
-                    <p> <Text value="30 मिनट उपयोग न होने या 24 घंटे बाद लॉगिन समाप्त होता है। पासवर्ड बदलने पर सभी उपकरण लॉगआउट होंगे और नया पुनर्प्राप्ति कोड मिलेगा।"/> </p>
+                    <p>{actor.remembered ? (hi ? `इस डिवाइस पर लॉगिन ${new Date(actor.rememberedUntil || 0).toLocaleString('hi-IN')} तक बना रहेगा।` : `This device stays signed in until ${new Date(actor.rememberedUntil || 0).toLocaleString('en-IN')}.`) : (hi ? "सामान्य लॉगिन 30 मिनट निष्क्रिय रहने पर या 24 घंटे बाद समाप्त होता है।" : "A normal sign-in expires after 30 minutes of inactivity or 24 hours.")}</p>
+                    <p className="m-muted">{hi ? "केवल अपने भरोसेमंद डिवाइस पर चुनें: इसे इस्तेमाल करने वाला व्यक्ति आपके खुले खाते तक पहुँच सकता है। लॉगआउट या पासवर्ड बदलने पर याद रखा गया लॉगिन भी समाप्त होगा।" : "Use this only on your trusted device: someone using it can access your signed-in account. Signing out or changing your password also ends remembered access."}</p>
+                    <button className="outline" disabled={busy} onClick={()=>run("rememberDevice",{enabled:!actor.remembered},hi ? "इस डिवाइस का लॉगिन विकल्प सहेज लिया गया।" : "This device's sign-in preference was saved.")}>{actor.remembered ? (hi ? "याद रखा गया लॉगिन बंद करें" : "Stop remembering this sign-in") : (hi ? "इस डिवाइस पर 7 दिन लॉगिन बनाए रखें" : "Keep this device signed in for 7 days")}</button>
                     <form
                       onSubmit={async (e) => {
                         const f = e.currentTarget;

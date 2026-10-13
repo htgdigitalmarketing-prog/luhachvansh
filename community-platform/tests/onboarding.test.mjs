@@ -40,6 +40,17 @@ async function fixture() {
 const approve = (f, reviewer, claim) =>
   f.db.verifyClaim(reviewer, claim, true, "Checked with a known synthetic relative.", "family_knowledge");
 
+test('Roman spellings find Hindi claim candidates and never reveal private same-name people',async()=>{
+ const f=await fixture();try{
+  const candidates=f.db.claimCandidates(f.member,{name:'ram kumar',parent:'hari singh'});
+  assert.deepEqual(candidates.candidates.map(p=>p.id),['m1']);
+  const matches=f.db.searchFor(f.member,'ram kumar');
+  assert.deepEqual(matches.map(p=>p.id).sort(),['m1','m2']);
+  assert.equal(JSON.stringify(matches).includes('hidden'),false);
+  assert.equal(JSON.stringify(matches).includes('kid'),false);
+ }finally{f.db.close();}
+});
+
 test("admin relatives apply immediately; public genealogy excludes contacts and refuses children, holds and non-admins", async () => {
   const f = await fixture();
   try {

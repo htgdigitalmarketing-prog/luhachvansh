@@ -64,6 +64,34 @@ const privateSettings = {
   phone: "555-test",
   city: "Test City",
 };
+test('remembered devices survive idle days, expire after seven days, and rotate only this device',async()=>{
+ const f=await fixture();try{
+  const original=f.db.one('SELECT password_hash,recovery_hash FROM credentials WHERE account_id=?',f.admin);
+  const other=f.db.session(f.admin);
+  assert.throws(()=>f.db.rememberDevice(f.member,f.owner.token,true));
+  const remembered=f.db.rememberDevice(f.admin,f.owner.token,true);
+  assert.equal(remembered.maxAge,604800);
+  assert.equal(f.db.actor(f.owner.token),null);
+  assert.ok(f.db.actor(other));
+  f.db.run('UPDATE member_sessions SET last_seen=? WHERE hash=?',Date.now()-2*86400000,digest(remembered.token));
+  assert.equal(f.db.actor(remembered.token).remembered,true);
+  assert.deepEqual(f.db.one('SELECT password_hash,recovery_hash FROM credentials WHERE account_id=?',f.admin),original);
+  const normal=f.db.rememberDevice(f.admin,remembered.token,false);
+  assert.equal(f.db.actor(remembered.token),null);
+  assert.equal(f.db.actor(normal.token).remembered,false);
+  assert.equal(f.db.one('SELECT COUNT(*) n FROM remembered_sessions').n,0);
+  f.db.run('UPDATE member_sessions SET last_seen=? WHERE hash=?',Date.now()-31*60000,digest(normal.token));
+  assert.equal(f.db.actor(normal.token),null);
+  const login=await f.db.authenticate('owner',password,true);
+  assert.equal(login.maxAge,604800);
+  f.db.run('UPDATE member_sessions SET expires=? WHERE hash=?',Date.now()-1,digest(login.token));
+  assert.equal(f.db.actor(login.token),null);
+  assert.equal(f.db.one('SELECT COUNT(*) n FROM remembered_sessions').n,0);
+  const logout=f.db.session(f.admin,true);f.db.logout(logout);
+  assert.equal(f.db.actor(logout),null);
+  assert.equal(f.db.one('SELECT COUNT(*) n FROM remembered_sessions').n,0);
+ }finally{f.db.close();}
+});
 test("recovery copies are encrypted, owner-only, current, and assisted recovery requires a recorded identity check",async()=>{
  const f=await fixture();try {
   assert.equal(f.db.recoveryCopies(f.admin).find(r=>r.username==='member').code,f.user.recovery);

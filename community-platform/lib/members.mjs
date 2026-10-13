@@ -15,6 +15,7 @@ import { memberDbPath } from "./storage.mjs";
 import { looseVillage, villageKey } from "./villages.mjs";
 import { englishTexts } from "./heritage.mjs";
 import { graphData } from "./viewer.mjs";
+import { phoneticScore } from "./phonetic.mjs";
 const scrypt = promisify(scryptCallback),
   DAY = 86400000;
 // Name comparison folds only presentation differences (case, punctuation, nukta, chandrabindu) and a trailing
@@ -81,6 +82,7 @@ export class MemberStore extends Store {
    CREATE TABLE IF NOT EXISTS invitations(hash TEXT PRIMARY KEY,label TEXT NOT NULL,created_by TEXT NOT NULL,expires INTEGER NOT NULL,used_by TEXT,revoked INTEGER NOT NULL DEFAULT 0);
    CREATE TABLE IF NOT EXISTS throttles(key TEXT PRIMARY KEY,count INTEGER NOT NULL,until INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS member_sessions(hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),created INTEGER NOT NULL,last_seen INTEGER NOT NULL,expires INTEGER NOT NULL);
+   CREATE TABLE IF NOT EXISTS remembered_sessions(hash TEXT PRIMARY KEY REFERENCES member_sessions(hash) ON DELETE CASCADE,expires INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS profile_privacy(person_id TEXT PRIMARY KEY REFERENCES people(id),audience TEXT NOT NULL DEFAULT 'private',life TEXT NOT NULL DEFAULT 'unknown',contact_audience TEXT NOT NULL DEFAULT 'private',email TEXT NOT NULL DEFAULT '',phone TEXT NOT NULL DEFAULT '',city TEXT NOT NULL DEFAULT '',updated INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS privacy_holds(person_id TEXT PRIMARY KEY REFERENCES people(id),reason TEXT NOT NULL);
    CREATE TABLE IF NOT EXISTS verification_details(claim_id TEXT PRIMARY KEY REFERENCES claims(id),relationship TEXT NOT NULL,method TEXT,reviewer TEXT,reviewed INTEGER);
@@ -170,13 +172,13 @@ export class MemberStore extends Store {
   actor(raw) {
     if (!raw) return null;
     const row = this.one(
-      "SELECT a.*,c.handle,c.verified,s.last_seen,s.expires FROM member_sessions s JOIN accounts a ON a.id=s.account_id JOIN credentials c ON c.account_id=a.id WHERE s.hash=?",
+      "SELECT a.*,c.handle,c.verified,s.last_seen,s.expires,r.expires AS remembered_until FROM member_sessions s JOIN accounts a ON a.id=s.account_id JOIN credentials c ON c.account_id=a.id LEFT JOIN remembered_sessions r ON r.hash=s.hash WHERE s.hash=?",
       hash(raw),
     );
     if (
       !row ||
       row.expires <= Date.now() ||
-      row.last_seen < Date.now() - 30 * 60 * 1000
+      (!(row.remembered_until > Date.now()) && row.last_seen < Date.now() - 30 * 60 * 1000)
     ) {
       this.run("DELETE FROM member_sessions WHERE hash=?", hash(raw));
       return null;
@@ -192,19 +194,33 @@ export class MemberStore extends Store {
       role: row.role,
       handle: row.handle,
       verified: !!row.verified,
+      remembered: row.remembered_until > Date.now(),
+      rememberedUntil: row.remembered_until || null,
     };
   }
-  session(id) {
+  session(id, remembered = false) {
     const raw = token();
+    const expires = Date.now() + (remembered ? 7 : 1) * DAY;
     this.run(
       "INSERT INTO member_sessions VALUES(?,?,?,?,?)",
       hash(raw),
       id,
       Date.now(),
       Date.now(),
-      Date.now() + DAY,
+      expires,
     );
+    if (remembered) this.run("INSERT INTO remembered_sessions VALUES(?,?)", hash(raw), expires);
     return raw;
+  }
+  rememberDevice(actor, raw, enabled) {
+    need(this.actor(raw)?.id === actor, "Sign in to continue.", 401);
+    let next;
+    this.transaction(() => {
+      this.logout(raw);
+      next = this.session(actor, enabled === true);
+      this.log(actor, "device_signin_preference", actor, { remembered: enabled === true, days: enabled ? 7 : 1 });
+    });
+    return { token: next, maxAge: enabled ? 7 * 86400 : 86400 };
   }
   logout(raw) {
     if (raw) this.run("DELETE FROM member_sessions WHERE hash=?", hash(raw));
@@ -309,7 +325,7 @@ export class MemberStore extends Store {
     });
     return { token: this.session(id), recovery };
   }
-  async authenticate(username, password) {
+  async authenticate(username, password, remembered = false) {
     const h = handle(username);
     this.throttle("login:" + h);
     this.throttle("login-global", 40);
@@ -330,7 +346,7 @@ export class MemberStore extends Store {
       401,
     );
     this.run("DELETE FROM throttles WHERE key=?", hash("login:" + h));
-    return { token: this.session(c.account_id) };
+    return { token: this.session(c.account_id, remembered === true), maxAge: remembered ? 7 * 86400 : 86400 };
   }
   async recover(username, code, password) {
     const h = handle(username);
@@ -648,15 +664,10 @@ export class MemberStore extends Store {
     if (vkey) {
       const keys = new Map();
       const keyOf = (v) => (keys.has(v) ? keys.get(v) : keys.set(v, villageKey(v)).get(v));
-      rows = rows.filter((r) => keyOf(r.village) === vkey || looseVillage(r.village).includes(vloose));
+      rows = rows.filter((r) => keyOf(r.village) === vkey || looseVillage(r.village).includes(vloose) || phoneticScore(village,[r.village,englishTexts([r.village])[0]])>0);
     }
     const english = latin ? englishTexts(rows.map((r) => r.name)) : [];
-    const score = (names, q) =>
-      names.some((n) => n === q)
-        ? 2
-        : names.some((n) => n.includes(q) || q.split(" ").every((w) => n.includes(w)))
-          ? 1
-          : 0;
+    const score = (names, q) => phoneticScore(q,names);
     let matched = rows
       .map((r, i) => ({ r, en: english[i], score: score([foldName(r.name), latin ? foldName(english[i]) : ""].filter(Boolean), name) }))
       .filter((m) => m.score && this.claimable(m.r.id));
@@ -671,7 +682,7 @@ export class MemberStore extends Store {
         if (!m.father) return false;
         const names = [foldName(m.father.name)];
         if (latin) names.push(foldName(englishTexts([m.father.name])[0]));
-        return names.some((n) => n === parent || n.includes(parent));
+        return phoneticScore(parent,names)>0;
       });
     matched.sort((a, b) => b.score - a.score || String(a.r.generation).localeCompare(String(b.r.generation)));
     const candidates = matched.slice(0, 25).map(({ r, en, father }) => {
@@ -960,27 +971,16 @@ export class MemberStore extends Store {
   searchFor(actor, q = "", village = "") {
     this.user(actor);
     const clean = text(q, 100);
-    if (!this.verified(actor)) {
-      if (clean.length < 2) return [];
-      // Unverified invitees can locate an archival entry to request verification, not browse its graph or notes.
-      return super
-        .search(clean, village, "archive")
-        .filter((p) => {
-          const s = this.privacy(p.id);
-          return ["verified", "public"].includes(s.audience) && s.life !== "child";
-        })
-        .map((p) => ({
-          id: p.id,
-          name: p.name,
-          village: p.village,
-          kind: p.kind,
-          claimOnly: true,
-        }));
-    }
-    return super
-      .search(clean, village)
-      .map((p) => this.safePerson(actor, p))
-      .filter(Boolean);
+    const verified=this.verified(actor);
+    if (!verified && clean.length<2) return [];
+    // Filter permission before ranking or limiting: hidden matches never consume visible result slots.
+    const rows=this.all("SELECT id,name,aliases,village,gender,kind,legacy_id,public_code,generation,source,source_page,notes FROM people WHERE active=1 ORDER BY name")
+      .filter(p=>verified?this.visible(actor,p.id):this.claimable(p.id))
+      .filter(p=>!village||villageKey(p.village)===villageKey(village)||phoneticScore(village,p.village)>0);
+    const names=englishTexts(rows.map(p=>p.name)), villages=englishTexts(rows.map(p=>p.village));
+    return rows.map((p,i)=>{const values=[p.name,p.aliases,p.village,p.legacy_id,p.public_code,names[i],villages[i]];return {p,i,score:clean?phoneticScore(clean,[...values,values.filter(Boolean).join(' ')]):1};})
+      .filter(r=>r.score).sort((a,b)=>b.score-a.score).slice(0,60)
+      .map(({p,i})=>verified?{...this.safePerson(actor,p),nameEnglish:names[i],villageEnglish:villages[i]}:{id:p.id,name:p.name,village:p.village,kind:p.kind,claimOnly:true});
   }
   familyFor(actor, id) {
     this.requireVisible(actor, id);

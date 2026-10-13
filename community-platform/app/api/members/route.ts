@@ -25,13 +25,13 @@ function signedIn(req: NextRequest) {
   if (!actor) throw new Problem("Sign in to continue.", 401);
   return { db, actor };
 }
-function signedResponse(result: { token: string; recovery?: string }) {
+function signedResponse(result: { token: string; recovery?: string; maxAge?: number }) {
   const r = response({ ok: true, recovery: result.recovery });
   r.cookies.set(COOKIE, result.token, {
     httpOnly: true,
     sameSite: "strict",
     path: "/",
-    maxAge: 86400,
+    maxAge: result.maxAge || 86400,
     secure: secureSession(),
   });
   return r;
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       return signedResponse(result);
     }
     if (b.action === "signin") {
-      const result = await db.authenticate(b.username, b.password);
+      const result = await db.authenticate(b.username, b.password, b.remember === "on" || b.remember === true);
       db.logout(req.cookies.get(COOKIE)?.value);
       return signedResponse(result);
     }
@@ -111,6 +111,8 @@ export async function POST(req: NextRequest) {
     db.tick();
     let result = {};
     switch (b.action) {
+      case "rememberDevice":
+        return signedResponse(db.rememberDevice(actor.id, req.cookies.get(COOKIE)?.value, b.enabled === true));
       case "saveRecoveryCopy": db.saveRecoveryCopy(actor.id,b.code); break;
       case "recoveryCopies": result={copies:db.recoveryCopies(actor.id)}; break;
       case "issueRecovery": result=db.issueRecovery(actor.id,b.id,b.reason); break;

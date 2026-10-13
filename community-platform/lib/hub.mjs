@@ -2,6 +2,7 @@ import { MemberStore } from "./members.mjs";
 import { Problem } from "./store.mjs";
 import { memberDbPath } from "./storage.mjs";
 import { randomUUID } from "node:crypto";
+import { phoneticScore } from "./phonetic.mjs";
 import { resolve } from "node:path";
 const need = (ok, msg, status = 400) => {
   if (!ok) throw new Problem(msg, status);
@@ -295,9 +296,7 @@ export class HubStore extends MemberStore {
           d.account_id !== a &&
           this.eligible(d.account_id) &&
           !this.blocked(a, d.account_id) &&
-          `${d.name} ${d.city} ${d.state} ${d.country}`
-            .toLocaleLowerCase()
-            .includes(term),
+          (!term || phoneticScore(term,[d.name,d.city,d.state,d.country,`${d.name} ${d.city} ${d.state} ${d.country}`])>0),
       )
       .slice(0, 60)
       .map(({ account_id, name, city, state, country }) => ({
