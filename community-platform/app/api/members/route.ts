@@ -129,6 +129,9 @@ export async function POST(req: NextRequest) {
       case "claim":
         db.requestClaim(actor.id, b.id, b.reason, b.relationship);
         break;
+      case "confirmOwnNode":
+        db.confirmOwnNode(actor.id, b.id, { confirm: b.confirm === true, statement: b.statement });
+        break;
       case "claimNode":
         db.requestNodeClaim(actor.id, b);
         break;

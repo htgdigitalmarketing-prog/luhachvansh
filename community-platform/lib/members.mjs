@@ -535,9 +535,65 @@ export class MemberStore extends Store {
   }
   personalClaim(actor) {
     return this.one(
-      "SELECT c.id,c.status,c.person_id,c.created,p.name AS person_name,p.village AS person_village,p.kind FROM claims c JOIN verification_details v ON v.claim_id=c.id JOIN people p ON p.id=c.person_id WHERE c.account_id=? AND v.relationship='self' AND c.status IN ('pending','approved') ORDER BY c.created DESC LIMIT 1",
+      `SELECT c.id,c.status,c.person_id,c.created,p.name AS person_name,p.village AS person_village,p.kind,
+        coalesce(p.legacy_id,p.public_code,'') AS person_code,p.generation AS person_generation,
+        (SELECT f.name FROM relationships r JOIN people f ON f.id=r.a WHERE r.b=c.person_id AND r.type='parent' AND r.active=1 ORDER BY CASE r.role WHEN 'father' THEN 0 ELSE 1 END LIMIT 1) AS person_parent
+       FROM claims c JOIN verification_details v ON v.claim_id=c.id JOIN people p ON p.id=c.person_id WHERE c.account_id=? AND v.relationship='self' AND c.status IN ('pending','approved') ORDER BY c.created DESC LIMIT 1`,
       actor,
     );
+  }
+  isOriginalOwner(actor) {
+    return (
+      this.user(actor).role === "admin" &&
+      !!this.one(
+        "SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",
+        actor,
+      )
+    );
+  }
+  // Narrow exception, explicitly requested by the site owner ("i am super admin. i need no reviewer"): only the
+  // original bootstrap owner may confirm their OWN pending self claim, by an explicit confirmation with a written
+  // statement, recorded in the audit log. It never happens automatically, never for anyone else's claim, and
+  // ordinary members and appointed reviewers keep the independent-review rule (verifyClaim).
+  confirmOwnNode(actor, claimId, input = {}) {
+    need(this.isOriginalOwner(actor), "Only the original owner account can confirm its own entry.", 403);
+    need(input.confirm === true, "Tick the confirmation that this archive entry is your own.");
+    need(text(input.statement).length >= 15, "Write how you know this entry is yours (at least 15 characters).");
+    this.transaction(() => {
+      const c = this.one(
+        "SELECT c.*,v.relationship FROM claims c JOIN verification_details v ON v.claim_id=c.id WHERE c.id=?",
+        claimId,
+      );
+      need(c && c.status === "pending", "Claim is no longer pending.", 409);
+      need(c.account_id === actor && c.relationship === "self", "Only your own personal claim can be confirmed here.", 403);
+      need(
+        !this.one("SELECT id FROM claims WHERE person_id=? AND status='approved'", c.person_id),
+        "A steward already holds this profile; resolve ownership separately.",
+        409,
+      );
+      const p = this.person(c.person_id);
+      need(p, "Profile not available.", 404);
+      this.run("UPDATE claims SET status='approved',decision=? WHERE id=?", "Original owner self-confirmation: " + text(input.statement), c.id);
+      this.run(
+        "UPDATE verification_details SET method='owner_self_confirmation',reviewer=?,reviewed=? WHERE claim_id=?",
+        actor,
+        Date.now(),
+        c.id,
+      );
+      this.run(
+        "UPDATE proposals SET due=? WHERE author=? AND anchor=? AND status='pending' AND json_extract(payload,'$.relative')=1",
+        this.now() + 7 * DAY,
+        actor,
+        c.person_id,
+      );
+      this.log(actor, "owner_self_node_confirmed", c.person_id, {
+        claim: c.id,
+        code: p.legacy_id || p.public_code || "",
+        name: p.name,
+        village: p.village,
+        statement: text(input.statement),
+      });
+    });
   }
   // Archive entries an unlinked member may see while choosing their own node: shared, adult, not on hold.
   claimable(id) {
@@ -704,6 +760,20 @@ export class MemberStore extends Store {
     );
     return id;
   }
+  // A relative's village or birth place may be explicitly unknown: it is stored blank, never guessed (for example
+  // never copied from the husband's village). The duplicate check then compares names among blank-place entries.
+  validatePayload(anchor, payload) {
+    const unknown =
+      !payload.existingId && !text(payload.village) && (payload.villageUnknown === true || payload.relative === true);
+    if (!unknown) return super.validatePayload(anchor, payload);
+    const p = super.validatePayload(anchor, { ...payload, village: "⁣unknown-place" });
+    need(
+      !this.all("SELECT name FROM people WHERE active=1 AND village=''").some((r) => foldName(r.name) === foldName(p.name)),
+      "This name already exists in the same village. Select the existing person instead.",
+      409,
+    );
+    return { ...p, village: "" };
+  }
   // Existing people a member may link as a relative: visible to them, or a shared adult archive entry.
   linkable(actor, id) {
     return this.visible(actor, id) || this.claimable(id);
@@ -724,12 +794,17 @@ export class MemberStore extends Store {
       need(this.person(id) && this.linkable(actor, id), "Profile not available.", 404);
     const anchor = this.person(own.person_id);
     need(anchor, "Profile not available.", 404);
+    need(
+      input.existingId || text(input.village) || input.villageUnknown === true,
+      "Enter the village or place, or mark it as not known.",
+    );
     const p = {
       ...this.validatePayload(anchor, input),
       life: input.existingId ? this.privacy(input.existingId).life : input.life,
       sourceType: input.sourceType,
       birthFamily: text(input.birthFamily, 300),
       marriage: text(input.marriage, 300),
+      villageUnknown: !input.existingId && !text(input.village),
       relative: true,
     };
     need(
@@ -1422,6 +1497,7 @@ export class MemberStore extends Store {
       // Node-claim onboarding stays required until the account has a pending or approved self claim.
       onboarding: { required: !selfClaim, claim: selfClaim || null },
       introduction: this.one("SELECT about_hi,about_en,family_hi,family_en,updated FROM account_introductions WHERE account_id=?", actor),
+      canConfirmOwnNode: selfClaim?.status === "pending" && this.isOriginalOwner(actor),
       recoveryOwner: !!this.one("SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",actor) && a.role==='admin',
       recoveryRequests: a.role==='admin' && this.one("SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",actor) ? this.all("SELECT r.id,r.note,r.created,a.name,c.handle FROM recovery_requests r JOIN accounts a ON a.id=r.account_id JOIN credentials c ON c.account_id=a.id WHERE status='pending'") : [],
       claims,

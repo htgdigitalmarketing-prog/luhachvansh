@@ -280,15 +280,57 @@ test("Ajay-shaped synthetic case: the owner's node is found by father and villag
     assert.equal(found.candidates[0].father.name, "कर्मबीर");
     assert.equal(db.claimCandidates(owner, { name: "अजय", parent: "कर्मबीर" }).total, 1, "the other अजय has a different father");
     db.requestNodeClaim(owner, { searchName: "अजय", searchVillage: "गुगाहेड़ी", searchParent: "कर्मबीर", id: "legacy:गुगाहेड़ी_ii_38_8", reason: "Owner's statement: son of Karambir, brother of Akshay, Gugaheri.", confirm: true });
-    const spouse = db.proposeRelative(owner, { relation: "spouse", name: "डॉ. शगुन अजय लुहाच", aliases: "Dr. Shagun Ajay Luhach", gender: "female", village: "गुगाहेड़ी", life: "adult", sourceType: "family_knowledge", source: "Explicit statement by Ajay Luhach (husband), 13.10.2026." });
+    const wife = { relation: "spouse", name: "डॉ. शगुन अजय लुहाच", aliases: "Dr. Shagun Ajay Luhach", gender: "female", village: "", life: "adult", sourceType: "family_knowledge", source: "Explicit statement by Ajay Luhach (husband), 13.10.2026." };
+    assert.throws(() => db.proposeRelative(owner, wife), /mark it as not known/, "a blank place must be explicitly marked unknown");
+    const spouse = db.proposeRelative(owner, { ...wife, villageUnknown: true });
     const payload = JSON.parse(db.one("SELECT payload FROM proposals WHERE id=?", spouse).payload);
     assert.equal(payload.existingId, "", "a new spouse entry, not the unrelated archive शगुन");
-    assert.equal(db.one("SELECT status FROM proposals WHERE id=?", spouse).status, "pending");
+    assert.equal(payload.village, "", "unknown birth place is kept blank, never filled with the husband's village");
+    assert.equal(payload.villageUnknown, true);
     db.run("UPDATE proposals SET due=0");
     db.tick();
-    assert.equal(db.one("SELECT status FROM proposals WHERE id=?", spouse).status, "pending", "waits for the owner's independent identity review");
+    assert.equal(db.one("SELECT status FROM proposals WHERE id=?", spouse).status, "pending", "waits until the owner's own node is confirmed");
+    const claim = db.memberState(owner).onboarding.claim;
+    assert.equal(db.memberState(owner).canConfirmOwnNode, true);
+    db.confirmOwnNode(owner, claim.id, { confirm: true, statement: "I am Ajay, son of Karambir and brother of Akshay, Gugaheri." });
+    assert.equal(db.memberState(owner).onboarding.claim.status, "approved");
+    db.run("UPDATE proposals SET due=0");
+    db.tick();
+    assert.equal(db.one("SELECT status FROM proposals WHERE id=?", spouse).status, "auto_accepted");
+    const added = db.one("SELECT person_id FROM proposals WHERE id=?", spouse).person_id;
+    assert.equal(db.person(added).village, "");
+    assert.equal(db.familyFor(owner, "legacy:गुगाहेड़ी_ii_38_8").spouses[0].name, "डॉ. शगुन अजय लुहाच");
   } finally {
     db.close();
+  }
+});
+
+test("only the original owner may explicitly confirm their own pending claim; everyone else keeps independent review", async () => {
+  const f = await fixture();
+  try {
+    // A v12-style claim (no onboarding context) is recognised: no duplicate claim is demanded.
+    const own = f.db.requestClaim(f.admin, "m1", "Owner's own synthetic node, submitted before onboarding.", "self");
+    assert.equal(f.db.memberState(f.admin).onboarding.required, false);
+    assert.equal(f.db.memberState(f.admin).onboarding.claim.id, own);
+    assert.equal(f.db.memberState(f.admin).onboarding.claim.person_parent, "हरि सिंह");
+    assert.throws(() => f.db.verifyClaim(f.admin, own, true, "Ordinary review path stays closed.", "family_records"), /separate reviewer/);
+    assert.throws(() => f.db.confirmOwnNode(f.admin, own, { statement: "Synthetic owner statement for test." }), /Tick the confirmation/);
+    assert.throws(() => f.db.confirmOwnNode(f.admin, own, { confirm: true, statement: "short" }), /15 characters/);
+    // A member, and even an appointed reviewer, cannot use the owner path for their own claim.
+    const memberClaim = f.db.requestNodeClaim(f.member, { searchName: "राम कुमार", searchVillage: "गाँव-ख", id: "m2", reason: "Member's own synthetic node for review.", confirm: true });
+    assert.equal(f.db.memberState(f.member).canConfirmOwnNode, false);
+    assert.throws(() => f.db.confirmOwnNode(f.member, memberClaim, { confirm: true, statement: "Member tries the owner path." }), (e) => e.status === 403);
+    approve(f, f.admin, memberClaim);
+    await f.db.appointReviewer(f.admin, f.member, password, "Synthetic reviewer for this owner-path test.");
+    assert.throws(() => f.db.confirmOwnNode(f.member, own, { confirm: true, statement: "Reviewer tries to confirm the owner's claim." }), (e) => e.status === 403);
+    f.db.confirmOwnNode(f.admin, own, { confirm: true, statement: "I am the owner; this is my own synthetic entry." });
+    assert.equal(f.db.one("SELECT status FROM claims WHERE id=?", own).status, "approved");
+    assert.equal(f.db.one("SELECT method,reviewer FROM verification_details WHERE claim_id=?", own).method, "owner_self_confirmation");
+    const audit = f.db.one("SELECT detail FROM audit WHERE action='owner_self_node_confirmed'");
+    assert.match(audit.detail, /this is my own synthetic entry/);
+    assert.throws(() => f.db.confirmOwnNode(f.admin, own, { confirm: true, statement: "Confirming the same claim twice." }), /no longer pending/);
+  } finally {
+    f.db.close();
   }
 });
 

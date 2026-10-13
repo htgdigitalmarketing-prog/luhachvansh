@@ -82,7 +82,7 @@ type Proposal = {
   anchor_name?: string;
   identity_verified?: boolean;
   person_code?: string | null;
-  payload: { name: string; relation: string; source: string; relative?: boolean; life?: string; sourceType?: string; birthFamily?: string; marriage?: string; existingId?: string; secondId?: string };
+  payload: { name: string; relation: string; source: string; relative?: boolean; villageUnknown?: boolean; life?: string; sourceType?: string; birthFamily?: string; marriage?: string; existingId?: string; secondId?: string };
   status: string;
   decision?: string;
   due: number;
@@ -91,7 +91,8 @@ type Proposal = {
 };
 type State = {
   actor: Actor;
-  onboarding?: { required: boolean; claim: { id: string; status: string; person_id: string; person_name: string; person_village: string } | null };
+  onboarding?: { required: boolean; claim: { id: string; status: string; person_id: string; person_name: string; person_village: string; person_code?: string; person_generation?: string; person_parent?: string } | null };
+  canConfirmOwnNode?: boolean;
   recoveryOwner?: boolean;
   recoveryRequests?: {id:string;name:string;handle:string;note:string;created:number}[];
   introduction?: { about_hi: string; about_en: string; family_hi: string; family_en: string; updated: number };
@@ -756,8 +757,47 @@ export default function Members() {
                       <ShieldCheck size={15} />
                       {personal.status === "approved"
                         ? hi ? "पहचान सत्यापित" : "Identity verified"
-                        : hi ? "एक अलग समीक्षक की जाँच लंबित है" : "Waiting for an independent reviewer"}
+                        : state?.canConfirmOwnNode
+                          ? hi ? "आपकी अपनी स्पष्ट पुष्टि लंबित है" : "Waiting for your own explicit confirmation"
+                          : hi ? "एक अलग समीक्षक की जाँच लंबित है" : "Waiting for an independent reviewer"}
                     </span>
+                    {personal.status === "pending" && state?.canConfirmOwnNode && (
+                      <form
+                        className="m-form-grid m-owner-confirm"
+                        onSubmit={(e) => {
+                          const d = fields(e);
+                          run(
+                            "confirmOwnNode",
+                            { id: personal.id, confirm: d.confirm === "on", statement: d.statement },
+                            hi ? "आपकी प्रविष्टि की पुष्टि दर्ज हो गई और लॉग में सुरक्षित है।" : "Your own entry is confirmed and recorded in the audit log.",
+                          );
+                        }}
+                      >
+                        <h3 className="m-wide">{hi ? "मूल मुख्य प्रशासक: अपनी प्रविष्टि की स्वयं पुष्टि" : "Original owner: confirm your own entry"}</h3>
+                        <p className="m-muted m-wide">
+                          {hi
+                            ? "यह विकल्प केवल साइट के मूल मुख्य प्रशासक खाते को, केवल उसकी अपनी प्रविष्टि के लिए मिलता है। अन्य सदस्यों और नियुक्त समीक्षकों के अनुरोध पहले की तरह किसी अलग समीक्षक से जाँचे जाते हैं। पुष्टि अपने-आप नहीं होती; यह निर्णय कारण सहित स्थायी लॉग में दर्ज होगा।"
+                            : "Only the site's original owner account gets this option, and only for its own entry. Other members' and appointed reviewers' requests are still checked by a separate reviewer. Nothing is confirmed automatically; this decision is kept in the permanent audit log with your statement."}
+                        </p>
+                        <dl className="m-claim-context m-wide">
+                          <dt>{hi ? "नाम" : "Name"}</dt><dd>{personal.person_name}</dd>
+                          <dt>{hi ? "गाँव" : "Village"}</dt><dd>{personal.person_village || (hi ? "दर्ज नहीं" : "not recorded")}</dd>
+                          <dt>{hi ? "मूल क्रमांक" : "Record no."}</dt><dd><code>{personal.person_code || "—"}</code></dd>
+                          <dt>{hi ? "दर्ज पिता / माता" : "Recorded parent"}</dt><dd>{personal.person_parent || (hi ? "दर्ज नहीं" : "not recorded")}</dd>
+                          {personal.person_generation && <><dt>{hi ? "पीढ़ी" : "Generation"}</dt><dd>{personal.person_generation}</dd></>}
+                        </dl>
+                        <label className="m-wide">{hi ? "आप कैसे जानते हैं कि यह आपकी प्रविष्टि है?" : "How do you know this entry is yours?"}
+                          <textarea name="statement" required minLength={15} maxLength={1000} />
+                        </label>
+                        <label className="m-check m-wide">
+                          <input type="checkbox" name="confirm" required />
+                          {hi
+                            ? "मैं मूल मुख्य प्रशासक हूँ और पुष्टि करता/करती हूँ कि ऊपर दिखाई गई नाम, गाँव, मूल क्रमांक और पिता वाली प्रविष्टि मेरी अपनी है।"
+                            : "I am the original owner and confirm that the entry above, with this name, village, record number and parent, is my own."}
+                        </label>
+                        <button className="primary" disabled={busy}>{hi ? "अपनी प्रविष्टि की पुष्टि करें" : "Confirm my own entry"}</button>
+                      </form>
+                    )}
                     {personal.status === "approved" && (
                       <button
                         className="outline"
@@ -1519,6 +1559,7 @@ export default function Members() {
                           p.payload.sourceType && (hi ? "स्रोत: " : "Source type: ") + p.payload.sourceType.replaceAll("_", " "),
                           p.payload.life && (hi ? "जीवन-स्थिति: " : "Life stage: ") + tr(p.payload.life),
                           p.payload.existingId && (hi ? "पहले से दर्ज व्यक्ति से जोड़ा गया" : "links an existing entry"),
+                          p.payload.villageUnknown && (hi ? "स्थान: ज्ञात नहीं (खाली रखा गया)" : "Place: not known (left blank)"),
                           p.payload.secondId && (hi ? "जन्म/विवाह की कड़ी चुनी गई" : "birth/marriage link chosen"),
                           p.payload.birthFamily && (hi ? "जन्म का परिवार: " : "Birth family: ") + p.payload.birthFamily,
                           p.payload.marriage && (hi ? "विवाह: " : "Marriage: ") + p.payload.marriage,
@@ -1569,14 +1610,13 @@ export default function Members() {
                     )}
                   </section>
                 ))}
-                <h2 className="m-section-title"> <Text value="दूसरा समीक्षक नियुक्त करें"/> </h2>
+                <h2 className="m-section-title">{hi ? "अतिरिक्त समीक्षक नियुक्त करें (वैकल्पिक)" : "Appoint an additional reviewer (optional)"}</h2>
                 <section className="m-panel">
-                  <p> <Text value="दूसरा विश्वसनीय समीक्षक मुख्य प्रशासक के परिवार के रिश्ते की जाँच कर सकता है। उसे सभी प्रोफ़ाइल और सत्यापन अनुरोधों पर प्रशासक अधिकार मिलेंगे। नियुक्ति के लिए अपना पासवर्ड दें।"/> </p>
+                  <p>{hi ? "मूल मुख्य प्रशासक अपनी प्रविष्टि की पुष्टि “परिचय” पृष्ठ पर स्वयं कर सकते हैं; इसके लिए दूसरे समीक्षक की आवश्यकता नहीं है। सदस्यों के अनुरोध जाँचने में मदद के लिए आप किसी भरोसेमंद, सत्यापित सदस्य को समीक्षक बना सकते हैं। उसे सभी प्रोफ़ाइल और सत्यापन अनुरोधों पर प्रशासक अधिकार मिलेंगे, पर वह अपना अनुरोध स्वयं स्वीकृत नहीं कर सकेगा। नियुक्ति के लिए अपना पासवर्ड दें।" : "The original owner can confirm their own entry on the Home page; no second reviewer is needed for that. To help check members' requests, you may appoint a trusted, verified member as a reviewer. They get administrator rights over profiles and verification requests, but can never approve their own request. Enter your password to appoint."}</p>
                   <ol className="m-steps">
                     <li><Text value="परिवार का कोई वास्तविक, भरोसेमंद व्यक्ति सदस्य खाता बनाए और अपनी पहचान का अनुरोध भेजे।" en="A real, trusted family member creates a member account and submits their own identity request."/></li>
                     <li><Text value="आप उनकी पहचान स्वयं जाँचकर ऊपर 'प्रोफ़ाइल सत्यापन' में स्वीकृत करें।" en="You check their identity yourself and approve it under 'Profile verification' above."/></li>
-                    <li><Text value="फिर यहाँ उन्हें दूसरा समीक्षक नियुक्त करें। वे दोबारा लॉगिन करेंगे।" en="Then appoint them here as the second reviewer. They will sign in again."/></li>
-                    <li><Text value="वे आपके अपने पहचान अनुरोध की जाँच करके निर्णय दर्ज करें। अपना अनुरोध आप स्वयं स्वीकृत नहीं कर सकते।" en="They review your own identity request and record the decision. You cannot approve your own request."/></li>
+                    <li><Text value="फिर यहाँ उन्हें समीक्षक नियुक्त करें। वे दोबारा लॉगिन करेंगे।" en="Then appoint them here as a reviewer. They will sign in again."/></li>
                   </ol>
                   <p className="m-muted"><Text value="समीक्षक का चयन आपका निर्णय है। प्रणाली कोई समीक्षक अपने-आप नियुक्त नहीं करती और कोई काल्पनिक खाता नहीं बनाती।" en="Choosing the reviewer is your decision. The system never appoints a reviewer automatically or creates a placeholder account."/></p>
                   {!state?.members.some((m) => m.role !== "admin" && m.verified) && (
