@@ -11,3 +11,11 @@ Historical prose is attributed to the existing book/archive. Origin traditions r
 Deploy the source package to the existing isolated test.luhachvansh.com Node app using its current persistent database and environment. This request authorizes making the wiki live there. The original Laravel production host is outside the code target. Rollback uses the preceding v20 source deployment; persistent archive/member storage is unaffected. The test host retains its existing noindex policy.
 
 Further expansion can add sourced thematic articles and richer village summaries through the same content schema. An edit/revision workflow would be a later feature requiring review controls; it is not represented as already available.
+
+## Public publishing fallback
+
+Hostinger repeatedly failed to prepare its upload service on 14.10.2026, before accepting the source package. The wiki was therefore published separately at **https://admirable-kitten-6793df.netlify.app/** in Ajay Luhach's existing Netlify account. Project ID: `606097a9-45c7-4ef7-b183-6723216a41a4`. The public site is static HTML, CSS and JavaScript: no SQLite, member accounts, private records, secrets or server functions.
+
+`integration/build-wiki-static.mjs` generates this edition from the same ten topic guides and the existing read-only public heritage projection. It exports 56 village excerpts and their source-backed aliases, never member tables. Source links point back to test.luhachvansh.com. Hindi/English switching and search are implemented locally in the browser. Rebuild from the repository root with an explicit `LUHACH_HERITAGE_DB` pointing to the existing archive; the output defaults to ignored `.local-integration/wiki-static`. Upload only the generated static output to this existing Netlify project. `.netlify` is excluded by the generated output's `.gitignore`.
+
+The first production deploy was `6ace83f38c2654828704cc86`, followed by the CSS correction `6ace84f9039c80dcdc5689d5`. Netlify shows the latter as currently published. The integrated Node package remains ready for Hostinger, but has not been deployed there. Moving the wiki to the main/custom domain is a separate hosting operation; no DNS change was made.

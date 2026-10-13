@@ -1,0 +1,15 @@
+# Wiki delivery — 14.10.2026
+
+Live public URL: **https://admirable-kitten-6793df.netlify.app/**.
+
+The series contains ten bilingual topic guides and 56 source-linked village entries, covering identity, history, migration, villages, family records, traditions, people, memories, sources and contributions. Readers can search both languages and attested village spellings, follow section anchors and related pages, and return to the original full archive. Duplicate-name source articles retain their original IDs. Tradition, attributed chronology and unresolved date variants remain distinct.
+
+Netlify project: `606097a9-45c7-4ef7-b183-6723216a41a4`. Initial deploy: `6ace83f38c2654828704cc86`, ready/public production. Current corrected deploy: `6ace84f9039c80dcdc5689d5`, published at approximately 00:52 IST on 14.10.2026. Both were ordinary manual static uploads in the existing personal account. No paid services, new accounts, DNS changes or database changes were made. An inherited CSS rule affecting nested bilingual eyebrow labels was corrected and the live computed style and screenshot confirmed the correction.
+
+Validation: 98 automated tests passed; the isolated `.next-wiki-v21` production build passed; all 67 integrated wiki HTTP routes passed locally; all generated static local links resolve. Local and live browser checks confirmed bilingual search, preserved separate Nandha records and source navigation. Mobile reading was checked locally. Netlify confirmed a ready production deployment and the live homepage/history/search were verified in Chrome. Shell batch checks encountered intermittent connection resets, so the hosted batch report is not represented as a complete all-route pass. The first build's missing generated manifest was resolved with an isolated build output directory.
+
+The integrated Node application is committed at `28c8f9a` and pushed to both origin and review on `integration/test-community-20261012`. Its Hostinger source package is `.local-integration/community-node-v21-wiki.zip`, made from the Git index to exclude concurrent unreviewed village-map work. Hostinger repeatedly reported **Failed to prepare service** during upload preparation. No new deployment began there; v20 was the last confirmed current release. The separately deployed static edition uses `.local-integration/luhach-vansh-wiki-public.zip`, built with `integration/build-wiki-static.mjs`.
+
+Evidence: `.local-integration/wiki-local-verification.json`, `.local-integration/wiki-hosted-verification.json` (transport failures retained), `.local-integration/wiki-live-2026-10-14.png`. The public static output contains no private database, member contacts, keys or account data. Source archive links continue to use the existing test host and depend on its availability.
+
+Next hosting action: once Hostinger upload preparation works, deploy the prepared integrated package to test.luhachvansh.com with its existing environment, then verify `/wiki` and village pages. Keep the public Netlify wiki available until the intended domain is independently verified.
