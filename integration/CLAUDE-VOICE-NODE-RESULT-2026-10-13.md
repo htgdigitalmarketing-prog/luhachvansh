@@ -1,6 +1,6 @@
 # Claude result — voice input, node-linked signup, family explorer (13.10.2026)
 
-Status: **source complete, tested and built. Not deployed.**
+Status (v14): **source complete, tested (90/90) and built. The source-only v14 package is ready. Not deployed.**
 
 **Briefs**
 - `integration/CLAUDE-VOICE-NODE-SIGNUP-2026-10-13.md`, including the appended final paragraphs.
@@ -103,7 +103,44 @@ This lets Codex diagnose a moved database without shell access.
 - The parent's name is review context only. **It creates no graph edge.**
 - A declined self-submitted profile with no other links is retired, so it cannot linger as a duplicate.
 
-**Unchanged rules:** identity is never approved by time and never by the claimant themselves. A separate reviewer is still required.
+**Unchanged rules for members:** identity is never approved by time and never by the claimant themselves. A separate reviewer is still required.
+
+**Owner exception (v14), at Ajay's explicit instruction "i am super admin. i need no reviwer":** see section 3a.
+
+## 3a. Original owner confirms his own entry (v14)
+
+**Store:** `confirmOwnNode` in `lib/members.mjs`. **Route:** POST action `confirmOwnNode`.
+
+**Who can use it.** Only the **original bootstrap owner account** (the account created with the one-time owner setup), and only for **its own pending self claim**.
+
+**What it requires**
+- an explicit confirmation tick
+- a written statement of at least 15 characters
+- no other approved steward on that entry
+
+**Where it appears.** On the owner's Home page, in the "वंशावली में आपकी प्रविष्टि" card. The card shows the exact match before the owner confirms: name, village, original record number (such as `गुगाहेड़ी_ii_38_8`), recorded parent and generation.
+
+**What it records**
+- the claim becomes `approved`, with method `owner_self_confirmation`
+- the owner is recorded as decider, with a timestamp
+- an audit entry, `owner_self_node_confirmed`, stores the claim, code, name, village and statement
+- any pending relative proposals of the owner get a fresh seven-day objection window
+
+**Never automatic.** Being an administrator does not link anyone.
+
+**Ordinary members and appointed reviewers** still cannot approve their own claims: `verifyClaim` is unchanged, and they get a 403 on this path.
+
+**Ajay's existing pending claim.** It was submitted through the v12 UI and is **recognised as is**. It counts as his personal claim, so onboarding does not ask for a duplicate, and the confirmation panel appears directly.
+
+**Admin page.** The second-reviewer section is now "Appoint an additional reviewer (optional)". It no longer says the owner needs a reviewer.
+
+## 3b. Unknown birth place (v14)
+
+The relative form has a "स्थान ज्ञात नहीं — खाली रखें" (place not known — leave blank) option, with a warning not to guess and that a husband's village is not her birth village.
+- The server accepts a blank village only when it is explicitly marked unknown. A blank field without the mark is refused, so a place is not left out by accident.
+- The place is stored **blank**, with `villageUnknown: true`. Nothing is ever filled in, for example from Gugaheri.
+- For blank-place entries, the duplicate check compares names among other blank-place entries.
+- Source, relationship and identity safeguards are unchanged.
 
 **Family-shared code.** A relative added by someone else (for example a wife) cannot be found by name, because she is private. The proposer sees her permanent code, `LV-XXXX-XXXX`, on the Requests tab and passes it on privately. She enters it in onboarding to claim her own entry. Codes of children or entries on hold never open a claim, and a claimed code cannot be claimed again.
 
@@ -187,16 +224,19 @@ The **draft only** is in `integration/OWNER-CLAIM-AND-SPOUSE-DRAFT-2026-10-13.md
 - It warns explicitly against `ज्ञानपुर_vii_38_10`.
 - It has the spouse-form values, with Ajay's statement as the source.
 
-A synthetic test with the same structure checks two things:
+A synthetic test with the same structure checks five things:
 - The owner's node is the only candidate when searching by village and father.
-- The new spouse proposal does not link to the unrelated शगुन. It waits for the owner's independent review.
+- The new spouse proposal, with its place explicitly unknown and stored blank, does not link to the unrelated शगुन.
+- It waits until the owner confirms his own entry.
+- After his confirmation, it is accepted when the objection window ends.
+- Afterwards it appears as his spouse in the signed-in explorer.
 
 ## Validation
 
 **Tests and build**
-- `npm test`: **89/89 pass**. That is the 74 earlier tests, unchanged, plus 15 new: 9 in `tests/onboarding.test.mjs` and 6 in `tests/voice.test.mjs`.
+- `npm test`: **90/90 pass** (v14). That is the 74 earlier tests, unchanged, plus 16 new: 10 in `tests/onboarding.test.mjs`, including the owner-confirmation and unknown-place cases, and 6 in `tests/voice.test.mjs`.
 - `tsc --noEmit` is clean.
-- Production `next build` passes. It was built into `.next-v13`, so the v12 preview on :3025 (`.next`) was not disturbed. `.next-*/` is now gitignored.
+- Production `next build` passes for v14. It was built into `.next-v13`, a separate output folder, so the v12 preview on :3025 (`.next`) was not disturbed. `.next-*/` is gitignored.
 
 **Earlier browser check (before the follow-up brief).** This was done before `CLAUDE-FAMILY-FOLLOWUP` arrived, which says not to drive browsers by shell or CDP. It used a headless Chrome DevTools script against a **synthetic** database on 127.0.0.1:3026, which has since been stopped. Results are in `.local-integration/v13-verification.json`, with screenshots in `.local-integration/screenshots/v13/`.
 
@@ -215,23 +255,29 @@ A synthetic test with the same structure checks two things:
 - the code-based claim
 - the public-consent option
 - the objection-window labels
+- the owner self-confirmation panel (v14)
+- the "place not known" option (v14)
 
 ## Commits, remotes and package
 
-**Commit.** `785f0dc`: "Voice input, node-linked signup, family explorer and consent-based publication". This result document is committed separately; see `git log`.
+**Commits**
+- `785f0dc` (v13): "Voice input, node-linked signup, family explorer and consent-based publication".
+- `e55d24a` (v14): "Owner-only self-node confirmation and explicit unknown birth place".
+- This result document is committed separately; see `git log`.
 
-**Remotes.** The commit is pushed to both remotes, on branch `integration/test-community-20261012`:
-- `origin` (htgdigitalmarketing-prog/luhachvansh): `685215f..785f0dc`
-- `review` (ajay1694-max/luhach-community): `685215f..785f0dc`
+**Remotes.** Both commits are pushed to both remotes, on branch `integration/test-community-20261012`:
+- `origin` (htgdigitalmarketing-prog/luhachvansh)
+- `review` (ajay1694-max/luhach-community)
 
 **Not committed.** Codex's `TEST-DOMAIN-MOVE-2026-10-13.md` is left uncommitted because it contains a hosting account path.
 
-**Package.** `C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/community-node-v13.zip`
-- 9,079,684 bytes, under the 10 MB upload limit.
-- Built with `git archive` from `HEAD:community-platform`, the same layout as v12, so it holds git-tracked source and public assets only.
+**Package to deploy (v14).** `C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/community-node-v14.zip`
+- 9,083,117 bytes, under the 10 MB upload limit.
+- Built with `git archive` from commit `e55d24a`, `HEAD:community-platform`, the same layout as v12, so it holds git-tracked source and public assets only.
 - Checked to contain no `.env.local`, no `.sqlite`, no recovery key, no `node_modules` and no `.next`.
+- The v13 zip is superseded.
 
-**Not deployed.**
+**Not deployed. No real database was touched.**
 
 **Deployment notes for Codex**
 - Keep the existing environment variables. `LUHACH_DEPLOYMENT=test` and an absolute, existing `LUHACH_MEMBER_DB` are now strictly required.
@@ -245,7 +291,13 @@ A synthetic test with the same structure checks two things:
 
 ## Human input still needed
 
-1. Choose and appoint the real second reviewer, who approves Ajay's claim.
-2. Shagun's birth village or place, or the place she agrees to show. It is required for a new entry.
-3. Shagun's own decision about appearing publicly. Only she can make it, from her own account.
-4. Codex deploys and verifies through CUA on `test.luhachvansh.com`. Codex should also look for, and set aside, any empty `members.sqlite` created in the old temporary-domain directory.
+**No longer needed (superseded by Ajay's 12:24 IST instruction):**
+- a second reviewer for Ajay's own claim
+- a mandatory birth place for Shagun
+
+**Still needed:**
+1. **Codex deploys v14** and checks it through CUA on `test.luhachvansh.com`.
+2. **Ajay confirms his own entry.** As the signed-in owner, Ajay (or Codex at his direction) opens Home. His already-pending v12 claim shows a confirmation panel. Check that it shows `गुगाहेड़ी_ii_38_8` with parent कर्मबीर, then tick, write the statement and confirm.
+3. **Ajay proposes Shagun as his spouse.** The form values are in the draft. Tick "स्थान ज्ञात नहीं" unless a real place is known. It is accepted after the 7-day objection window if nobody objects.
+4. **Shagun decides about the public tree.** Whether she ever appears publicly is her own decision, made from her own account.
+5. **The old database folder.** Codex should look for, and set aside, any empty `members.sqlite` that v12 may have created in the old temporary-domain directory.
