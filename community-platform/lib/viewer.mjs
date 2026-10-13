@@ -8,16 +8,25 @@ export function viewerData(db, actor) {
     .filter(r => ids.has(r.a) && ids.has(r.b));
   return graphData(people,edges);
 }
+// Daughter / daughter-in-law are contextual roles of one woman in the shown graph, never separate identities:
+// a woman with a recorded parent is a daughter of that family; a woman with a recorded spouse is a
+// daughter-in-law of the family she married into. One node can carry both roles at once.
+export function familyRole(p,hasParent,hasSpouse){
+  if(p.gender!=='female')return null;
+  return hasParent&&hasSpouse?'daughter+daughter-in-law':hasParent?'daughter':hasSpouse?'daughter-in-law':null;
+}
 export function graphData(people,edges){
   const parents = new Map(), spouses = new Map();
   for (const r of edges) {
     if (r.type === 'parent') { const a = parents.get(r.b) || []; a.push({id:r.a,role:r.role}); parents.set(r.b,a); }
     if (r.type === 'spouse') for (const [a,b] of [[r.a,r.b],[r.b,r.a]]) { const s=spouses.get(a)||[];s.push(b);spouses.set(a,s); }
   }
+  const present=new Set(people.map(p=>p.id));
   return { records: people.map(p => {
     const links=parents.get(p.id)||[];
-    return { id:p.id, genealogyId:p.legacy_id||p.id, name:p.name, aliases:p.aliases,
-      gender:p.gender, villageName:p.village||'', villages:p.village?[p.village]:[],
+    return { id:p.id, genealogyId:p.legacy_id||p.public_code||p.id, name:p.name, aliases:p.aliases,
+      role:familyRole(p,links.filter(l=>present.has(l.id)).length>0,(spouses.get(p.id)||[]).some(id=>present.has(id))),
+      gender:p.gender, community:p.kind==='community', villageName:p.village||'', villages:p.village?[p.village]:[],
       generation:p.generation?Number(p.generation):null, pageNumber:'',
       // A single layout anchor is not the complete relationship model.
       fatherId:(links.find(r=>r.role==='father')||links[0])?.id||null,

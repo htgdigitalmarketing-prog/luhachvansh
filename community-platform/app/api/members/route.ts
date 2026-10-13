@@ -58,6 +58,19 @@ export async function GET(req: NextRequest) {
         db.familyFor(actor.id, req.nextUrl.searchParams.get("id") || ""),
       );
     if (action === "state") return response(db.memberState(actor.id));
+    if (action === "tree")
+      return response(db.memberTree(actor.id, req.nextUrl.searchParams.get("focus") || ""));
+    if (action === "candidates") {
+      const q = req.nextUrl.searchParams;
+      return response(
+        db.claimCandidates(actor.id, {
+          name: q.get("name") || "",
+          village: q.get("village") || "",
+          parent: q.get("parent") || "",
+          code: q.get("code") || "",
+        }),
+      );
+    }
     throw new Problem("Unknown request");
   } catch (e) {
     return fail(e);
@@ -116,8 +129,15 @@ export async function POST(req: NextRequest) {
       case "claim":
         db.requestClaim(actor.id, b.id, b.reason, b.relationship);
         break;
+      case "claimNode":
+        db.requestNodeClaim(actor.id, b);
+        break;
       case "createProfile":
-        db.createProfile(actor.id, b);
+        // The route always uses the duplicate-checked onboarding path for a missing person.
+        db.requestNewProfile(actor.id, b);
+        break;
+      case "proposeRelative":
+        db.proposeRelative(actor.id, b);
         break;
       case "verify":
         db.verifyClaim(actor.id, b.id, b.approve === true, b.reason, b.method);

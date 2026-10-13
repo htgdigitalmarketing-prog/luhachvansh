@@ -11,8 +11,18 @@ import {existsSync,readFileSync,writeFileSync} from "node:fs";
 import { promisify } from "node:util";
 import { resolve } from "node:path";
 import { Store, Problem } from "./store.mjs";
+import { memberDbPath } from "./storage.mjs";
+import { looseVillage, villageKey } from "./villages.mjs";
+import { englishTexts } from "./heritage.mjs";
+import { graphData } from "./viewer.mjs";
 const scrypt = promisify(scryptCallback),
   DAY = 86400000;
+// Name comparison folds only presentation differences (case, punctuation, nukta, chandrabindu) and a trailing
+// clan name; it never guesses spellings.
+const foldName = (x) =>
+  looseVillage(x).replace(/\s+(?:luhach|लुहाच)$/u, "").trim();
+const LIFE = ["adult", "child", "deceased", "unknown"];
+const SOURCE_TYPES = ["family_knowledge", "family_document", "archive_record", "community_elder"];
 const hash = (x) => createHash("sha256").update(String(x)).digest("hex");
 const token = () => randomBytes(32).toString("base64url");
 const need = (x, m, status = 400) => {
@@ -63,6 +73,9 @@ export class MemberStore extends Store {
       const before = resolve(path + ".before-recovery-vault.sqlite");
       if (!existsSync(before)) this.db.prepare("VACUUM INTO ?").run(before);
     }
+    // Additive migration: a stable human-readable code for people added after the original archive.
+    if (!this.all("PRAGMA table_info(people)").some((c) => c.name === "public_code"))
+      this.db.exec("ALTER TABLE people ADD COLUMN public_code TEXT");
     this.db.exec(`
    CREATE TABLE IF NOT EXISTS credentials(account_id TEXT PRIMARY KEY REFERENCES accounts(id),handle TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,recovery_hash TEXT NOT NULL,verified INTEGER NOT NULL DEFAULT 0,created INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS invitations(hash TEXT PRIMARY KEY,label TEXT NOT NULL,created_by TEXT NOT NULL,expires INTEGER NOT NULL,used_by TEXT,revoked INTEGER NOT NULL DEFAULT 0);
@@ -74,7 +87,25 @@ export class MemberStore extends Store {
    CREATE TABLE IF NOT EXISTS account_introductions(account_id TEXT PRIMARY KEY REFERENCES accounts(id),about_hi TEXT NOT NULL DEFAULT '',about_en TEXT NOT NULL DEFAULT '',family_hi TEXT NOT NULL DEFAULT '',family_en TEXT NOT NULL DEFAULT '',updated INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS recovery_vault(account_id TEXT PRIMARY KEY REFERENCES accounts(id),encrypted TEXT NOT NULL,created INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS recovery_requests(id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),note TEXT NOT NULL,status TEXT NOT NULL,created INTEGER NOT NULL,decision TEXT);
+   CREATE UNIQUE INDEX IF NOT EXISTS people_public_code ON people(public_code) WHERE public_code IS NOT NULL;
+   CREATE TABLE IF NOT EXISTS claim_context(claim_id TEXT PRIMARY KEY REFERENCES claims(id),search_name TEXT NOT NULL DEFAULT '',search_village TEXT NOT NULL DEFAULT '',search_parent TEXT NOT NULL DEFAULT '',candidates INTEGER NOT NULL DEFAULT 0,similar TEXT NOT NULL DEFAULT '[]',created INTEGER NOT NULL);
   `);
+    for (const p of this.all("SELECT id FROM people WHERE kind='community' AND public_code IS NULL"))
+      this.assignCode(p.id);
+  }
+  // Original archive IDs (e.g. village_ii_38_8) are never changed. People added later keep their internal UUID
+  // and receive a random code such as "LV-7K4Q-2M9D": it encodes no village, gender, generation or family,
+  // never changes, and is never re-used, so a woman keeps one code across her birth and married families.
+  assignCode(id) {
+    const alphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+    for (;;) {
+      const b = randomBytes(8),
+        c = [...b].map((x) => alphabet[x % 32]).join("");
+      const code = `LV-${c.slice(0, 4)}-${c.slice(4)}`;
+      if (this.one("SELECT id FROM people WHERE public_code=?", code)) continue;
+      this.run("UPDATE people SET public_code=? WHERE id=? AND public_code IS NULL", code, id);
+      return code;
+    }
   }
   now() {
     return Date.now();
@@ -463,9 +494,333 @@ export class MemberStore extends Store {
     const a = this.user(actor);
     if (a.role === "admin" || this.owns(actor, id)) return true;
     const p = this.privacy(id);
-    return (
-      this.verified(actor) && p.audience === "verified" && p.life !== "child"
+    if (this.verified(actor) && ["verified", "public"].includes(p.audience) && p.life !== "child")
+      return true;
+    return this.familyCircle(actor, id);
+  }
+  // A relative added through an accepted proposal stays private, yet is shown to the members whose own
+  // (self/guardian) verified node is directly linked to them. A child is shown only to the member whose node
+  // is the child's recorded parent. Once the relative verifies their own profile, or an administrator places a
+  // privacy hold, only their own sharing choice applies.
+  familyCircle(actor, id) {
+    const p = this.person(id);
+    if (!p || p.kind !== "community" || !p.proposal_id) return false;
+    if (
+      this.one("SELECT person_id FROM privacy_holds WHERE person_id=?", id) ||
+      this.one(
+        "SELECT c.id FROM claims c JOIN verification_details v ON v.claim_id=c.id WHERE c.person_id=? AND c.status='approved' AND v.relationship='self'",
+        id,
+      )
+    )
+      return false;
+    const mine = this.all(
+      "SELECT c.person_id FROM claims c JOIN verification_details v ON v.claim_id=c.id WHERE c.account_id=? AND c.status='approved' AND v.relationship IN ('self','guardian')",
+      actor,
+    ).map((r) => r.person_id);
+    if (!mine.length) return false;
+    const marks = mine.map(() => "?").join(",");
+    if (this.privacy(id).life === "child")
+      return !!this.one(
+        `SELECT id FROM relationships WHERE active=1 AND type='parent' AND b=? AND a IN (${marks})`,
+        id,
+        ...mine,
+      );
+    return !!this.one(
+      `SELECT id FROM relationships WHERE active=1 AND ((a=? AND b IN (${marks})) OR (b=? AND a IN (${marks})))`,
+      id,
+      ...mine,
+      id,
+      ...mine,
     );
+  }
+  personalClaim(actor) {
+    return this.one(
+      "SELECT c.id,c.status,c.person_id,c.created,p.name AS person_name,p.village AS person_village,p.kind FROM claims c JOIN verification_details v ON v.claim_id=c.id JOIN people p ON p.id=c.person_id WHERE c.account_id=? AND v.relationship='self' AND c.status IN ('pending','approved') ORDER BY c.created DESC LIMIT 1",
+      actor,
+    );
+  }
+  // Archive entries an unlinked member may see while choosing their own node: shared, adult, not on hold.
+  claimable(id) {
+    const p = this.person(id),
+      s = this.privacy(id);
+    return (
+      !!p &&
+      p.kind === "archive" &&
+      ["verified", "public"].includes(s.audience) &&
+      s.life !== "child" &&
+      !this.one("SELECT person_id FROM privacy_holds WHERE person_id=?", id)
+    );
+  }
+  // Explicit candidate list for node-claim onboarding. Name plus village or parent is required so a bare
+  // same-name match is never offered alone; nothing is pre-selected and ambiguity is shown, not resolved.
+  claimCandidates(actor, input = {}) {
+    this.user(actor);
+    this.throttle("candidates:" + actor, 60);
+    // A relative added by a family member is private, so it never appears in name search. Its family-shared
+    // code (LV-XXXX-XXXX) lets that adult find and claim their own entry; children and held entries never match.
+    const code = text(input.code, 20).toUpperCase();
+    if (code) {
+      const p = this.one("SELECT id,name,village,public_code FROM people WHERE public_code=? AND active=1 AND kind='community'", code);
+      const ok =
+        p &&
+        this.privacy(p.id).life !== "child" &&
+        !this.one("SELECT person_id FROM privacy_holds WHERE person_id=?", p.id) &&
+        !this.one(
+          "SELECT c.id FROM claims c JOIN verification_details v ON v.claim_id=c.id WHERE c.person_id=? AND c.status IN ('pending','approved') AND v.relationship='self'",
+          p.id,
+        );
+      return {
+        candidates: ok ? [{ id: p.id, name: p.name, nameEnglish: englishTexts([p.name])[0], village: p.village, villageEnglish: englishTexts([p.village])[0], generation: "", serial: p.public_code, father: null, grandfather: null, linked: false }] : [],
+        total: ok ? 1 : 0,
+        limited: false,
+      };
+    }
+    const name = foldName(text(input.name, 120)),
+      village = text(input.village, 120),
+      parent = foldName(text(input.parent, 120));
+    need(name.length >= 2, "Enter the name recorded for you in the family archive.");
+    need(
+      village || parent.length >= 2,
+      "Add your village or your father's or mother's name so that people with the same name are not confused.",
+    );
+    const vkey = village ? villageKey(village) : "",
+      vloose = looseVillage(village);
+    const latin = /[a-z]/.test(name + " " + parent);
+    let rows = this.all(
+      "SELECT id,name,village,generation,legacy_id FROM people WHERE active=1 AND kind='archive'",
+    );
+    if (vkey) {
+      const keys = new Map();
+      const keyOf = (v) => (keys.has(v) ? keys.get(v) : keys.set(v, villageKey(v)).get(v));
+      rows = rows.filter((r) => keyOf(r.village) === vkey || looseVillage(r.village).includes(vloose));
+    }
+    const english = latin ? englishTexts(rows.map((r) => r.name)) : [];
+    const score = (names, q) =>
+      names.some((n) => n === q)
+        ? 2
+        : names.some((n) => n.includes(q) || q.split(" ").every((w) => n.includes(w)))
+          ? 1
+          : 0;
+    let matched = rows
+      .map((r, i) => ({ r, en: english[i], score: score([foldName(r.name), latin ? foldName(english[i]) : ""].filter(Boolean), name) }))
+      .filter((m) => m.score && this.claimable(m.r.id));
+    const parentOf = (id) =>
+      this.one(
+        "SELECT p.id,p.name,r.role FROM relationships r JOIN people p ON p.id=r.a WHERE r.active=1 AND r.type='parent' AND r.b=? AND p.active=1 ORDER BY CASE r.role WHEN 'father' THEN 0 ELSE 1 END LIMIT 1",
+        id,
+      );
+    matched = matched.map((m) => ({ ...m, father: parentOf(m.r.id) }));
+    if (parent.length >= 2)
+      matched = matched.filter((m) => {
+        if (!m.father) return false;
+        const names = [foldName(m.father.name)];
+        if (latin) names.push(foldName(englishTexts([m.father.name])[0]));
+        return names.some((n) => n === parent || n.includes(parent));
+      });
+    matched.sort((a, b) => b.score - a.score || String(a.r.generation).localeCompare(String(b.r.generation)));
+    const candidates = matched.slice(0, 25).map(({ r, en, father }) => {
+      const grandfather = father ? parentOf(father.id) : null;
+      const [nameEnglish, villageEnglish, fatherEnglish, grandEnglish] = englishTexts([
+        r.name,
+        r.village,
+        father?.name || "",
+        grandfather?.name || "",
+      ]);
+      return {
+        id: r.id,
+        name: r.name,
+        nameEnglish: en || nameEnglish,
+        village: r.village,
+        villageEnglish,
+        generation: r.generation || "",
+        serial: r.legacy_id || "",
+        father: father && this.claimable(father.id) ? { name: father.name, nameEnglish: fatherEnglish, relationship: father.role || "parent" } : null,
+        grandfather: grandfather && this.claimable(grandfather.id) ? { name: grandfather.name, nameEnglish: grandEnglish } : null,
+        linked: !!this.one(
+          "SELECT c.id FROM claims c JOIN verification_details v ON v.claim_id=c.id WHERE c.person_id=? AND c.status='approved' AND v.relationship='self'",
+          r.id,
+        ),
+      };
+    });
+    return { candidates, total: matched.length, limited: matched.length > candidates.length };
+  }
+  requestNodeClaim(actor, input = {}) {
+    this.user(actor);
+    need(!this.personalClaim(actor), "Your account already has a personal profile request. Ask an administrator to change it.", 409);
+    need(
+      input.confirm === true,
+      "Confirm that you checked the name, father, village and generation before choosing this entry.",
+    );
+    const search = {
+      name: text(input.searchName, 120),
+      village: text(input.searchVillage, 120),
+      parent: text(input.searchParent, 120),
+      code: text(input.searchCode, 20),
+    };
+    const found = this.claimCandidates(actor, search);
+    // The chosen node must come from the explicit candidate list the member actually saw.
+    need(found.candidates.some((c) => c.id === input.id), "Choose one of the listed archive entries.");
+    const claim = this.requestClaim(actor, input.id, input.reason, "self", !!search.code);
+    this.run(
+      "INSERT INTO claim_context VALUES(?,?,?,?,?,?,?)",
+      claim,
+      search.code ? "code " + search.code.toUpperCase() : search.name,
+      search.village,
+      search.parent,
+      found.total,
+      JSON.stringify(found.candidates.filter((c) => c.id !== input.id).slice(0, 10).map((c) => c.id)),
+      Date.now(),
+    );
+    return claim;
+  }
+  // A missing person gets a private new-profile request, never a silent duplicate of a visible entry.
+  requestNewProfile(actor, input = {}) {
+    this.user(actor);
+    const name = text(input.name, 120),
+      village = text(input.village, 120),
+      parent = text(input.parentName, 120);
+    need(name.length >= 2 && village, "Enter your name and ancestral village.");
+    need(parent.length >= 2, "Enter your father's or mother's name so reviewers can place the new profile.");
+    need(input.notListed === true, "Confirm that none of the listed archive entries is you.");
+    const same = this.all("SELECT id,name,village FROM people WHERE active=1").filter(
+      (p) => foldName(p.name) === foldName(name) && villageKey(p.village) === villageKey(village),
+    );
+    need(
+      !same.some((r) => this.claimable(r.id)) || input.confirmDistinct === true,
+      "A person with this name is already recorded in this village. Choose that entry, or confirm that you are a different person.",
+      409,
+    );
+    const id = this.createProfile(actor, { ...input, name, village });
+    const claim = this.one("SELECT id FROM claims WHERE person_id=? AND account_id=?", id, actor).id;
+    this.run(
+      "INSERT INTO claim_context VALUES(?,?,?,?,?,?,?)",
+      claim,
+      name,
+      village,
+      parent,
+      same.length,
+      JSON.stringify(same.slice(0, 10).map((r) => r.id)),
+      Date.now(),
+    );
+    return id;
+  }
+  // Existing people a member may link as a relative: visible to them, or a shared adult archive entry.
+  linkable(actor, id) {
+    return this.visible(actor, id) || this.claimable(id);
+  }
+  // Structured spouse / mother / daughter (and father / son) proposal anchored on the member's own claimed node.
+  // Each proposal carries its source and explicit birth or marriage link. It follows the seven-day objection
+  // window (the user's chosen policy): once the author's own identity claim is approved, a valid proposal with no
+  // objection or conflict is accepted when the window ends. It waits while the identity is unverified, pauses on
+  // any objection or conflict, and a child's record always needs an administrator. Authors never accept their own.
+  proposeRelative(actor, input = {}) {
+    this.user(actor);
+    const own = this.personalClaim(actor);
+    need(own, "Link your account to your own family entry first.", 403);
+    need(LIFE.includes(input.life), "Choose the relative's life stage.");
+    need(SOURCE_TYPES.includes(input.sourceType), "Choose the kind of source.");
+    need(text(input.source, 1000).length >= 15, "Describe the source of this information (at least 15 characters).");
+    for (const id of [input.existingId, input.secondId].filter(Boolean))
+      need(this.person(id) && this.linkable(actor, id), "Profile not available.", 404);
+    const anchor = this.person(own.person_id);
+    need(anchor, "Profile not available.", 404);
+    const p = {
+      ...this.validatePayload(anchor, input),
+      life: input.existingId ? this.privacy(input.existingId).life : input.life,
+      sourceType: input.sourceType,
+      birthFamily: text(input.birthFamily, 300),
+      marriage: text(input.marriage, 300),
+      relative: true,
+    };
+    need(
+      !this.all(
+        "SELECT payload FROM proposals WHERE anchor=? AND status IN ('pending','disputed','conflict')",
+        anchor.id,
+      ).some((r) => {
+        const q = JSON.parse(r.payload);
+        return q.relation === p.relation && (p.existingId ? q.existingId === p.existingId : !q.existingId && foldName(q.name) === foldName(p.name));
+      }),
+      "The same relative is already awaiting review.",
+      409,
+    );
+    this.validateEdges(this.edgesFor(anchor.id, p.existingId || "new-person", p));
+    const id = randomUUID();
+    this.transaction(() => {
+      this.run(
+        "INSERT INTO proposals(id,author,anchor,version,payload,status,created,due) VALUES(?,?,?,?,?,?,?,?)",
+        id,
+        actor,
+        anchor.id,
+        anchor.version,
+        JSON.stringify(p),
+        "pending",
+        this.now(),
+        this.now() + 7 * DAY,
+      );
+      this.log(actor, "relative_proposed", anchor.id, {
+        proposal: id,
+        relation: p.relation,
+        existing: !!p.existingId,
+        linked: !!p.secondId,
+      });
+      this.notify("admin", id, "A sourced relative proposal is open for objections.");
+      this.notify(actor, id, "Your relative proposal is open for seven days of review.");
+    });
+    return id;
+  }
+  accept(actor, id, automatic = false, reason = "") {
+    const row = this.one("SELECT author,anchor,payload FROM proposals WHERE id=?", id);
+    const payload = row ? JSON.parse(row.payload) : {};
+    if (payload.relative) {
+      need(
+        this.identityApproved(row.author, row.anchor),
+        "The proposer's own identity claim must be approved before this relative can be linked.",
+        409,
+      );
+      need(!automatic || payload.life !== "child", "A child's record needs an administrator decision.", 409);
+    }
+    super.accept(actor, id, automatic, reason);
+    const created = this.one("SELECT id FROM people WHERE proposal_id=?", id);
+    if (created) this.assignCode(created.id);
+    if (created && !this.one("SELECT person_id FROM profile_privacy WHERE person_id=?", created.id))
+      this.run(
+        "INSERT INTO profile_privacy VALUES(?,?,?,?,?,?,?,?)",
+        created.id,
+        "private",
+        LIFE.includes(payload.life) ? payload.life : "unknown",
+        "private",
+        "",
+        "",
+        "",
+        Date.now(),
+      );
+  }
+  identityApproved(account, person) {
+    return !!this.one(
+      "SELECT c.id FROM claims c JOIN verification_details v ON v.claim_id=c.id WHERE c.account_id=? AND c.person_id=? AND c.status='approved' AND v.relationship='self'",
+      account,
+      person,
+    );
+  }
+  // Store.tick plus two holds for relative proposals: they stay pending (not "conflict") while the author's
+  // identity is unverified, and a child's record is never accepted by the clock.
+  tick() {
+    this.transaction(() => {
+      for (const p of this.all(
+        "SELECT id,author,anchor,payload FROM proposals WHERE status='pending' AND due<=?",
+        this.now(),
+      )) {
+        const q = JSON.parse(p.payload);
+        if (q.relative && (q.life === "child" || !this.identityApproved(p.author, p.anchor))) continue;
+        try {
+          this.accept("system", p.id, true);
+        } catch (e) {
+          if (!(e instanceof Problem)) throw e;
+          this.run("UPDATE proposals SET status='conflict',decision=? WHERE id=?", e.message, p.id);
+          this.notify("admin", p.id, "Automatic acceptance paused: " + e.message);
+        }
+      }
+    });
   }
   requireVisible(actor, id) {
     need(
@@ -520,7 +875,7 @@ export class MemberStore extends Store {
         .search(clean, village, "archive")
         .filter((p) => {
           const s = this.privacy(p.id);
-          return s.audience === "verified" && s.life !== "child";
+          return ["verified", "public"].includes(s.audience) && s.life !== "child";
         })
         .map((p) => ({
           id: p.id,
@@ -550,7 +905,47 @@ export class MemberStore extends Store {
         .filter(Boolean),
     };
   }
-  requestClaim(actor, id, reason, relationship) {
+  // Data for the signed-in visual explorer: every recorded ancestor of the member's own approved node plus the
+  // nearby family (three links out: siblings, cousins, spouses and their birth families, children). The walk only
+  // passes through people this member may see, so it does not reveal the shape of private branches.
+  memberTree(actor, focus = "") {
+    this.user(actor);
+    const own = this.all(
+      "SELECT c.person_id FROM claims c WHERE c.account_id=? AND c.status='approved'",
+      actor,
+    ).map((r) => r.person_id).filter((id) => this.person(id));
+    const start = focus && this.person(focus) && this.visible(actor, focus) ? [focus] : own;
+    need(start.length, "Link and verify your own family entry to open your family tree.", 403);
+    const edges = this.all("SELECT id,a,b,type,role FROM relationships WHERE active=1");
+    const near = new Map(), up = new Map();
+    for (const e of edges) {
+      for (const [x, y] of [[e.a, e.b], [e.b, e.a]]) (near.get(x) || near.set(x, []).get(x)).push(y);
+      if (e.type === "parent") (up.get(e.b) || up.set(e.b, []).get(e.b)).push(e.a);
+    }
+    const allowed = new Map(),
+      can = (id) => (allowed.has(id) ? allowed.get(id) : allowed.set(id, this.visible(actor, id)).get(id));
+    const keep = new Set(start), LIMIT = 1500;
+    for (const id of start) for (let stack = [id]; stack.length && keep.size < LIMIT; )
+      for (const parent of up.get(stack.pop()) || []) if (!keep.has(parent) && can(parent)) { keep.add(parent); stack.push(parent); }
+    let frontier = [...start];
+    for (let depth = 0; depth < 3 && frontier.length && keep.size < LIMIT; depth++) {
+      const next = [];
+      for (const id of frontier) for (const n of near.get(id) || []) if (!keep.has(n) && can(n) && keep.size < LIMIT) { keep.add(n); next.push(n); }
+      frontier = next;
+    }
+    const people = [...keep].map((id) => this.person(id)).filter(Boolean);
+    const data = graphData(people, edges.filter((e) => keep.has(e.a) && keep.has(e.b)));
+    const names = englishTexts(data.records.map((r) => r.name)),
+      villages = englishTexts(data.records.map((r) => r.villageName));
+    return {
+      ...data,
+      records: data.records.map((r, i) => ({ ...r, nameEnglish: names[i], villageEnglish: villages[i] })),
+      focus: start[0],
+      own,
+      limited: keep.size >= LIMIT,
+    };
+  }
+  requestClaim(actor, id, reason, relationship, viaFamilyCode = false) {
     this.user(actor);
     need(
       ["self", "guardian", "relative"].includes(relationship),
@@ -561,9 +956,10 @@ export class MemberStore extends Store {
     const policy = this.privacy(id);
     need(
       (p.kind === "archive" &&
-        policy.audience === "verified" &&
+        ["verified", "public"].includes(policy.audience) &&
         policy.life !== "child") ||
         this.visible(actor, id) ||
+        (viaFamilyCode && relationship === "self") ||
         !!this.one(
           "SELECT id FROM proposals WHERE id=? AND author=? AND person_id=?",
           p.proposal_id,
@@ -580,6 +976,11 @@ export class MemberStore extends Store {
         id,
       ),
       "You already have a request for this profile.",
+      409,
+    );
+    need(
+      relationship !== "self" || !this.personalClaim(actor),
+      "Your account already has a personal profile request. Ask an administrator to change it.",
       409,
     );
     need(
@@ -641,6 +1042,7 @@ export class MemberStore extends Store {
         text(input.village, 120),
         "Self-submitted profile; verification required",
       );
+      this.assignCode(id);
       this.run(
         "INSERT INTO profile_privacy VALUES(?,?,?,?,?,?,?,?)",
         id,
@@ -724,6 +1126,14 @@ export class MemberStore extends Store {
           "UPDATE credentials SET verified=1 WHERE account_id=?",
           c.account_id,
         );
+        // Relatives proposed while the identity was unverified get a full objection window from now.
+        if (c.relationship === "self")
+          this.run(
+            "UPDATE proposals SET due=? WHERE author=? AND anchor=? AND status='pending' AND json_extract(payload,'$.relative')=1",
+            this.now() + 7 * DAY,
+            c.account_id,
+            c.person_id,
+          );
         if (c.relationship === "guardian") {
           const p = this.privacy(c.person_id);
           this.run(
@@ -738,6 +1148,16 @@ export class MemberStore extends Store {
             Date.now(),
           );
         }
+      } else {
+        // A declined self-submitted profile with no other steward or link is retired, so it cannot linger as a duplicate.
+        const p = this.one("SELECT kind,proposal_id FROM people WHERE id=?", c.person_id);
+        if (
+          p?.kind === "community" &&
+          !p.proposal_id &&
+          !this.one("SELECT id FROM claims WHERE person_id=? AND status IN ('pending','approved')", c.person_id) &&
+          !this.one("SELECT id FROM relationships WHERE active=1 AND (a=? OR b=?)", c.person_id, c.person_id)
+        )
+          this.run("UPDATE people SET active=0 WHERE id=?", c.person_id);
       }
       this.log(
         actor,
@@ -807,9 +1227,15 @@ export class MemberStore extends Store {
       403,
     );
     need(
-      ["private", "verified"].includes(input.audience) &&
+      ["private", "verified", "public"].includes(input.audience) &&
         ["private", "verified"].includes(input.contactAudience),
       "Choose a valid visibility setting.",
+    );
+    // Publishing in the anonymous family tree needs the adult's own explicit consent; contacts are never public.
+    need(
+      input.audience !== "public" ||
+        (c.relationship === "self" && input.life === "adult" && input.publicConsent === true),
+      "Only an adult managing their own profile can consent to appear in the public family tree.",
     );
     need(
       ["adult", "child", "deceased", "unknown"].includes(input.life),
@@ -829,13 +1255,13 @@ export class MemberStore extends Store {
     need(
       input.contactAudience !== "verified" ||
         (input.life === "adult" &&
-          input.audience === "verified" &&
+          ["verified", "public"].includes(input.audience) &&
           c.relationship === "self" &&
           input.contactConsent === true),
       "Only an adult sharing their own profile may consent to sharing contact details.",
     );
     need(
-      input.audience !== "verified" || input.profileConsent === true,
+      input.audience === "private" || input.profileConsent === true,
       "Confirm consent to share your profile with verified members.",
     );
     const email = text(input.email, 254),
@@ -862,6 +1288,7 @@ export class MemberStore extends Store {
         life: input.life,
         contactAudience: input.contactAudience,
         profileConsent: input.profileConsent === true,
+        publicConsent: input.publicConsent === true,
         contactConsent: input.contactConsent === true,
       });
     });
@@ -941,10 +1368,18 @@ export class MemberStore extends Store {
         actor,
       );
     const claims = this.all(
-      `SELECT c.*,p.name AS person_name,a.name AS account_name,v.relationship,v.method FROM claims c JOIN people p ON p.id=c.person_id JOIN accounts a ON a.id=c.account_id JOIN verification_details v ON v.claim_id=c.id WHERE ?='admin' OR c.account_id=? ORDER BY c.created DESC`,
+      `SELECT c.*,p.name AS person_name,p.village AS person_village,p.kind AS person_kind,p.generation AS person_generation,
+        (SELECT f.name FROM relationships r JOIN people f ON f.id=r.a WHERE r.b=c.person_id AND r.type='parent' AND r.active=1 ORDER BY CASE r.role WHEN 'father' THEN 0 ELSE 1 END LIMIT 1) AS person_parent,
+        a.name AS account_name,v.relationship,v.method,x.search_name,x.search_village,x.search_parent,x.candidates,x.similar
+       FROM claims c JOIN people p ON p.id=c.person_id JOIN accounts a ON a.id=c.account_id JOIN verification_details v ON v.claim_id=c.id LEFT JOIN claim_context x ON x.claim_id=c.id
+       WHERE ?='admin' OR c.account_id=? ORDER BY c.created DESC`,
       a.role,
       actor,
+    ).map(({ similar, candidates, ...c }) =>
+      // Similar-entry counts can include private people, so only reviewers see them.
+      a.role === "admin" ? { ...c, candidates, similar: JSON.parse(similar || "[]").length } : c,
     );
+    const selfClaim = this.personalClaim(actor);
     const own = this.all(
       "SELECT DISTINCT p.* FROM people p JOIN claims c ON c.person_id=p.id WHERE c.account_id=? AND c.status='approved' AND p.active=1",
       actor,
@@ -962,6 +1397,17 @@ export class MemberStore extends Store {
       .map((p) => ({
         ...p,
         payload: JSON.parse(p.payload),
+        anchor_name: this.person(p.anchor)?.name || "",
+        // The author can pass this code privately to the added adult so they can claim their own entry.
+        person_code:
+          p.person_id && (p.author === actor || a.role === "admin")
+            ? this.one("SELECT public_code FROM people WHERE id=? AND active=1", p.person_id)?.public_code || null
+            : null,
+        identity_verified: !!this.one(
+          "SELECT c.id FROM claims c JOIN verification_details v ON v.claim_id=c.id WHERE c.account_id=? AND c.person_id=? AND c.status='approved' AND v.relationship='self'",
+          p.author,
+          p.anchor,
+        ),
         objections: this.all(
           "SELECT reason,created FROM objections WHERE proposal_id=?",
           p.id,
@@ -973,6 +1419,8 @@ export class MemberStore extends Store {
         handle: credentials.handle,
         verified: !!credentials.verified,
       },
+      // Node-claim onboarding stays required until the account has a pending or approved self claim.
+      onboarding: { required: !selfClaim, claim: selfClaim || null },
       introduction: this.one("SELECT about_hi,about_en,family_hi,family_en,updated FROM account_introductions WHERE account_id=?", actor),
       recoveryOwner: !!this.one("SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",actor) && a.role==='admin',
       recoveryRequests: a.role==='admin' && this.one("SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",actor) ? this.all("SELECT r.id,r.note,r.created,a.name,c.handle FROM recovery_requests r JOIN accounts a ON a.id=r.account_id JOIN credentials c ON c.account_id=a.id WHERE status='pending'") : [],
@@ -1005,7 +1453,4 @@ export class MemberStore extends Store {
   }
 }
 let singleton;
-export const getMembers = () =>
-  (singleton ??= new MemberStore(
-    process.env.LUHACH_MEMBER_DB || resolve("data/members.sqlite"),
-  ));
+export const getMembers = () => (singleton ??= new MemberStore(memberDbPath()));

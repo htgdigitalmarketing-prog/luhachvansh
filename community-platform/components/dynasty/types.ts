@@ -9,6 +9,8 @@ export interface PersonRecord {
   parentIds?: string[];
   spouseIds?: string[];
   gender?: string;
+  role?: 'daughter' | 'daughter-in-law' | 'daughter+daughter-in-law' | null; // contextual, see lib/viewer.mjs
+  community?: boolean; // added through an accepted member proposal (authenticated explorer only unless public by consent)
   aliases?: string;
   fatherId?: string | null; // UUID of the father node for precise linking
   generation: number | null;

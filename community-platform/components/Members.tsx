@@ -3,6 +3,9 @@ import {Text,useLanguage} from "./Language";
 import {hiText,hiError} from "../lib/hindi.mjs";
 import { useEffect, useState, useRef, FormEvent } from "react";
 import ProfilePicker from "./ProfilePicker";
+import NodeOnboarding from "./NodeOnboarding";
+import RelativeForm from "./RelativeForm";
+import MemberTree from "./MemberTree";
 import {
   Sprout,
   ShieldCheck,
@@ -61,13 +64,25 @@ type Claim = {
   relationship: string;
   method?: string;
   decision?: string;
+  person_village?: string;
+  person_parent?: string;
+  person_generation?: string;
+  person_kind?: string;
+  search_name?: string;
+  search_village?: string;
+  search_parent?: string;
+  candidates?: number;
+  similar?: number;
 };
 type Proposal = {
   id: string;
   author: string;
   author_name: string;
   anchor: string;
-  payload: { name: string; relation: string; source: string };
+  anchor_name?: string;
+  identity_verified?: boolean;
+  person_code?: string | null;
+  payload: { name: string; relation: string; source: string; relative?: boolean; life?: string; sourceType?: string; birthFamily?: string; marriage?: string; existingId?: string; secondId?: string };
   status: string;
   decision?: string;
   due: number;
@@ -76,6 +91,7 @@ type Proposal = {
 };
 type State = {
   actor: Actor;
+  onboarding?: { required: boolean; claim: { id: string; status: string; person_id: string; person_name: string; person_village: string } | null };
   recoveryOwner?: boolean;
   recoveryRequests?: {id:string;name:string;handle:string;note:string;created:number}[];
   introduction?: { about_hi: string; about_en: string; family_hi: string; family_en: string; updated: number };
@@ -201,7 +217,17 @@ export default function Members() {
     }
     setLoaded(true);
   }
+  const [inviteCode, setInviteCode] = useState("");
   useEffect(() => {
+    // "?mode=register" opens account creation. An invitation shared as "#invite=…" stays in the fragment
+    // (never sent to the server or in referrers); it is copied into the form and removed from the address bar.
+    const params = new URLSearchParams(window.location.search);
+    const invite = new URLSearchParams(window.location.hash.slice(1)).get("invite");
+    if (params.get("mode") === "register" || invite) setMode("register");
+    if (invite) {
+      setInviteCode(invite.slice(0, 200));
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
     refresh().catch((e) => {
       setError(hiError(e.message));
       setLoaded(true);
@@ -308,6 +334,15 @@ export default function Members() {
     setTab("privacy");
     setMessage("");
   }
+  // Relative proposals: objection window once the proposer is verified; children always need an administrator.
+  const moderation = (p: Proposal) =>
+    p.payload.relative && p.status === "pending"
+      ? !p.identity_verified
+        ? hi ? "प्रस्तावक की पहचान की पुष्टि की प्रतीक्षा" : "Waiting for the proposer's identity check"
+        : p.payload.life === "child"
+          ? hi ? "बच्चे की जानकारी — प्रशासक का निर्णय आवश्यक" : "Child's record — needs an administrator"
+          : hi ? `आपत्ति अवधि ${when(p.due)} तक; आपत्ति न हो तो स्वीकृत` : `Objection window until ${when(p.due)}; accepted if no objection`
+      : tr(p.status);
   const card = (p: Person) => (
     <button className="m-person" key={p.id} onClick={() => open(p)}>
       <span className="m-avatar">{p.name.slice(0, 1)}</span>
@@ -318,6 +353,8 @@ export default function Members() {
       <ArrowRight size={16} />
     </button>
   );
+  const onboarding = !!state?.onboarding?.required;
+  const personal = state?.onboarding?.claim || null;
   if (!loaded)
     return (
       <div className="loading">
@@ -448,6 +485,16 @@ export default function Members() {
             </div>
           </section>
           <section className="m-login m-panel">
+            {(mode === "signin" || mode === "register") && (
+              <div className="m-auth-switch" role="group" aria-label={t("Sign in or create an account", "लॉगिन या नया खाता")}>
+                <button type="button" aria-pressed={mode === "signin"} className={mode === "signin" ? "active" : ""} onClick={() => { setMode("signin"); setError(""); }}>
+                  <KeyRound size={16} /> {t("Sign in", "लॉगिन")}
+                </button>
+                <button type="button" aria-pressed={mode === "register"} className={mode === "register" ? "active" : ""} onClick={() => { setMode("register"); setError(""); }}>
+                  <Plus size={16} /> {hi ? "खाता बनाएँ" : "Create account"}
+                </button>
+              </div>
+            )}
             <span className="m-icon">
               <ShieldCheck size={26} />
             </span>
@@ -469,7 +516,7 @@ export default function Members() {
                 : mode === "setup"
                   ? t("Create your first administrator account. Choose a password you can remember.", "पहला प्रशासक खाता बनाएँ। अपनी पसंद का याद रहने वाला पासवर्ड चुनें।")
                   : mode === "help" ? (hi ? "नाम और गाँव बताकर प्रशासक से सहायता माँगें।" : "Ask the administrator for help using your name and village.") : mode === "register"
-                    ? "प्रशासक से एक बार उपयोग वाला निमंत्रण प्राप्त करें।"
+                    ? (hi ? "खाता बनाने के लिए प्रशासक से मिला एक बार उपयोग वाला निमंत्रण कोड चाहिए। खाता बनते ही अगला चरण वंशावली में अपनी प्रविष्टि चुनना है।" : "You need the one-time invitation code from an administrator. Right after creating the account, the next step is choosing your own entry in the family tree.")
                     : "खाता बनाते समय सुरक्षित किया गया पुनर्प्राप्ति कोड इस्तेमाल करें।"}
             </p>
             {mode === "help" ? <form onSubmit={e=>run("requestRecovery",fields(e),hi ? "यदि यह सदस्य खाता मौजूद है, तो सहायता अनुरोध प्रशासक तक पहुँचा दिया गया है।" : "If this account exists, your request has reached the administrator.")}>
@@ -523,13 +570,14 @@ export default function Members() {
                     ? "खाता पुनर्प्राप्ति कोड"
                     : mode === "setup"
                       ? "निजी प्रशासक-स्थापना कोड"
-                      : "निमंत्रण कोड"}
+                      : (hi ? "निमंत्रण कोड" : "Invitation code")}
                   <input
                     name="code"
                     type="password"
                     required
                     autoComplete="off"
                     maxLength={200}
+                    defaultValue={mode === "register" ? inviteCode : undefined}
                     onChange={e => { if (mode === "setup") setSetupPrepared(e.target.value.length >= 32); }}
                   />
                 </label>
@@ -623,9 +671,15 @@ export default function Members() {
         <>
           <nav className="m-nav" aria-label={tr("सदस्य नेविगेशन")}>
             {[
-              ["home", "मुख्य जानकारी", "परिचय", HomeIcon],
-              ["search", "परिवार खोजें", "परिवार खोजें", Search],
-              ["requests", "अनुरोध", "अनुरोध", UserCheck],
+              ["home", onboarding ? "Link to the family tree" : "मुख्य जानकारी", onboarding ? "वंशावली से जुड़ें" : "परिचय", HomeIcon],
+              // Until the account is linked to a node, members only see onboarding and account security.
+              ...(onboarding && actor.role !== "admin"
+                ? []
+                : [
+                    ...(personal?.status === "approved" ? [["tree", "My family tree", "मेरा वंश-वृक्ष", Users]] : []),
+                    ["search", "परिवार खोजें", "परिवार खोजें", Search],
+                    ["requests", "अनुरोध", "अनुरोध", UserCheck],
+                  ]),
               ["privacy", "गोपनीयता और खाता", "गोपनीयता", Settings],
               ...(actor.role === "admin"
                 ? [["admin", "प्रशासक कक्ष", "प्रशासक", ShieldCheck]]
@@ -683,6 +737,58 @@ export default function Members() {
                         : t("Verification required", "सत्यापन आवश्यक")}
                   </span>
                 </section>
+                {onboarding && (
+                  <NodeOnboarding
+                    actorName={actor.name}
+                    onDone={async (notice) => {
+                      await refresh();
+                      setMessage(notice);
+                    }}
+                  />
+                )}
+                {personal && (
+                  <section className="m-panel m-personal">
+                    <h2>{hi ? "वंशावली में आपकी प्रविष्टि" : "Your entry in the family tree"}</h2>
+                    <p>
+                      <strong>{personal.person_name}</strong> · {personal.person_village}
+                    </p>
+                    <span className={"m-badge " + (personal.status === "approved" ? "verified" : "")}>
+                      <ShieldCheck size={15} />
+                      {personal.status === "approved"
+                        ? hi ? "पहचान सत्यापित" : "Identity verified"
+                        : hi ? "एक अलग समीक्षक की जाँच लंबित है" : "Waiting for an independent reviewer"}
+                    </span>
+                    {personal.status === "approved" && (
+                      <button
+                        className="outline"
+                        onClick={() => open({ id: personal.person_id, name: personal.person_name, village: personal.person_village, kind: "archive" })}
+                      >
+                        {hi ? "मेरा परिवार देखें" : "Open my family"} <ArrowRight size={15} />
+                      </button>
+                    )}
+                    {personal.status === "approved" && (
+                      <button className="primary" onClick={() => { setTab("tree"); setSelected(null); setFamily(null); }}>
+                        {hi ? "मेरा वंश-वृक्ष देखें" : "View my family tree"} <ArrowRight size={15} />
+                      </button>
+                    )}
+                  </section>
+                )}
+                {personal && (
+                  <RelativeForm
+                    anchorName={personal.person_name}
+                    identityVerified={personal.status === "approved"}
+                    busy={busy}
+                    submit={(d) =>
+                      run(
+                        "proposeRelative",
+                        d,
+                        hi
+                          ? "प्रस्ताव सुरक्षित हुआ। आपत्ति अवधि पूरी होने और स्वीकार होने तक यह वंशावली में नहीं जुड़ेगा।"
+                          : "Proposal saved. It joins the family tree only after its objection window ends and it is accepted.",
+                      )
+                    }
+                  />
+                )}
                 <section className="m-panel">
                   <h2>{hi ? "मेरा परिचय और परिवार" : "About me and my family"}</h2>
                   <p className="m-muted">{hi ? "यह निजी मसौदा केवल आपके खाते में दिखता है। इसे सहेजने से वंशावली में कोई रिश्ता नहीं जुड़ता और पहचान सत्यापित नहीं होती। घर का पता, पहचान-पत्र या पासवर्ड न लिखें।" : "This private draft is visible only in your account. Saving it does not add genealogy links or verify an identity. Leave out home addresses, identity documents and passwords."}</p>
@@ -706,9 +812,11 @@ export default function Members() {
                           {card(p)}
                           <span className="m-badge">
                             <LockKeyhole size={13} />
-                            {p.audience === "verified"
-                              ? "सत्यापित सदस्यों से साझा"
-                              : "निजी प्रोफ़ाइल"}
+                            {p.audience === "public"
+                              ? hi ? "सार्वजनिक वंशावली में (सहमति से)" : "In the public tree (by consent)"
+                              : p.audience === "verified"
+                                ? tr("सत्यापित सदस्यों से साझा")
+                                : tr("निजी प्रोफ़ाइल")}
                           </span>
                           {["self", "guardian"].includes(
                             p.relationship || "",
@@ -729,11 +837,13 @@ export default function Members() {
                             "परिवार अभिलेख में अपना नाम खोजें। नाम न होने पर नई प्रोफ़ाइल का अनुरोध करें।",
                           )}
                         </p>
-                        <button
-                          className="primary"
-                          onClick={() => setTab("search")}
-                        > <Text value="मेरी प्रोफ़ाइल खोजें"/> <ArrowRight size={16} />
-                        </button>
+                        {!personal && !onboarding && (
+                          <button
+                            className="primary"
+                            onClick={() => setTab("home")}
+                          > <Text value="मेरी प्रोफ़ाइल खोजें"/> <ArrowRight size={16} />
+                          </button>
+                        )}
                       </div>
                     )}
                   </section>
@@ -755,6 +865,9 @@ export default function Members() {
                   </aside>
                 </div>
               </>
+            )}
+            {tab === "tree" && (
+              <MemberTree accountId={actor.id} onOpen={(p) => open({ ...p, kind: "archive" })} />
             )}
             {tab === "search" && (
               <>
@@ -781,53 +894,14 @@ export default function Members() {
                 {query.length >= 2 && !results.length && (
                   <p className="m-muted"> <Text value="कोई नाम नहीं मिला। हिंदी नाम या दूसरी वर्तनी से खोजें।"/> </p>
                 )}
-                <details className="m-panel">
-                  <summary>
-                    {t(
-                      "नाम नहीं मिला? अपनी प्रोफ़ाइल का अनुरोध करें",
-                      "अभिलेख में नाम नहीं है? अपनी प्रोफ़ाइल बनाएँ",
-                    )}
-                  </summary>
-                  <p> <Text value="दोहरी प्रविष्टि से बचने के लिए पहले खोजें। प्रशासक के सत्यापन तक नई प्रोफ़ाइल निजी रहेगी।"/> </p>
-                  <form
-                    className="m-form-grid"
-                    onSubmit={async (e) => {
-                      const form = e.currentTarget;
-                      if (
-                        await run(
-                          "createProfile",
-                          fields(e),
-                          "निजी प्रोफ़ाइल का अनुरोध भेज दिया गया। प्रशासक इसकी जाँच करेंगे।",
-                        )
-                      ) {
-                        form.reset();
-                        setTab("requests");
-                      }
-                    }}
-                  >
-                    <label> <Text value="पूरा नाम"/> <input
-                        name="name"
-                        required
-                        maxLength={120}
-                        defaultValue={actor.name}
-                      />
-                    </label>
-                    <label> <Text value="हिंदी नाम / अन्य प्रचलित नाम"/> <input name="aliases" maxLength={120} />
-                    </label>
-                    <label> <Text value="पैतृक गाँव"/> <input name="village" required maxLength={120} />
-                    </label>
-                    <label className="m-wide"> <Text value="परिवार से रिश्ता और जाँच का तरीका"/> <textarea
-                        name="reason"
-                        required
-                        minLength={15}
-                        maxLength={1000}
-                        placeholder={tr("माता-पिता या रिश्तेदार का नाम, गाँव और परिवार का संदर्भ दें। पहचान-पत्र या घर का पूरा पता न दें।")}
-                      />
-                    </label>
-                    <button className="primary" disabled={busy}> <Text value="सत्यापन का अनुरोध भेजें"/> <UserCheck size={16} />
-                    </button>
-                  </form>
-                </details>
+                {onboarding && (
+                  <p className="m-note">
+                    {hi
+                      ? "अपनी प्रविष्टि चुनने या नई निजी प्रोफ़ाइल माँगने के लिए “वंशावली से जुड़ें” चरण पूरा करें।"
+                      : "To choose your own entry or request a private new profile, complete the “Link to the family tree” step."}{" "}
+                    <button className="outline" onClick={() => setTab("home")}>{hi ? "वंशावली से जुड़ें" : "Link to the family tree"}</button>
+                  </p>
+                )}
               </>
             )}
             {selected && (
@@ -895,7 +969,8 @@ export default function Members() {
                   </>
                 )}
                 <details>
-                  <summary> <Text value="इस प्रोफ़ाइल से अपना रिश्ता सत्यापित कराएँ"/> </summary>
+                  <summary>{hi ? "इस व्यक्ति की जानकारी सँभालने की अनुमति माँगें (अभिभावक / रिश्तेदार)" : "Ask to look after this person's record (guardian / relative)"}</summary>
+                  <p className="m-muted">{hi ? "अपनी स्वयं की प्रविष्टि केवल “वंशावली से जुड़ें” चरण में चुनी जाती है।" : "Your own entry is chosen only in the “Link to the family tree” step."}</p>
                   <form
                     onSubmit={(e) => {
                       const d = fields(e);
@@ -907,7 +982,6 @@ export default function Members() {
                     }}
                   >
                     <label> <Text value="आपका रिश्ता"/> <select name="relationship">
-                        <option value="self"> <Text value="यह मेरी प्रोफ़ाइल है"/> </option>
                         <option value="guardian"> <Text value="मैं माता-पिता / अभिभावक हूँ"/> </option>
                         <option value="relative"> <Text value="मैं इस रिश्तेदार की जानकारी सँभालता/सँभालती हूँ"/> </option>
                       </select>
@@ -1004,7 +1078,7 @@ export default function Members() {
                     <p> <Text value="अभी कोई सत्यापन अनुरोध नहीं है।"/> </p>
                     <button
                       className="outline"
-                      onClick={() => setTab("search")}
+                      onClick={() => setTab("home")}
                     > <Text value="मेरी प्रोफ़ाइल खोजें"/> </button>
                   </div>
                 )}
@@ -1013,9 +1087,18 @@ export default function Members() {
                     <h3>
                       {p.payload.name} · {tr(p.payload.relation)}
                     </h3>
-                    <span className="m-badge">{tr(p.status)}</span>
+                    <span className="m-badge">{moderation(p)}</span>
+                    {p.anchor_name && <p className="m-muted">{hi ? "जिससे जोड़ा जाना है:" : "Linked to:"} {p.anchor_name}</p>}
                     <p>{p.payload.source}</p>
-                    <p> <Text value="समीक्षा की अंतिम तिथि:"/> {when(p.due)}</p>
+                    {!p.payload.relative && <p> <Text value="समीक्षा की अंतिम तिथि:"/> {when(p.due)}</p>}
+                    {p.person_code && p.author === actor.id && (
+                      <p className="m-note">
+                        {hi ? "स्थायी पारिवारिक कोड:" : "Permanent family code:"} <code>{p.person_code}</code>.{" "}
+                        {hi
+                          ? "यदि यह व्यक्ति वयस्क है, यह कोड उन्हें निजी रूप से दें। वे अपने खाते में इसी कोड से अपनी प्रविष्टि चुनकर सत्यापन माँग सकते हैं और चाहें तो सार्वजनिक वंशावली में दिखने की सहमति दे सकते हैं।"
+                          : "If this person is an adult, give them this code privately. With it they can choose their own entry from their account, ask for verification and, if they wish, consent to appear in the public family tree."}
+                      </p>
+                    )}
                     {p.decision && <p>{p.decision}</p>}
                     {p.person_id &&
                       p.author === actor.id &&
@@ -1121,6 +1204,7 @@ export default function Members() {
                                   ...d,
                                   id: privacyPerson,
                                   profileConsent: d.profileConsent === "on",
+                                  publicConsent: d.publicConsent === "on",
                                   contactConsent: d.contactConsent === "on",
                                 },
                                 "गोपनीयता सुरक्षित की गई। आगे के अनुरोधों पर ये विकल्प लागू होंगे।",
@@ -1155,8 +1239,17 @@ export default function Members() {
                               >
                                 <option value="private"> <Text value="केवल सत्यापित देखभालकर्ता और प्रशासक"/> </option>
                                 <option value="verified"> <Text value="सत्यापित सदस्य"/> </option>
+                                <option value="public">{hi ? "सार्वजनिक वंशावली भी (केवल वयस्क, अपनी सहमति से)" : "Also the public family tree (adults, own consent only)"}</option>
                               </select>
                             </label>
+                            {privacy.audience === "public" && (
+                              <label className="m-check">
+                                <input type="checkbox" name="publicConsent" required />
+                                {hi
+                                  ? "मैं वयस्क हूँ और अपनी सहमति देता/देती हूँ कि मेरा नाम, गाँव और दर्ज रिश्ते बिना लॉगिन वाली सार्वजनिक वंशावली और लुहाच मित्र में दिखें। संपर्क विवरण कभी सार्वजनिक नहीं होते। यह सहमति कभी भी वापस ले सकते हैं।"
+                                  : "I am an adult and consent to my name, village and recorded relationships appearing in the public family tree and Luhach Mitra without sign-in. Contact details are never public. I can withdraw this at any time."}
+                              </label>
+                            )}
                             <label className="m-check">
                               <input type="checkbox" name="profileConsent" /> <Text value="सत्यापित सदस्य चुनने पर मैं इस प्रोफ़ाइल को उनके साथ साझा करने की सहमति देता/देती हूँ।"/> </label>
                             <hr />
@@ -1349,6 +1442,27 @@ export default function Members() {
                         <span className="m-badge">{tr(c.relationship)}</span>
                       </div>
                       <p>{c.reason}</p>
+                      <dl className="m-claim-context">
+                        <dt>{hi ? "चुनी गई प्रविष्टि" : "Chosen entry"}</dt>
+                        <dd>
+                          {c.person_name} · {c.person_village}
+                          {c.person_generation ? ` · ${hi ? "पीढ़ी" : "generation"} ${c.person_generation}` : ""}
+                          {c.person_kind === "community" ? (hi ? " · नई निजी प्रोफ़ाइल" : " · new private profile") : ""}
+                        </dd>
+                        <dt>{hi ? "दर्ज पिता / माता" : "Recorded parent"}</dt>
+                        <dd>{c.person_parent || (hi ? "दर्ज नहीं" : "not recorded")}</dd>
+                        {c.search_name && (
+                          <>
+                            <dt>{hi ? "सदस्य की खोज" : "Member's search"}</dt>
+                            <dd>
+                              {[c.search_name, c.search_village, c.search_parent].filter(Boolean).join(" · ")} —{" "}
+                              {c.person_kind === "community"
+                                ? hi ? `इसी गाँव में इसी नाम की ${c.similar || 0} प्रविष्टियाँ` : `${c.similar || 0} same-name entries in this village`
+                                : hi ? `${c.candidates || 0} संभावित प्रविष्टियाँ दिखीं` : `${c.candidates || 0} candidates were shown`}
+                            </dd>
+                          </>
+                        )}
+                      </dl>
                       <form
                         className="m-form-grid"
                         onSubmit={(e) => {
@@ -1395,9 +1509,24 @@ export default function Members() {
                       {p.payload.name} · {tr(p.payload.relation)}
                     </h3>
                     <p>
-                      {p.author_name} · {tr(p.status)}
+                      {p.author_name} · {moderation(p)}
+                      {p.anchor_name ? ` · ${hi ? "जिससे जोड़ा जाना है" : "linked to"}: ${p.anchor_name}` : ""}
                     </p>
                     <p>{p.payload.source}</p>
+                    {p.payload.relative && (
+                      <p className="m-muted">
+                        {[
+                          p.payload.sourceType && (hi ? "स्रोत: " : "Source type: ") + p.payload.sourceType.replaceAll("_", " "),
+                          p.payload.life && (hi ? "जीवन-स्थिति: " : "Life stage: ") + tr(p.payload.life),
+                          p.payload.existingId && (hi ? "पहले से दर्ज व्यक्ति से जोड़ा गया" : "links an existing entry"),
+                          p.payload.secondId && (hi ? "जन्म/विवाह की कड़ी चुनी गई" : "birth/marriage link chosen"),
+                          p.payload.birthFamily && (hi ? "जन्म का परिवार: " : "Birth family: ") + p.payload.birthFamily,
+                          p.payload.marriage && (hi ? "विवाह: " : "Marriage: ") + p.payload.marriage,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    )}
                     {p.objections.map((o, i) => (
                       <p key={i}> <Text value="आपत्ति:"/> {o.reason}</p>
                     ))}

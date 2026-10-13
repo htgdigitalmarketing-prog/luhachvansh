@@ -29,11 +29,19 @@ export function publicViewerData(){
 }
 export function publicGraph(db,hidden=new Set()){
  const privacy=!!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='profile_privacy'").get();
- const people=db.prepare("SELECT id,legacy_id,name,aliases,gender,village,generation FROM people p WHERE active=1 AND kind='archive'"+(privacy?" AND NOT EXISTS(SELECT 1 FROM profile_privacy v WHERE v.person_id=p.id AND (v.audience='private' OR v.life='child'))":"")).all().filter(p=>!hidden.has(p.id));
+ const holds=privacy&&!!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='privacy_holds'").get();
+ const code=db.prepare('PRAGMA table_info(people)').all().some(c=>c.name==='public_code');
+ // Archive entries are public unless withdrawn or a child. A member-added (community) person appears only after
+ // their own explicit public consent as an adult (or deceased) and never while a privacy hold exists.
+ const people=db.prepare(`SELECT id,legacy_id,${code?'public_code,':''}name,aliases,gender,village,generation,kind FROM people p WHERE active=1 AND (`+
+  (privacy?`(kind='archive' AND NOT EXISTS(SELECT 1 FROM profile_privacy v WHERE v.person_id=p.id AND (v.audience='private' OR v.life='child')))
+   OR (kind='community' AND EXISTS(SELECT 1 FROM profile_privacy v WHERE v.person_id=p.id AND v.audience='public' AND v.life IN ('adult','deceased')))`:"kind='archive'")+
+  `)`+(holds?' AND NOT EXISTS(SELECT 1 FROM privacy_holds h WHERE h.person_id=p.id)':'')).all().filter(p=>!hidden.has(p.id));
  const ids=new Set(people.map(p=>p.id));
+ // Only explicit links (source-imported or accepted proposals) between two publicly visible people are shown.
  const edges=db.prepare('SELECT id,a,b,type,role FROM relationships WHERE active=1').all().filter(e=>ids.has(e.a)&&ids.has(e.b));
  const data=graphData(people,edges),names=englishTexts(data.records.map(p=>p.name)),villages=englishTexts(data.records.map(p=>p.villageName));
- return {...data,records:data.records.map((p,i)=>({...p,nameEnglish:names[i],villageEnglish:villages[i]})),notice:'Public historical archive. Private profiles, children, contacts and new member submissions are excluded.'};
+ return {...data,records:data.records.map((p,i)=>({...p,nameEnglish:names[i],villageEnglish:villages[i]})),notice:'Public historical archive. Private profiles, children, contacts and member additions without their own public consent are excluded.'};
 }
 export function publicFamily(data,id){
  const p=data.records.find(p=>p.id===id);if(!p)throw new Problem('Person not found',404);

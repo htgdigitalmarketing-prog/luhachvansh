@@ -5,9 +5,11 @@ import { useState } from "react";
 export default function ProfilePicker({
   name,
   label,
+  labelEn,
 }: {
   name: string;
   label: string;
+  labelEn?: string;
 }) {
 const {tr}=useLanguage();
 
@@ -18,7 +20,7 @@ const {tr}=useLanguage();
   return (
     <div className="m-wide">
       <label>
-        {<Text value={label}/>}
+        {<Text value={label} en={labelEn}/>}
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}

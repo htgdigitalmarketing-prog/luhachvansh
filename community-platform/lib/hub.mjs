@@ -1,5 +1,6 @@
 import { MemberStore } from "./members.mjs";
 import { Problem } from "./store.mjs";
+import { memberDbPath } from "./storage.mjs";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 const need = (ok, msg, status = 400) => {
@@ -230,7 +231,7 @@ export class HubStore extends MemberStore {
       this.verified(a) &&
       this.selfClaim(a, d.person_id) &&
       this.privacy(d.person_id).life === "adult" &&
-      this.privacy(d.person_id).audience === "verified" &&
+      ["verified","public"].includes(this.privacy(d.person_id).audience) &&
       !this.one(
         "SELECT person_id FROM privacy_holds WHERE person_id=?",
         d.person_id,
@@ -260,7 +261,7 @@ export class HubStore extends MemberStore {
     need(
       this.selfClaim(a, b.person_id) &&
         this.privacy(b.person_id).life === "adult" &&
-        this.privacy(b.person_id).audience === "verified" &&
+        ["verified","public"].includes(this.privacy(b.person_id).audience) &&
         !this.one(
           "SELECT person_id FROM privacy_holds WHERE person_id=?",
           b.person_id,
@@ -777,7 +778,4 @@ export class HubStore extends MemberStore {
 }
 export const mediaRoot=()=>process.env.LUHACH_MEMBER_DB?resolve(process.env.LUHACH_MEMBER_DB+'.media'):resolve('data/media');
 let singleton;
-export const getHub = () =>
-  (singleton ??= new HubStore(
-    process.env.LUHACH_MEMBER_DB || resolve("data/members.sqlite"),
-  ));
+export const getHub = () => (singleton ??= new HubStore(memberDbPath()));

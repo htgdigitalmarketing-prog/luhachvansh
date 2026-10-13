@@ -1,15 +1,11 @@
 import {NextResponse} from 'next/server';
-import {DatabaseSync} from 'node:sqlite';
-import {existsSync} from 'node:fs';
-import {isAbsolute} from 'node:path';
+import {storageDiagnostics} from '../../../lib/storage.mjs';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export async function GET(){
- let storageReady=false;
- const file=process.env.LUHACH_MEMBER_DB;
- if(process.env.LUHACH_DEPLOYMENT==='test'&&file&&isAbsolute(file)&&existsSync(file)){
-  let db:DatabaseSync|undefined;
-  try{db=new DatabaseSync(file,{readOnly:true});storageReady=!!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='legacy_records'").get();}catch{}finally{db?.close();}
- }
- return NextResponse.json({service:'luhach-community',storageReady},{status:storageReady?200:503,headers:{'Cache-Control':'no-store'}});
+ // `checks` reports booleans and public content counts so a moved or empty database is diagnosable without shell access.
+ const checks=storageDiagnostics();
+ const storageReady=checks.deploymentFlag&&checks.memberDbExists&&checks.legacyTables;
+ const contentReady=storageReady&&checks.content.village>0&&checks.archivePeople>0;
+ return NextResponse.json({service:'luhach-community',storageReady,contentReady,checks},{status:storageReady?200:503,headers:{'Cache-Control':'no-store'}});
 }

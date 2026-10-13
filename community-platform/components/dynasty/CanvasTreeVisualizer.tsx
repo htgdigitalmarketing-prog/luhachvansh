@@ -31,6 +31,14 @@ const getVillageColor = (str: string) => {
   return { bg: `hsl(${h}, 70%, 94%)`, border: `hsl(${h}, 60%, 80%)`, text: `hsl(${h}, 90%, 25%)` };
 };
 
+// Contextual roles (see lib/viewer.mjs familyRole). Colour is never the only signal: each node also prints its role.
+export const ROLE_STYLE = {
+  daughter: { bg: '#fde7ef', border: '#be185d', text: '#831843', hi: 'बेटी', en: 'Daughter' },
+  'daughter-in-law': { bg: '#fff1d6', border: '#b45309', text: '#78350f', hi: 'बहू', en: 'Daughter-in-law' },
+} as const;
+export const roleLabel = (role: PersonRecord['role'], hi: boolean) =>
+  !role ? '' : role.split('+').map(r => ROLE_STYLE[r as keyof typeof ROLE_STYLE][hi ? 'hi' : 'en']).join(' · ');
+
 export const CanvasTreeVisualizer: React.FC<CanvasTreeVisualizerProps> = ({
   records,
   onNodeClick,
@@ -38,7 +46,7 @@ export const CanvasTreeVisualizer: React.FC<CanvasTreeVisualizerProps> = ({
   primaryNodeId,
   targetNodeId, pathIds
 }) => {
-const {tr}=useLanguage();
+const {tr,language}=useLanguage();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -273,7 +281,8 @@ const {tr}=useLanguage();
             ctx.globalAlpha = 1.0;
         }
 
-        const colors = getVillageColor(node.villageName);
+        const roles = node.role ? node.role.split('+') as (keyof typeof ROLE_STYLE)[] : [];
+        const colors = roles.length ? { bg: ROLE_STYLE[roles[0]].bg, border: ROLE_STYLE[roles[roles.length - 1]].border, text: ROLE_STYLE[roles[0]].text } : getVillageColor(node.villageName);
         const x = node.x - NODE_WIDTH / 2;
         const y = node.y - NODE_HEIGHT / 2;
 
@@ -282,6 +291,8 @@ const {tr}=useLanguage();
 
         ctx.fillStyle = colors.bg;
         ctx.fillRect(x, y, NODE_WIDTH, NODE_HEIGHT);
+        // A woman who is both a daughter and a daughter-in-law is one node with a split fill.
+        if (roles.length === 2) { ctx.fillStyle = ROLE_STYLE[roles[1]].bg; ctx.fillRect(x + NODE_WIDTH / 2, y, NODE_WIDTH / 2, NODE_HEIGHT); }
 
         // BORDER COLOR LOGIC
         if (isHighlighted) {
@@ -292,9 +303,12 @@ const {tr}=useLanguage();
             ctx.lineWidth = 3;
         } else {
             ctx.strokeStyle = colors.border;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = roles.length ? 2.5 : 1;
         }
+        // Member-added people (visible only to this signed-in viewer unless public by consent) get a dashed border.
+        ctx.setLineDash(node.community ? [6, 4] : []);
         ctx.strokeRect(x, y, NODE_WIDTH, NODE_HEIGHT);
+        ctx.setLineDash([]);
 
         // TEXT COLOR LOGIC
         if (isHighlighted) {
@@ -312,21 +326,26 @@ const {tr}=useLanguage();
         if (metrics.width > NODE_WIDTH - 10) {
              ctx.font = `bold ${FONT_SIZE - 2}px Inter, sans-serif`;
         }
-        ctx.fillText(node.name, node.x, node.y - 4);
+        ctx.fillText(node.name, node.x, node.y - (roles.length ? 10 : 4));
+        if (roles.length) {
+            ctx.font = `600 ${FONT_SIZE - 2}px Inter, sans-serif`;
+            ctx.fillStyle = isHighlighted ? '#9a3412' : colors.text;
+            ctx.fillText(roleLabel(node.role, language === 'hi'), node.x, node.y + 4);
+        }
 
         // Text (Full ID)
         ctx.fillStyle = isHighlighted ? '#ea580c' : '#4b5563';
         ctx.font = `400 ${FONT_SIZE - 3}px monospace`;
         let displayId = node.genealogyId || "";
         if (displayId.length > 20) displayId = "..." + displayId.slice(-18);
-        ctx.fillText(displayId, node.x, node.y + 12);
+        ctx.fillText(displayId, node.x, node.y + (roles.length ? 18 : 12));
 
         ctx.globalAlpha = 1.0;
     });
 
     ctx.restore();
 
-  }, [layoutNodes, transform, isLayoutReady, focusNodeId, primaryNodeId, targetNodeId, highlightedIds]);
+  }, [layoutNodes, transform, isLayoutReady, focusNodeId, primaryNodeId, targetNodeId, highlightedIds, language]);
 
   // Input Handlers
   useEffect(()=>{const canvas=canvasRef.current;if(!canvas)return;const wheel=(e:WheelEvent)=>{e.preventDefault();const rect=canvas.getBoundingClientRect();setTransform(t=>wheelTransform(t,e,e.clientX-rect.left,e.clientY-rect.top));};canvas.addEventListener('wheel',wheel,{passive:false});return()=>canvas.removeEventListener('wheel',wheel);},[]);
