@@ -76,6 +76,8 @@ type Proposal = {
 };
 type State = {
   actor: Actor;
+  recoveryOwner?: boolean;
+  recoveryRequests?: {id:string;name:string;handle:string;note:string;created:number}[];
   introduction?: { about_hi: string; about_en: string; family_hi: string; family_en: string; updated: number };
   own: Person[];
   claims: Claim[];
@@ -264,11 +266,9 @@ export default function Members() {
     setMessage("");
     try {
       const r = await call(action, data);
-      if (r.recovery)
-        setSecret({ label: "आपका एक बार दिखाया जाने वाला खाता पुनर्प्राप्ति कोड", value: r.recovery });
       if (r.code)
         setSecret({
-          label: "एक बार उपयोग वाला निमंत्रण · सात दिन तक मान्य",
+          label: action === "issueRecovery" ? "सदस्य की खाता सहायता का निजी कोड" : "एक बार उपयोग वाला निमंत्रण · सात दिन तक मान्य",
           value: r.code,
         });
       await refresh();
@@ -408,8 +408,8 @@ export default function Members() {
                   </strong>
                   <small>
                     {t(
-                      "Invitation, password and recovery code",
-                      "निमंत्रण, पासवर्ड और पुनर्प्राप्ति कोड",
+                      "Simple sign-in and help from your administrator",
+                      "सरल लॉगिन और प्रशासक की सहायता",
                     )}
                   </small>
                 </span>
@@ -468,11 +468,16 @@ export default function Members() {
                   )
                 : mode === "setup"
                   ? t("Create your first administrator account. Choose a password you can remember.", "पहला प्रशासक खाता बनाएँ। अपनी पसंद का याद रहने वाला पासवर्ड चुनें।")
-                  : mode === "register"
+                  : mode === "help" ? (hi ? "नाम और गाँव बताकर प्रशासक से सहायता माँगें।" : "Ask the administrator for help using your name and village.") : mode === "register"
                     ? "प्रशासक से एक बार उपयोग वाला निमंत्रण प्राप्त करें।"
                     : "खाता बनाते समय सुरक्षित किया गया पुनर्प्राप्ति कोड इस्तेमाल करें।"}
             </p>
-            <form
+            {mode === "help" ? <form onSubmit={e=>run("requestRecovery",fields(e),hi ? "यदि यह सदस्य खाता मौजूद है, तो सहायता अनुरोध प्रशासक तक पहुँचा दिया गया है।" : "If this account exists, your request has reached the administrator.")}>
+              <p>{hi ? "कोड याद रखने की ज़रूरत नहीं। प्रशासक से अपनी पहचान की जाँच कराकर सहायता लें।" : "You do not need to remember a code. Ask the administrator to check your identity and help."}</p>
+              <label>{hi ? "नाम या यूज़रनेम" : "Name or username"}<input name="username" required maxLength={120}/></label>
+              <label>{hi ? "प्रशासक आपको कैसे पहचानें?" : "How can the administrator identify you?"}<textarea name="note" required minLength={5} maxLength={500} placeholder={hi ? "नाम, गाँव या परिचित रिश्तेदार बताएँ। पहचान-पत्र या पूरा पता न दें।" : "Name, village or a known relative. No identity documents or home address."}/></label>
+              <button className="primary" disabled={busy}>{hi ? "प्रशासक से सहायता माँगें" : "Ask the administrator for help"}</button>
+            </form> : <form
               key={mode}
               onSubmit={async (e) => {
                 const d = fields(e);
@@ -580,8 +585,9 @@ export default function Members() {
                       : t("Create account", "खाता बनाएँ")}
                 <ArrowRight size={16} />
               </button>
-            </form>
+            </form>}
             <div className="m-auth-links">
+              <button onClick={()=>{setMode(mode === "help" ? "signin" : "help");setError("");}}>{hi ? (mode === "help" ? "लॉगिन पर वापस जाएँ" : "पासवर्ड भूल गए? प्रशासक से सहायता लें") : (mode === "help" ? "Back to sign in" : "Forgot your password? Ask the administrator")}</button>
               <button
                 onClick={() => {
                   setMode(mode === "register" ? "signin" : "register");
@@ -600,7 +606,7 @@ export default function Members() {
               >
                 {mode === "recover"
                   ? "लॉगिन पर वापस जाएँ"
-                  : "पासवर्ड भूल गए?"}
+                  : (hi ? "सुरक्षा कोड है? उससे खाता वापस पाएँ" : "Have a recovery code? Use it")}
               </button>
               {setup && (
                 <button
@@ -1250,7 +1256,7 @@ export default function Members() {
                     > <Text value="सभी उपकरणों से लॉगआउट करें"/> </button>
                     <div className="m-note">
                       <ShieldCheck size={20} />
-                      <p> <Text value="समुदाय में प्रवेश निमंत्रण और परिवार के रिश्ते की जाँच से मिलता है। यूज़रनेम और पासवर्ड से आपका खाता सुरक्षित होता है। फ़ोन या ईमेल से सत्यापन यहाँ उपलब्ध नहीं है।"/> </p>
+                      <p>{hi ? "पासवर्ड भूलने पर प्रशासक से सहायता माँगें। सुरक्षा कोड की निजी प्रति सर्वर पर सुरक्षित रखी जाती है; उसे खुद सहेजना अनिवार्य नहीं है। पहचान की जाँच के बाद ही सहायता मिलेगी।" : "If you forget your password, ask the administrator. Recovery copies are stored securely on the server; members are not required to keep a code. Assistance follows an identity check."}</p>
                     </div>
                   </aside>
                 </div>
@@ -1264,6 +1270,13 @@ export default function Members() {
                   <p> <Text value="व्यक्ति, परिवार से रिश्ता और जानकारी का स्रोत जाँचें। केवल लॉगिन होने से वंश का रिश्ता सिद्ध नहीं होता।"/> </p>
                 </div>
                 <div className="m-columns">
+                  {state?.recoveryOwner && <section className="m-panel">
+                    <h2>{hi ? "खाता सहायता — मुख्य प्रशासक" : "Account help — owner administrator"}</h2>
+                    <p>{hi ? "सदस्यों को कोड सँभालने की ज़रूरत नहीं। उनकी पहचान जाँचें, फिर नया सहायता कोड जारी करें। पासवर्ड पढ़े नहीं जा सकते।" : "Members do not need to keep codes. Check their identity before issuing a replacement. Passwords cannot be read."}</p>
+                    <button className="outline" onClick={async()=>{try { const r=await call("recoveryCopies",{});const url=URL.createObjectURL(new Blob([JSON.stringify({version:1,exported:new Date().toISOString(),copies:r.copies},null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="luhach-private-recovery-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); } catch(e){setError(hiError((e as Error).message));}}}>{hi ? "निजी सहायता कोड की बैकअप प्रति डाउनलोड करें" : "Download private recovery backup"}</button>
+                    <details><summary>{hi ? "पहले से बने अपने कोड की प्रति सुरक्षित करें" : "Save a copy of your existing recovery code"}</summary><form onSubmit={e=>run("saveRecoveryCopy",fields(e),hi ? "निजी प्रति सुरक्षित हो गई।" : "Private copy saved.")}><label>{hi ? "आपका वर्तमान निजी कोड" : "Your current private code"}<input name="code" type="password" required autoComplete="off" maxLength={200}/></label><button className="primary" disabled={busy}>{hi ? "निजी प्रति सुरक्षित करें" : "Save private copy"}</button></form></details>
+                    {(state.recoveryRequests || []).map(r=><form key={r.id} onSubmit={e=>run("issueRecovery",{...fields(e),id:r.id},hi ? "पहचान जाँच के बाद सहायता कोड जारी किया गया।" : "Recovery issued after identity review.")}><h3>{r.name} · {r.handle}</h3><p>{r.note}</p><label>{hi ? "आपने पहचान कैसे जाँची?" : "How did you check the identity?"}<textarea name="reason" required minLength={10} maxLength={1000}/></label><button className="primary" disabled={busy}>{hi ? "जाँच के बाद सहायता कोड जारी करें" : "Issue recovery after review"}</button></form>)}
+                  </section>}
                   <section className="m-panel">
                     <h2> <Text value="सदस्य को निमंत्रण दें"/> </h2>
                     <p> <Text value="एक बार उपयोग वाला निमंत्रण बनाएँ और संबंधित व्यक्ति को स्वयं दें। यहाँ से अपने-आप संदेश नहीं भेजा जाता।"/> </p>
@@ -1578,14 +1591,14 @@ export default function Members() {
           >
             <KeyRound size={30} />
             <h2>{tr(secret.label)}</h2>
-            <p> <Text value="बंद करने से पहले इसे निजी जगह सुरक्षित करें। यह केवल एक बार दिखता है और पढ़े जा सकने वाले रूप में रखा नहीं जाता। इसे परिवार के संग्रह में न डालें।"/> </p>
+            <p>{hi ? "संबंधित व्यक्ति को यह कोड निजी तौर पर दें। इसे सार्वजनिक परिवार संग्रह में न डालें। सहायता कोड की प्रति मुख्य प्रशासक के सुरक्षित सहायता पैनल में रखी जाती है।" : "Give this code privately to the intended member. Do not post it in the public archive. Recovery copies are kept in the owner's secure help panel."}</p>
             <textarea
               readOnly
               aria-label={tr("निजी कोड")}
               value={secret.value}
               onFocus={(e) => e.target.select()}
             />
-            <button className="primary" onClick={() => setSecret(null)}> <Text value="मैंने इसे निजी जगह सुरक्षित कर लिया है"/> <Check size={16} />
+            <button className="primary" onClick={() => setSecret(null)}>{hi ? "ठीक है" : "Done"} <Check size={16} />
             </button>
           </section>
         </div>

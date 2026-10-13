@@ -5,7 +5,7 @@ import {
   writeFileSync,
   readdirSync,
 } from "node:fs";
-import { resolve, join } from "node:path";
+import { resolve, join, dirname } from "node:path";
 import {
   randomBytes,
   createCipheriv,
@@ -14,7 +14,8 @@ import {
 } from "node:crypto";
 import { backup, DatabaseSync } from "node:sqlite";
 import { getHub, mediaRoot } from "../lib/hub.mjs";
-const keyPath = resolve("data/BACKUP-KEY.txt");
+const keyPath = process.env.LUHACH_BACKUP_KEY || resolve(dirname(process.env.LUHACH_MEMBER_DB || resolve("data/members.sqlite")),"BACKUP-KEY.txt");
+mkdirSync(dirname(keyPath), {recursive:true});
 mkdirSync("data", { recursive: true });
 mkdirSync("backups", { recursive: true });
 if (!existsSync(keyPath))
@@ -46,6 +47,7 @@ const payload = Buffer.from(
       created: new Date().toISOString(),
       database: readFileSync(snapshot).toString("base64"),
       media,
+      recoveryKey: store.recoveryKeyPath && existsSync(store.recoveryKeyPath) ? readFileSync(store.recoveryKeyPath).toString("base64") : null,
     }),
   ),
   iv = randomBytes(12),
@@ -80,6 +82,7 @@ const checkDir = resolve("data/restore-checks", stamp);
 mkdirSync(checkDir, { recursive: true });
 const checkFile = join(checkDir, "members.sqlite");
 writeFileSync(checkFile, Buffer.from(restored.database, "base64"));
+if (restored.recoveryKey) writeFileSync(checkFile+".recovery-key",Buffer.from(restored.recoveryKey,"base64"),{mode:0o600});
 const check = new DatabaseSync(checkFile);
 const integrity = check.prepare("PRAGMA integrity_check").get();
 if (Object.values(integrity)[0] !== "ok")

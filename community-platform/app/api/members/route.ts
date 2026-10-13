@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
       throw new Problem("Invalid request");
     }
     const db = getMembers();
+    if (b.action === "requestRecovery") { db.requestRecovery(b.username,b.note); return response({ok:true}); }
     if (b.action === "register" || b.action === "setup") {
       const result = await db.register(b, b.action === "setup");
       db.logout(req.cookies.get(COOKIE)?.value);
@@ -97,6 +98,9 @@ export async function POST(req: NextRequest) {
     db.tick();
     let result = {};
     switch (b.action) {
+      case "saveRecoveryCopy": db.saveRecoveryCopy(actor.id,b.code); break;
+      case "recoveryCopies": result={copies:db.recoveryCopies(actor.id)}; break;
+      case "issueRecovery": result=db.issueRecovery(actor.id,b.id,b.reason); break;
       case "saveIntroduction":
         db.saveIntroduction(actor.id, b);
         break;

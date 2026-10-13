@@ -64,6 +64,34 @@ const privateSettings = {
   phone: "555-test",
   city: "Test City",
 };
+test("recovery copies are encrypted, owner-only, current, and assisted recovery requires a recorded identity check",async()=>{
+ const f=await fixture();try {
+  assert.equal(f.db.recoveryCopies(f.admin).find(r=>r.username==='member').code,f.user.recovery);
+  assert.equal(f.db.one("SELECT encrypted FROM recovery_vault WHERE account_id=?",f.member).encrypted.includes(f.user.recovery),false);
+  assert.throws(()=>f.db.recoveryCopies(f.member));
+  f.db.run("UPDATE accounts SET role='admin' WHERE id=?",f.member);
+  assert.throws(()=>f.db.recoveryCopies(f.member),/first owner/);
+  f.db.run("UPDATE accounts SET role='member' WHERE id=?",f.member);
+  assert.throws(()=>f.db.saveRecoveryCopy(f.member,'wrong-code'),/not current/);
+  f.db.saveRecoveryCopy(f.member,f.user.recovery);
+  f.db.requestRecovery('unknown','A test request with no account');
+  assert.equal(f.db.one('SELECT COUNT(*) n FROM recovery_requests').n,0);
+  f.db.requestRecovery('member','Known family member from Test Village');
+  const r=f.db.memberState(f.admin).recoveryRequests[0];
+  assert.equal(f.db.memberState(f.member).recoveryRequests.length,0);
+  assert.throws(()=>f.db.issueRecovery(f.member,r.id,'Checked identity against known relative'));
+  assert.throws(()=>f.db.issueRecovery(f.admin,r.id,'x'));
+  const replacement=f.db.issueRecovery(f.admin,r.id,'Checked identity with the known test relative');
+  assert.equal(f.db.actor(f.user.token),null);
+  await assert.rejects(f.db.recover('member',f.user.recovery,password));
+  assert.equal(f.db.recoveryCopies(f.admin).find(c=>c.username==='member').code,replacement.code);
+  const recovered=await f.db.recover('member',replacement.code,'1234');
+  assert.notEqual(recovered.recovery,replacement.code);
+  assert.equal(f.db.recoveryCopies(f.admin).find(c=>c.username==='member').code,recovered.recovery);
+  assert.throws(()=>f.db.issueRecovery(f.admin,r.id,'Another identity check'),/no longer/);
+  assert.equal(f.db.one("SELECT detail FROM audit WHERE action='assisted_recovery_issued'").detail.includes(replacement.code),false);
+ } finally {f.db.close();}
+});
 test("simple passwords work without composition or minimum-length rules, but empty passwords are rejected", async () => {
   const f = await fixture();
   try {

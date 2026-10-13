@@ -4,7 +4,10 @@ import {
   createHash,
   scrypt as scryptCallback,
   timingSafeEqual,
+  createCipheriv,
+  createDecipheriv,
 } from "node:crypto";
+import {existsSync,readFileSync,writeFileSync} from "node:fs";
 import { promisify } from "node:util";
 import { resolve } from "node:path";
 import { Store, Problem } from "./store.mjs";
@@ -54,6 +57,12 @@ async function passwordMatches(password, stored) {
 export class MemberStore extends Store {
   constructor(path = resolve("data/members.sqlite")) {
     super(path, { seed: false });
+    this.recoveryKeyPath = path === ":memory:" ? null : resolve(path + ".recovery-key");
+    if (path !== ":memory:" && this.one("SELECT name FROM sqlite_master WHERE name='credentials'") &&
+        this.one("SELECT account_id FROM credentials LIMIT 1") && !this.one("SELECT name FROM sqlite_master WHERE name='recovery_vault'")) {
+      const before = resolve(path + ".before-recovery-vault.sqlite");
+      if (!existsSync(before)) this.db.prepare("VACUUM INTO ?").run(before);
+    }
     this.db.exec(`
    CREATE TABLE IF NOT EXISTS credentials(account_id TEXT PRIMARY KEY REFERENCES accounts(id),handle TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,recovery_hash TEXT NOT NULL,verified INTEGER NOT NULL DEFAULT 0,created INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS invitations(hash TEXT PRIMARY KEY,label TEXT NOT NULL,created_by TEXT NOT NULL,expires INTEGER NOT NULL,used_by TEXT,revoked INTEGER NOT NULL DEFAULT 0);
@@ -63,10 +72,63 @@ export class MemberStore extends Store {
    CREATE TABLE IF NOT EXISTS privacy_holds(person_id TEXT PRIMARY KEY REFERENCES people(id),reason TEXT NOT NULL);
    CREATE TABLE IF NOT EXISTS verification_details(claim_id TEXT PRIMARY KEY REFERENCES claims(id),relationship TEXT NOT NULL,method TEXT,reviewer TEXT,reviewed INTEGER);
    CREATE TABLE IF NOT EXISTS account_introductions(account_id TEXT PRIMARY KEY REFERENCES accounts(id),about_hi TEXT NOT NULL DEFAULT '',about_en TEXT NOT NULL DEFAULT '',family_hi TEXT NOT NULL DEFAULT '',family_en TEXT NOT NULL DEFAULT '',updated INTEGER NOT NULL);
+   CREATE TABLE IF NOT EXISTS recovery_vault(account_id TEXT PRIMARY KEY REFERENCES accounts(id),encrypted TEXT NOT NULL,created INTEGER NOT NULL);
+   CREATE TABLE IF NOT EXISTS recovery_requests(id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),note TEXT NOT NULL,status TEXT NOT NULL,created INTEGER NOT NULL,decision TEXT);
   `);
   }
   now() {
     return Date.now();
+  }
+  recoveryKey() {
+    if (!this.recoveryKeyPath) return this.memoryRecoveryKey ??= randomBytes(32);
+    if (!existsSync(this.recoveryKeyPath)) {
+      need(!this.one("SELECT account_id FROM recovery_vault LIMIT 1"), "Recovery storage key is unavailable.", 503);
+      try { writeFileSync(this.recoveryKeyPath, randomBytes(32), {flag:"wx",mode:0o600}); }
+      catch(e) { if (e.code !== "EEXIST") throw e; }
+    }
+    const key = readFileSync(this.recoveryKeyPath);
+    need(key.length === 32, "Recovery storage key is unavailable.", 503);
+    return key;
+  }
+  storeRecoveryCopy(account, code) {
+    const iv=randomBytes(12), cipher=createCipheriv("aes-256-gcm",this.recoveryKey(),iv);
+    const encrypted=Buffer.concat([cipher.update(code,"utf8"),cipher.final()]);
+    this.run("INSERT OR REPLACE INTO recovery_vault VALUES(?,?,?)", account,
+      JSON.stringify({iv:iv.toString("base64"),tag:cipher.getAuthTag().toString("base64"),data:encrypted.toString("base64")}),Date.now());
+  }
+  owner(actor) {
+    this.admin(actor);
+    need(this.one("SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",actor),"Only the first owner administrator can access recovery copies.",403);
+  }
+  saveRecoveryCopy(actor, code) {
+    this.user(actor);
+    need(typeof code === "string" && hash(code) === this.one("SELECT recovery_hash FROM credentials WHERE account_id=?",actor)?.recovery_hash,"This recovery code is not current.",400);
+    this.storeRecoveryCopy(actor,code);
+    this.log(actor,"recovery_copy_saved",actor,{});
+  }
+  recoveryCopies(actor) {
+    this.owner(actor);
+    return this.all("SELECT v.*,a.name,c.handle FROM recovery_vault v JOIN accounts a ON a.id=v.account_id JOIN credentials c ON c.account_id=a.id").map(row=>{
+      const e=JSON.parse(row.encrypted), d=createDecipheriv("aes-256-gcm",this.recoveryKey(),Buffer.from(e.iv,"base64"));d.setAuthTag(Buffer.from(e.tag,"base64"));
+      return {name:row.name,username:row.handle,code:Buffer.concat([d.update(Buffer.from(e.data,"base64")),d.final()]).toString("utf8"),updated:row.created};
+    });
+  }
+  requestRecovery(username, note) {
+    this.throttle("recovery-help-global",20);
+    const h=handle(username);this.throttle("recovery-help:"+h,3);
+    need(text(note,500).length >= 5,"Explain how the administrator can identify you.");
+    const candidates=this.all("SELECT c.account_id FROM credentials c JOIN accounts a ON a.id=c.account_id WHERE c.handle=? OR lower(a.name)=lower(?)",h,text(username,120));
+    const c=candidates.length===1 ? candidates[0] : null;
+    if (!c || this.one("SELECT id FROM recovery_requests WHERE account_id=? AND status='pending'",c.account_id)) return;
+    this.run("INSERT INTO recovery_requests VALUES(?,?,?,'pending',?,NULL)",randomUUID(),c.account_id,text(note,500),Date.now());
+  }
+  issueRecovery(actor, id, reason) {
+    this.owner(actor);need(text(reason).length >= 10,"Record how you checked the member's identity.");
+    const r=this.one("SELECT * FROM recovery_requests WHERE id=? AND status='pending'",id);need(r,"Request is no longer pending.",409);
+    need(r.account_id!==actor,"Use your saved owner code or an independent recovery process.",403);
+    const code=token();
+    this.transaction(()=>{this.run("UPDATE credentials SET recovery_hash=? WHERE account_id=?",hash(code),r.account_id);this.storeRecoveryCopy(r.account_id,code);this.run("DELETE FROM member_sessions WHERE account_id=?",r.account_id);this.run("UPDATE recovery_requests SET status='resolved',decision=? WHERE id=?",text(reason),id);this.log(actor,"assisted_recovery_issued",r.account_id,{request:id});});
+    return {code};
   }
   login() {
     throw new Problem("Sample accounts cannot sign into the member area.", 403);
@@ -207,6 +269,7 @@ export class MemberStore extends Store {
           id,
           invitation,
         );
+      this.storeRecoveryCopy(id, recovery);
       this.log(id, "account_registered", id, {
         adult: true,
         privacyNotice: "2026-10-10",
@@ -267,6 +330,7 @@ export class MemberStore extends Store {
         c.account_id,
       );
       this.run("DELETE FROM member_sessions WHERE account_id=?", c.account_id);
+      this.storeRecoveryCopy(c.account_id, recovery);
       this.log(c.account_id, "account_recovered", c.account_id, {});
     });
     return { token: this.session(c.account_id), recovery };
@@ -297,6 +361,7 @@ export class MemberStore extends Store {
         actor,
       );
       this.run("DELETE FROM member_sessions WHERE account_id=?", actor);
+      this.storeRecoveryCopy(actor, recovery);
       this.log(actor, "password_changed", actor, {});
     });
     return { token: this.session(actor), recovery };
@@ -909,6 +974,8 @@ export class MemberStore extends Store {
         verified: !!credentials.verified,
       },
       introduction: this.one("SELECT about_hi,about_en,family_hi,family_en,updated FROM account_introductions WHERE account_id=?", actor),
+      recoveryOwner: !!this.one("SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",actor) && a.role==='admin',
+      recoveryRequests: a.role==='admin' && this.one("SELECT id FROM audit WHERE actor=? AND action='account_registered' AND json_extract(detail,'$.bootstrap')=1",actor) ? this.all("SELECT r.id,r.note,r.created,a.name,c.handle FROM recovery_requests r JOIN accounts a ON a.id=r.account_id JOIN credentials c ON c.account_id=a.id WHERE status='pending'") : [],
       claims,
       own,
       proposals,
