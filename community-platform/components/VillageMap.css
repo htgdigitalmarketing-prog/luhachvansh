@@ -1,0 +1,4 @@
+
+.map-evidence{margin:18px 0;font-size:14px}.map-evidence summary{cursor:pointer;font-weight:700}.map-evidence table{width:100%;min-width:700px;border-collapse:collapse}.map-evidence th,.map-evidence td{text-align:left;vertical-align:top;padding:12px;border-bottom:1px solid #ddd}.map-evidence small{display:block;color:#66745e;line-height:1.6}.map-conflict{background:#faf2df;padding:8px;border-left:3px solid #b78b58}.village-map-svg .map-locality{fill:#fff!important;stroke:#2f5d47;stroke-width:3}.map-locality+.map-num{fill:#20382c}.map-locality-key{display:inline-block;width:12px;height:12px;border:2px solid #2f5d47;border-radius:50%;background:#fff}
+
+.map-area-line{stroke:#a16c3f;stroke-width:2;stroke-dasharray:5 4}.map-area-point{fill:#fbf4e3;stroke:#a16c3f;stroke-width:2}.map-area-num{fill:#714828;font:bold 9px sans-serif}.map-area-key{display:inline-block;width:16px;height:8px;border:2px dashed #a16c3f}

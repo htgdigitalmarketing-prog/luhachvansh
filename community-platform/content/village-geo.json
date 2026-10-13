@@ -1,24 +1,74 @@
 {
- "checked": "13.10.2026",
- "method": "A coordinate is used only when a named public source (Wikidata, OpenStreetMap, Wikipedia) identifies the same village in the stated district; OpenStreetMap points were accepted only when unique by name within the district. Others are listed as unverified or ambiguous with no point.",
+ "checked": "14.10.2026",
+ "method": "Original book descriptions reconciled to official Census2011 directory.26 previously missing places have exact-code-linked approximate coordinates from the India Geodata extract; live NIC unavailable. One approximate locality point from GeoNames have no standalone Census code. Historical Paintawas is represented by both current Kalan/Khurd Census locations with an explicitly unconfirmed undivided-village interpretation. Three ambiguous places remain unplotted. Original archive records unchanged.",
  "places": [
   {
    "hi": "नान्धा",
    "en": "Nandha",
    "district": "Charkhi Dadri",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "No village item/node found in Wikidata, OSM or Wikipedia. Only 'Nandha Branch Post Office' (Wikidata Q72953302, P131 Bhiwani district — Charkhi Dadri was carved from Bhiwani in 2016) confirms the village exists; it has no coordinate. Needs Census 2011 village code / Bharat Maps lookup (Badhra tehsil)."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "No village item/node found in Wikidata, OSM or Wikipedia. Only 'Nandha Branch Post Office' (Wikidata Q72953302, P131 Bhiwani district — Charkhi Dadri was carved from Bhiwani in 2016) confirms the village exists; it has no coordinate. Needs Census 2011 village code / Bharat Maps lookup (Badhra tehsil)."
+   },
+   "lat": 28.44932,
+   "lon": 75.94152,
+   "source": "India Geodata Census point extract",
+   "sourceId": "061553",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "081",
+    "subdistrictCode": "00403",
+    "code": "061553",
+    "name": "Nandha(53)",
+    "district": "Bhiwani",
+    "subdistrict": "Badhra",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P110",
+    "excerpt": "नाँधा हरियाणा की तहसील बाढ़डा, जिला चरखी दादरी का एक बड़ा गाँव है।"
+   }
   },
   {
    "hi": "मोहला",
    "en": "Mohla",
    "district": "Hisar",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only 'Mohla Branch Post Office' (Wikidata Q72956398, Hisar district), no coordinate. No OSM/Wikipedia village entry found."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only 'Mohla Branch Post Office' (Wikidata Q72956398, Hisar district), no coordinate. No OSM/Wikipedia village entry found."
+   },
+   "lat": 29.12346,
+   "lon": 76.27539,
+   "source": "India Geodata Census point extract",
+   "sourceId": "061107",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "080",
+    "subdistrictCode": "00396",
+    "code": "061107",
+    "name": "Mohla (62)",
+    "district": "Hisar",
+    "subdistrict": "Hansi",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P161",
+    "excerpt": "मोहला हरियाणा के हिसार जिले की बांस पेटवाड़ तहसील का एक काफी बड़ा गाँव है जो कि हांसी-जुलाना सड़क पर तहसील मुख्यालय से 8 किलोमीटर दूर स्थित है।"
+   }
   },
   {
    "hi": "गिरावड़",
@@ -53,18 +103,57 @@
    "en": "Nangla Ugrasen",
    "district": "Bulandshahr (one website entry says Hapur)",
    "state": "Uttar Pradesh",
-   "status": "unverified",
+   "status": "ambiguous",
    "evidence": "",
-   "note": "Nothing found in Wikidata, OSM (Bulandshahr and Hapur place lists) or Wikipedia under Nangla/Nagla Ugrasen/Ugarsain. District itself is uncertain (Bulandshahr vs Hapur on the website)."
+   "note": "Revenue orders identify Nangla Ugrasen as a Kuchesar hamlet. No standalone code or precise point established. Kuchesar120853 is a parent village, not the hamlet itself.",
+   "resolution": {
+    "hi": "नगला उग्रसैन कुचेसर का मजरा है। अलग Census गाँव कोड और सटीक स्थान स्थापित नहीं। कुचेसर का कोड 120853 है; उसका बिंदु मजरे की जगह नहीं लगाया गया।",
+    "en": "Revenue orders identify Nangla Ugrasen as a Kuchesar hamlet. No standalone code or precise point established. Kuchesar120853 is a parent village, not the hamlet itself."
+   },
+   "candidateCensusCodes": [
+    "120853"
+   ],
+   "book": {
+    "paragraph": "P396/P398"
+   },
+   "supportingSources": [
+    "https://vaad.up.nic.in/judgement/Print_Court_Order_External.aspx?login_type=AD&order_id=26245949",
+    "https://vaad.up.nic.in/judgement/Print_Court_Order_External.aspx?login_type=AD&order_id=21016113"
+   ]
   },
   {
    "hi": "भंडोली",
    "en": "Bhandoli",
    "district": "Bulandshahr",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "No Bhandoli/Bhandauli village found in Bulandshahr in Wikidata or OSM (Wikidata 'Bhandoli Branch Post Office' Q72953605 is in Faridabad district, Haryana — a different place)."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "No Bhandoli/Bhandauli village found in Bulandshahr in Wikidata or OSM (Wikidata 'Bhandoli Branch Post Office' Q72953605 is in Faridabad district, Haryana — a different place)."
+   },
+   "lat": 28.48138,
+   "lon": 77.87319,
+   "source": "India Geodata Census point extract",
+   "sourceId": "120687",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "142",
+    "subdistrictCode": "00746",
+    "code": "120687",
+    "name": "Bhandauli",
+    "district": "Bulandshahr ",
+    "subdistrict": "Bulandshahr",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P377",
+    "excerpt": "भंडोली गाँव पश्चिमी उतर प्रदेश के बुलन्दशहर जिले का एक मध्यम आबादी का गाँव है जो कि जिला मुख्यालय से 9 किलो मीटर दूर है।"
+   }
   },
   {
    "hi": "ज्ञानपुर",
@@ -99,9 +188,34 @@
    "en": "Dhundhwa",
    "district": "Kaithal",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only 'Dhundwa Branch Post Office' (Wikidata Q72958492, Kaithal district), no coordinate. OSM Kaithal has 'Dhundheri' (different name)."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only 'Dhundwa Branch Post Office' (Wikidata Q72958492, Kaithal district), no coordinate. OSM Kaithal has 'Dhundheri' (different name)."
+   },
+   "lat": 29.70294,
+   "lon": 76.18833,
+   "source": "India Geodata Census point extract",
+   "sourceId": "058893",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "073",
+    "subdistrictCode": "00368",
+    "code": "058893",
+    "name": "Dhondhwa (44)",
+    "district": "Kaithal",
+    "subdistrict": "Kaithal",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P170",
+    "excerpt": "ढुँढवा गाँव हरियाणा के कैथल जिले की कलायत तहसील का एक काफी बड़ा गाँव है।"
+   }
   },
   {
    "hi": "पाढ़ला",
@@ -122,18 +236,68 @@
    "en": "Bhartana",
    "district": "Jind",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "No Bhartana/Bhadtana found in Jind in Wikidata, OSM or Wikipedia."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "No Bhartana/Bhadtana found in Jind in Wikidata, OSM or Wikipedia."
+   },
+   "lat": 29.27689,
+   "lon": 76.48798,
+   "source": "India Geodata Census point extract",
+   "sourceId": "060194",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "077",
+    "subdistrictCode": "00385",
+    "code": "060194",
+    "name": "Bhartana (6)",
+    "district": "Jind",
+    "subdistrict": "Safidon",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P179",
+    "excerpt": "भड़ताना हरियाणा के जींद जिले की सफीदों तहसील का एक मध्यम आबादी का गाँव है।"
+   }
   },
   {
    "hi": "नली हुसैनपुर",
    "en": "Nali Husainpur",
    "district": "Hapur",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only 'Nali Husainpur Branch Post Office' (Wikidata Q70052279, Ghaziabad district — Hapur was carved out of Ghaziabad in 2011), no coordinate. Not mapped in OSM."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only 'Nali Husainpur Branch Post Office' (Wikidata Q70052279, Ghaziabad district — Hapur was carved out of Ghaziabad in 2011), no coordinate. Not mapped in OSM."
+   },
+   "lat": 28.69858,
+   "lon": 77.9104,
+   "source": "India Geodata Census point extract",
+   "sourceId": "119879",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "140",
+    "subdistrictCode": "00740",
+    "code": "119879",
+    "name": "Nali Husainpur",
+    "district": "Ghaziabad",
+    "subdistrict": "Hapur",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P266",
+    "excerpt": "नली हुसैनपुर गाँव उत्तर प्रदेश के जिला व तहसील हापुड़ का एक मध्यम आबादी का गाँव है।"
+   }
   },
   {
    "hi": "सेहरा",
@@ -168,54 +332,208 @@
    "en": "Khad Mohan Nagar",
    "district": "Bulandshahr",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only 'Khad Mohan Nagar Branch Post Office' (Wikidata Q69981969, Bulandshahr district), no coordinate."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only 'Khad Mohan Nagar Branch Post Office' (Wikidata Q69981969, Bulandshahr district), no coordinate."
+   },
+   "lat": 28.57019,
+   "lon": 77.97814,
+   "source": "India Geodata Census point extract",
+   "sourceId": "120897",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "142",
+    "subdistrictCode": "00747",
+    "code": "120897",
+    "name": "Khad Mohan Nagar",
+    "district": "Bulandshahr ",
+    "subdistrict": "Siana",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P371",
+    "excerpt": "खाद मोहन नगर गाँव पश्चिमी उत्तर प्रदेश के बुलन्दशहर जिले की सियाना तहसील का एक मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "अलखपुरा",
    "en": "Alakhpura",
    "district": "Bhiwani",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only an OSM POI 'PHC Alakhpura' (node/7168803836, 29.0153,76.0476) whose address resolves to Durjanpur, Bawani Khera, Bhiwani — a health centre named after the village, not the village itself. No village node/item found."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only an OSM POI 'PHC Alakhpura' (node/7168803836, 29.0153,76.0476) whose address resolves to Durjanpur, Bawani Khera, Bhiwani — a health centre named after the village, not the village itself. No village node/item found."
+   },
+   "lat": 28.91286,
+   "lon": 75.93985,
+   "source": "India Geodata Census point extract",
+   "sourceId": "061254",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "081",
+    "subdistrictCode": "00399",
+    "code": "061254",
+    "name": "Alakhpura (32)",
+    "district": "Bhiwani",
+    "subdistrict": "Tosham",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P186",
+    "excerpt": "अलखपुरा गाँव हरियाणा के भिवानी जिले की तोशाम तहसील का एक मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "सालहेवाला",
    "en": "Salhewala",
    "district": "Bhiwani",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "No Salhewala found. Search returned only Salhawas (Jhajjar/Rewari) — different place."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "No Salhewala found. Search returned only Salhawas (Jhajjar/Rewari) — different place."
+   },
+   "lat": 28.75446,
+   "lon": 75.77457,
+   "source": "India Geodata Census point extract",
+   "sourceId": "061236",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "081",
+    "subdistrictCode": "00399",
+    "code": "061236",
+    "name": "Salewala (75)",
+    "district": "Bhiwani",
+    "subdistrict": "Tosham",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P189",
+    "excerpt": "सालहेवाला गाँव हरियाणा के भिवानी जिले की तोशाम तहसील का एक मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "गुगाहेड़ी",
    "en": "Gugaheri",
    "district": "Rohtak",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only 'Gugaheri Branch Post Office' (Wikidata Q72959411, Rohtak district), no coordinate."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only 'Gugaheri Branch Post Office' (Wikidata Q72959411, Rohtak district), no coordinate."
+   },
+   "lat": 29.04892,
+   "lon": 76.40124,
+   "source": "India Geodata Census point extract",
+   "sourceId": "061562",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "082",
+    "subdistrictCode": "00404",
+    "code": "061562",
+    "name": "Gugaheri(111)",
+    "district": "Rohtak",
+    "subdistrict": "Maham",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P152",
+    "excerpt": "गुगाहेड़ी गाँव रोहतक जिला की महम तहसील का एक छोटा सा गाँव है।"
+   }
   },
   {
    "hi": "कादराबाद",
    "en": "Kadrabad",
    "district": "Bijnor",
    "state": "Uttar Pradesh",
-   "status": "unverified",
+   "status": "ambiguous",
    "evidence": "",
-   "note": "Only 'Kadrabad Branch Post Office' (Wikidata Q70003751, Bijnor district), no coordinate. Wikidata 'Kadrabad, Kapurthala' is in Punjab (different)."
+   "note": "Book describes ex-servicemen colony beside Turatpur/Murliwala. Same-name Census villages113436 and113772 do not match. Exact colony code/point not established.",
+   "resolution": {
+    "hi": "पुस्तक की पूर्व-सैनिक कॉलोनी तूरतपुर/मुरलीवाला के पास है। समान नाम वाले Census 113436 और 113772 अलग स्थान हैं। कॉलोनी का सटीक कोड/बिंदु अभी स्थापित नहीं।",
+    "en": "Book describes ex-servicemen colony beside Turatpur/Murliwala. Same-name Census villages113436 and113772 do not match. Exact colony code/point not established."
+   },
+   "candidateCensusCodes": [
+    "113436",
+    "113772"
+   ],
+   "book": {
+    "paragraph": "P157"
+   },
+   "supportingSources": [
+    "https://upnrhm.gov.in/assets/site-files/asha/Compiled_Bijnor.pdf"
+   ]
   },
   {
    "hi": "पैंतावास",
    "en": "Paintawas",
    "district": "Charkhi Dadri",
    "state": "Haryana",
-   "status": "ambiguous",
+   "status": "historical-area",
    "evidence": "",
-   "note": "OSM has 'Paintawas Khurd' (node/6218507211, Dadri, Charkhi Dadri, 28.6654,76.1904). The name normally exists as a Kalan/Khurd pair and the website does not say which, so no coordinate is given."
+   "note": "User authorised best inference14.10.2026. Both exact-coded current locations shown as historical-area context, not as a proven undivided village or uniquely identified origin.",
+   "resolution": {
+    "hi": "ऐतिहासिक पैंतावास: वर्तमान कलाँ/खुर्द क्षेत्र। पुराने समय में एक अविभाजित गाँव होने का अनुमान है, पुष्टि नहीं। पुस्तक किसी एक हिस्से को स्पष्ट नहीं करती।",
+    "en": "Historical Paintawas: the present Kalan/Khurd area. An earlier undivided village is a working inference, not confirmed. The book does not identify one present-day part."
+   },
+   "candidateCensusCodes": [
+    "061449",
+    "061448"
+   ],
+   "book": {
+    "paragraph": "P113/P210"
+   },
+   "supportingSources": [
+    "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   ],
+   "interpretation": {
+    "hi": "ऐतिहासिक पैंतावास: वर्तमान कलाँ/खुर्द क्षेत्र। पुराने समय में एक अविभाजित गाँव होने का अनुमान है, पुष्टि नहीं। पुस्तक किसी एक हिस्से को स्पष्ट नहीं करती।",
+    "en": "Historical Paintawas: the present Kalan/Khurd area. An earlier undivided village is a working inference, not confirmed. The book does not identify one present-day part."
+   },
+   "candidateLocations": [
+    {
+     "name": "Pentawas Kalan(110)",
+     "code": "061449",
+     "lat": 28.63683,
+     "lon": 76.19881,
+     "district": "Bhiwani",
+     "subdistrict": "Dadri",
+     "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648",
+     "coordinateSourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011"
+    },
+    {
+     "name": "Pantawas Khurd(109)",
+     "code": "061448",
+     "lat": 28.66531,
+     "lon": 76.18949,
+     "district": "Bhiwani",
+     "subdistrict": "Dadri",
+     "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648",
+     "coordinateSourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011"
+    }
+   ]
   },
   {
    "hi": "महम (मार्ग, P113)",
@@ -266,9 +584,34 @@
    "en": "Marot",
    "district": "Jhajjar",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only 'Marot Branch Post Office' (Wikidata Q72959660, Jhajjar district) and a canal 'Mārot Minor' (Q26810308); no village coordinate."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only 'Marot Branch Post Office' (Wikidata Q72959660, Jhajjar district) and a canal 'Mārot Minor' (Q26810308); no village coordinate."
+   },
+   "lat": 28.59154,
+   "lon": 76.54277,
+   "source": "India Geodata Census point extract",
+   "sourceId": "061934",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "083",
+    "subdistrictCode": "00410",
+    "code": "061934",
+    "name": "Marot(206)",
+    "district": "Jhajjar",
+    "subdistrict": "Matenhail",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P219",
+    "excerpt": "मारोत गाँव हरियाणा के झज्जर जिले की मातनहेल तहसील का मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "रानीला",
@@ -317,27 +660,102 @@
    "en": "Gahna",
    "district": "Bulandshahr",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "No Gahna found in Bulandshahr (Wikidata Gahna items are in Bihar/Uttarakhand/Chhattisgarh)."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "No Gahna found in Bulandshahr (Wikidata Gahna items are in Bihar/Uttarakhand/Chhattisgarh)."
+   },
+   "lat": 28.38104,
+   "lon": 78.10459,
+   "source": "India Geodata Census point extract",
+   "sourceId": "121053",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "142",
+    "subdistrictCode": "00748",
+    "code": "121053",
+    "name": "Gahana Govardhanpur",
+    "district": "Bulandshahr ",
+    "subdistrict": "Anupshahr",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P382",
+    "excerpt": "गहना गाँव पश्चिमी उत्तर प्रदेश के बुलन्दशहर जिले की अनूपगढ़ तहसील का एक मध्यम आबादी का गाँव है जो कि जिला मुख्यालय से 25 किलो मीटर और तहसील मुख्यालय से 16 किलो मीटर दूर स्थित है।"
+   }
   },
   {
    "hi": "बदरखा सिरवास",
    "en": "Badrakha",
    "district": "Bulandshahr",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "'Badrakha Sirwas' not found; Wikidata 'Badarkha Branch Post Office' Q70005862 is in Bagpat district, not Bulandshahr."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels. 121024 Badarkha in Anupshahr is not 121443 Badarkha Sirbas in Shikarpur.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "'Badrakha Sirwas' not found; Wikidata 'Badarkha Branch Post Office' Q70005862 is in Bagpat district, not Bulandshahr."
+   },
+   "lat": 28.17035,
+   "lon": 78.12239,
+   "source": "India Geodata Census point extract",
+   "sourceId": "121443",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "142",
+    "subdistrictCode": "00750",
+    "code": "121443",
+    "name": "Badarkha Sirbas",
+    "district": "Bulandshahr ",
+    "subdistrict": "Shikarpur",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P368",
+    "excerpt": "बदरखा सिरवास गाँव पश्चिमी उत्तर प्रदेश के बुलन्दशहर जिले की शिकारपुर तहसील का एक मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "सियाल्ली",
    "en": "Siyali",
    "district": "Bulandshahr",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "No Siyali/Sihali in Bulandshahr found. 'Sihali Jageer' (Q7513396) is in Amroha district — different district."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "No Siyali/Sihali in Bulandshahr found. 'Sihali Jageer' (Q7513396) is in Amroha district — different district."
+   },
+   "lat": 28.21576,
+   "lon": 78.12722,
+   "source": "India Geodata Census point extract",
+   "sourceId": "121436",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "142",
+    "subdistrictCode": "00750",
+    "code": "121436",
+    "name": "Syarli",
+    "district": "Bulandshahr ",
+    "subdistrict": "Shikarpur",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P386",
+    "excerpt": "स्यारली गाँव पश्चिमी उत्तर प्रदेश के बुलन्दशहर जिले की शिकारपुर तहसील का एक मध्यम आबादी का गाँव है।"
+   }
   },
   {
    "hi": "इगलास",
@@ -358,90 +776,337 @@
    "en": "Amarpur",
    "district": "Meerut",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Many Amarpurs in India; none found in Meerut district in Wikidata or OSM (OSM has one in Debai, Bulandshahr — different district)."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Many Amarpurs in India; none found in Meerut district in Wikidata or OSM (OSM has one in Debai, Bulandshahr — different district)."
+   },
+   "lat": 28.90871,
+   "lon": 77.87767,
+   "source": "India Geodata Census point extract",
+   "sourceId": "118985",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "138",
+    "subdistrictCode": "00733",
+    "code": "118985",
+    "name": "Amarpur Mazra Khandawli",
+    "district": "Meerut",
+    "subdistrict": "Mawana",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P351",
+    "excerpt": "अमरपुर पश्चिमी उत्तर प्रदेश का मेरठ जिले की मवाना तहसील का गंगा किनारे बसा एक छोटा सा गाँव है।"
+   }
   },
   {
    "hi": "भडंग़पुर",
    "en": "Bhadangpur",
    "district": "Hapur",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Not found in Hapur/Ghaziabad in Wikidata or OSM."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Not found in Hapur/Ghaziabad in Wikidata or OSM."
+   },
+   "lat": 28.68551,
+   "lon": 77.89789,
+   "source": "India Geodata Census point extract",
+   "sourceId": "119880",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "140",
+    "subdistrictCode": "00740",
+    "code": "119880",
+    "name": "Bhadangpur",
+    "district": "Ghaziabad",
+    "subdistrict": "Hapur",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P280",
+    "excerpt": "भड़ंगपुर गाँव पश्चिमी उत्तर प्रदेश में हापुड़ जिले का एक मध्यम आबादी वाला गाँव है जो कि जिला मुख्यालय से 16 किलोमीटर दूर पश्चिम दिशा में स्थित है।"
+   }
   },
   {
    "hi": "गढ़ी गुलडहर",
    "en": "Garhi Guldhar",
    "district": "Ghaziabad",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Only Guldhar railway/RRTS stations in Ghaziabad city (Q31295726, Q124296453) found; no village 'Garhi Guldhar' item/node, so no coordinate."
+   "status": "ambiguous",
+   "evidence": "Book P347 identifies Garhi Guldhar as urban-absorbed. Approximate GeoNames Garhi locality point; no standalone Census code established.",
+   "note": "Book P347 describes urban Garhi Guldhar west of Sikrod. GeoNames Garhi has Sikrod on the opposite side. That candidate point is not accepted solely by name. Exact locality point and standalone Census code remain unestablished.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Only Guldhar railway/RRTS stations in Ghaziabad city (Q31295726, Q124296453) found; no village 'Garhi Guldhar' item/node, so no coordinate."
+   },
+   "source": "GeoNames",
+   "sourceId": "10265263",
+   "sourceUrl": "https://www.geonames.org/10265263/",
+   "book": {
+    "paragraph": "P347",
+    "excerpt": "गढ़ी गुलडहर गाँव उत्तर प्रदेश के गाजियाबाद जिले का एक गाँव है।"
+   },
+   "resolution": {
+    "hi": "पुस्तक (P347) के अनुसार शहरी गढ़ी गुलडहर, सिकरोड़ के पश्चिम में है। GeoNames के Garhi बिंदु पर सिकरोड़ उल्टी दिशा में मिलता है। समान नाम से गलत स्थान चुनने के बजाय सटीक बिंदु खुला रखा गया है; अलग Census गाँव कोड नहीं मिला।",
+    "en": "Book P347 describes urban Garhi Guldhar west of Sikrod. GeoNames Garhi has Sikrod on the opposite side. That candidate point is not accepted solely by name. Exact locality point and standalone Census code remain unestablished."
+   },
+   "candidatePoints": [
+    {
+     "source": "GeoNames",
+     "id": "10265263",
+     "name": "Garhi",
+     "lat": 28.70426,
+     "lon": 77.44484
+    }
+   ],
+   "supportingSources": [
+    "https://www.geonames.org/10265263/",
+    "https://www.geonames.org/10265262/",
+    "https://gstcouncil.gov.in/sites/default/files/AAR/nrctc_ltd-aar_order_no-08_dt_02.01.2025.pdf"
+   ]
   },
   {
    "hi": "छज्जा नगला",
    "en": "Chhajja Nagla",
    "district": "Moradabad",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Possible candidate only: OSM 'Chhaya Nagla' (node/8173283896, 28.9960,78.5791) in Amroha district (carved from Moradabad, 1997), near a Wikidata canal 'Chhajja Nagla Minor' (Q26811300, 28.9886,78.5819). Spelling and present district differ, so not accepted."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Possible candidate only: OSM 'Chhaya Nagla' (node/8173283896, 28.9960,78.5791) in Amroha district (carved from Moradabad, 1997), near a Wikidata canal 'Chhajja Nagla Minor' (Q26811300, 28.9886,78.5819). Spelling and present district differ, so not accepted."
+   },
+   "lat": 28.99537,
+   "lon": 78.57931,
+   "source": "India Geodata Census point extract",
+   "sourceId": "114903",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "135",
+    "subdistrictCode": "00718",
+    "code": "114903",
+    "name": "Chhajju Nagla",
+    "district": "Moradabad",
+    "subdistrict": "Kanth",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P420",
+    "excerpt": "छज्जा नंगला गाँव पश्चिमी उत्तर प्रदेश के मुरादाबाद जिले की कांठ तहसील का एक मध्यम आबादी का गाँव है।"
+   }
   },
   {
    "hi": "मुण्डाखेड़ी",
    "en": "Mundakheri",
    "district": "Moradabad",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Possible candidate only: OSM 'Muda Kheri' (node/8173301125, 28.9796,78.5871) in Amroha district (formerly Moradabad), ~2 km from 'Chhaya Nagla'. Spelling and district differ, so not accepted."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Possible candidate only: OSM 'Muda Kheri' (node/8173301125, 28.9796,78.5871) in Amroha district (formerly Moradabad), ~2 km from 'Chhaya Nagla'. Spelling and district differ, so not accepted."
+   },
+   "lat": 28.98095,
+   "lon": 78.58988,
+   "source": "India Geodata Census point extract",
+   "sourceId": "114910",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "135",
+    "subdistrictCode": "00718",
+    "code": "114910",
+    "name": "Mundha Kheri",
+    "district": "Moradabad",
+    "subdistrict": "Kanth",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P413",
+    "excerpt": "मुंडा खेड़ी गाँव पश्चिमी उत्तर प्रदेश का मुरादाबाद जिले की कांठ तहसील का एक मध्यम आबादी का गाँव है।"
+   }
   },
   {
    "hi": "दांशाह मलिक",
    "en": "Danshah Malik",
    "district": "Moradabad",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Not found in Wikidata, OSM or Wikipedia."
+   "status": "locality",
+   "evidence": "Book calls it Dan Shah Milak(P408). Approximate GeoNames Milak Dan Shah locality point; no standalone Census code established.",
+   "note": "Locality position, not a Census village code match.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Not found in Wikidata, OSM or Wikipedia."
+   },
+   "lat": 28.8408,
+   "lon": 78.73142,
+   "source": "GeoNames",
+   "sourceId": "10585308",
+   "sourceUrl": "https://www.geonames.org/10585308/",
+   "coordinateMethod": "gazetteer-locality",
+   "book": {
+    "paragraph": "P408",
+    "excerpt": "दानशाह मिल्क गाँव पश्चिमी उत्तर प्रदेश का मुरादाबाद जिले का एक छोटा स कस्बा है।"
+   },
+   "resolution": {
+    "hi": "पुस्तक में दानशाह मिल्क (P408)। बिंदु GeoNames Milak Dan Shah का अनुमानित स्थान है; अलग Census गाँव कोड स्थापित नहीं।",
+    "en": "Book calls it Dan Shah Milak(P408). Approximate GeoNames Milak Dan Shah locality point; no standalone Census code established."
+   }
   },
   {
    "hi": "घरोट",
    "en": "Gharot",
    "district": "Amroha",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Not found in Amroha/Moradabad in Wikidata or OSM."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Not found in Amroha/Moradabad in Wikidata or OSM."
+   },
+   "lat": 28.78703,
+   "lon": 78.36287,
+   "source": "India Geodata Census point extract",
+   "sourceId": "118275",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "137",
+    "subdistrictCode": "00731",
+    "code": "118275",
+    "name": "Gharont",
+    "district": "Jyotiba Phule Nagar",
+    "subdistrict": "Hasanpur",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P425",
+    "excerpt": "घरोंट गाँव पश्चिमी उत्तर प्रदेश के अमरोहा जिले की हसनपुर तहसील का एक मध्यम आबादी का गाँव है।"
+   }
   },
   {
    "hi": "बाबूखेड़ा",
    "en": "Babukhera",
    "district": "Sambhal",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Not found in Sambhal/Moradabad in Wikidata or OSM."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Not found in Sambhal/Moradabad in Wikidata or OSM."
+   },
+   "lat": 28.7476,
+   "lon": 78.48863,
+   "source": "India Geodata Census point extract",
+   "sourceId": "115672",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "135",
+    "subdistrictCode": "00721",
+    "code": "115672",
+    "name": "Babu Khera",
+    "district": "Moradabad",
+    "subdistrict": "Sambhal",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P417",
+    "excerpt": "बाबू खेड़ा गाँव पश्चिमी उत्तर प्रदेश के सम्भल जिले का एक मध्यम आबादी का गाँव है।"
+   }
   },
   {
    "hi": "दरियापुर",
    "en": "Dariyapur",
    "district": "Sambhal",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Very common name; no Dariyapur in Sambhal district found. OSM 'Daryapur' (node/8173262366) is in Moradabad/Amroha area, not Sambhal."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Very common name; no Dariyapur in Sambhal district found. OSM 'Daryapur' (node/8173262366) is in Moradabad/Amroha area, not Sambhal."
+   },
+   "lat": 28.74822,
+   "lon": 78.49765,
+   "source": "India Geodata Census point extract",
+   "sourceId": "115679",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "135",
+    "subdistrictCode": "00721",
+    "code": "115679",
+    "name": "Daryapur Band",
+    "district": "Moradabad",
+    "subdistrict": "Sambhal",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P410",
+    "excerpt": "दरियापुर गाँव पश्चिमी उत्तर प्रदेश के सम्भल जिले का एक मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "भींवपुरा",
    "en": "Bhinwpura",
    "district": "Nagaur",
    "state": "Rajasthan",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Not found in Nagaur in Wikidata or OSM."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Not found in Nagaur in Wikidata or OSM."
+   },
+   "lat": 27.12506,
+   "lon": 75.33486,
+   "source": "India Geodata Census point extract",
+   "sourceId": "083961",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "08",
+    "districtCode": "112",
+    "subdistrictCode": "00566",
+    "code": "083961",
+    "name": "Bheevpura",
+    "district": "Nagaur",
+    "subdistrict": "Nawa",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P229",
+    "excerpt": "भींवपुरा गाँव राजस्थान के नागौर जिले की नावाँ तहसील का एक मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "किशनगढ़ रेनवाल",
@@ -476,9 +1141,42 @@
    "en": "Punyana",
    "district": "Sikar",
    "state": "Rajasthan",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Not found in Sikar (OSM has only Poonani / Pooniyan hamlets — different names)."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Not found in Sikar (OSM has only Poonani / Pooniyan hamlets — different names)."
+   },
+   "lat": 27.07671,
+   "lon": 75.54047,
+   "source": "India Geodata Census point extract",
+   "sourceId": "080280",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "08",
+    "districtCode": "110",
+    "subdistrictCode": "00547",
+    "code": "080280",
+    "name": "Punana",
+    "district": "Jaipur ",
+    "subdistrict": "Amber",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P234",
+    "excerpt": "पुनाना गाँव राजस्थान के जयपुर जिले की जालसू तहसील का एक मध्यम आबादी का गाँव है।"
+   },
+   "sourceDiscrepancy": {
+    "hi": "संग्रह का शीर्षक/ज़िला: पुण्याना, सीकर। पुस्तक और मूल लेख: पुनाना, जयपुर/जालसू (P234)। मानचित्र में Census 080280 Punana (2011 Amber/Jaipur) लिया गया है; सीकर का Punyana 081866 नहीं। मूल रिकॉर्ड नहीं बदला गया।",
+    "en": "Archive heading/district say Punyana, Sikar, but the book P234 and original article body say Punana, Jaipur/Jalsu; Census 080280 Punana (2011 Amber) matches Bichpari, Nangal Ladi and Bishanpura. Census 081866 Punyana in Sikar is rejected. Original record unchanged."
+   },
+   "mappedName": {
+    "hi": "पुनाना",
+    "en": "Punana"
+   }
   },
   {
    "hi": "धींगपुर",
@@ -513,27 +1211,102 @@
    "en": "Mohammadpur Jatan",
    "district": "Bareilly",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Not found in Bareilly in Wikidata, OSM or Wikipedia."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Not found in Bareilly in Wikidata, OSM or Wikipedia."
+   },
+   "lat": 28.56448,
+   "lon": 79.46291,
+   "source": "India Geodata Census point extract",
+   "sourceId": "130173",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "150",
+    "subdistrictCode": "00787",
+    "code": "130173",
+    "name": "Mohammedpur Jatan",
+    "district": "Bareilly",
+    "subdistrict": "Bareilly ",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P428",
+    "excerpt": "मोहम्मदपुर जाटान गाँव पश्चिमी उत्तर प्रदेश के बरेली जिले का एक छोटा सा गाँव है।"
+   }
   },
   {
    "hi": "कबूलपुर",
    "en": "Kabulpur",
    "district": "Rohtak",
    "state": "Haryana",
-   "status": "unverified",
-   "evidence": "",
-   "note": "Wikidata only has 'Kabulpur Branch Post Office' (Q72959473) in Jhajjar district (not Rohtak) and an IndianOil 'Kabulpur Road' station in Jhajjar district; no village coordinate, and district differs from the website."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "Wikidata only has 'Kabulpur Branch Post Office' (Q72959473) in Jhajjar district (not Rohtak) and an IndianOil 'Kabulpur Road' station in Jhajjar district; no village coordinate, and district differs from the website."
+   },
+   "lat": 28.7599,
+   "lon": 76.57505,
+   "source": "India Geodata Census point extract",
+   "sourceId": "061617",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "06",
+    "districtCode": "082",
+    "subdistrictCode": "00405",
+    "code": "061617",
+    "name": "Kabulpur(108)",
+    "district": "Rohtak",
+    "subdistrict": "Rohtak",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P205",
+    "excerpt": "कबूलपुर गाँव हरियाणा के रोहतक जिले का एक बड़ा गाँव है।"
+   }
   },
   {
    "hi": "समसपुर",
    "en": "Samaspur",
    "district": "Meerut",
    "state": "Uttar Pradesh",
-   "status": "unverified",
-   "evidence": "",
-   "note": "No Samaspur in Meerut found. Wikidata Q7408880 'Samaspur' (29.48,77.38) has P131 only 'Haryana' and an inconsistent coordinate; Samaspur Majra (Q85638350) is in Jhajjar."
+   "status": "verified",
+   "evidence": "Identity matched to the official Census2011 directory and original book. Coordinate row joined by exact village code and state. Coordinate extract obtained from India Geodata; live NIC endpoint unavailable.",
+   "note": "Census2011 administrative names are retained separately from original archive labels.",
+   "previousResearch": {
+    "status": "unverified",
+    "note": "No Samaspur in Meerut found. Wikidata Q7408880 'Samaspur' (29.48,77.38) has P131 only 'Haryana' and an inconsistent coordinate; Samaspur Majra (Q85638350) is in Jhajjar."
+   },
+   "lat": 28.95655,
+   "lon": 78.02395,
+   "source": "India Geodata Census point extract",
+   "sourceId": "118923",
+   "sourceUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+   "coordinateMethod": "code-linked-point-extract",
+   "coordinatePrecision": "approximate settlement point; not a cadastral boundary",
+   "census": {
+    "stateCode": "09",
+    "districtCode": "138",
+    "subdistrictCode": "00733",
+    "code": "118923",
+    "name": "Shamashpur",
+    "district": "Meerut",
+    "subdistrict": "Mawana",
+    "sourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648"
+   },
+   "book": {
+    "paragraph": "P358",
+    "excerpt": "समसपुर गाँव पश्चिमी उत्तर प्रदेश के मेरठ जिले की मवाणा तहसील का एक मध्यम आबादी वाला गाँव है।"
+   }
   },
   {
    "hi": "नई दिल्ली",
@@ -580,5 +1353,26 @@
    "note": "Reference point (city).",
    "reference": true
   }
- ]
+ ],
+ "research": {
+  "originalMissing": 31,
+  "codeLinkedNew": 26,
+  "localityNew": 1,
+  "remaining": 3,
+  "censusSourceUrl": "https://censusindia.gov.in/nada/index.php/catalog/42648",
+  "coordinateExtractUrl": "https://github.com/yashveeeeeeer/india-geodata/releases/tag/census/2011",
+  "upstreamLayerUrl": "https://webgis1.nic.in/nicstreet/rest/services/admin2024/MapServer/5",
+  "coordinateCaveat": "Coordinates acquired from third-party public mirror/extract. Live NIC unavailable. Census codes do not themselves certify coordinates.",
+  "bookTitle": "लुहाच वंश का इतिहास",
+  "bookAuthor": "कर्नल कर्मबीर सिंह लुहाच",
+  "bookDate": "21.05.2025",
+  "bookParagraphNumbering": "Nonempty paragraphs numbered from P0;430 paragraphs.",
+  "bookSha256": "4fb30479ab20dd63775c88d0ffb16e4fff25a1ce6e93effb9be9514a338067b7",
+  "downloadHashes": {
+   "PC11_TV_DIR.xlsx": "e5670123e836148cd4a869805333b519f45ce837d1145c8b5cece3a01dbf7dd0",
+   "Census_Villages.parquet": "d267c36db8df40ff4d06e53012b7206013263489fe0fafd58635e0ad12e10371",
+   "IN-geonames.zip": "738f48ab5bc86a4325beaf013ce0a0f25119eceeeff9cd3d96f86991690df998"
+  },
+  "historicalAreaNew": 1
+ }
 }
