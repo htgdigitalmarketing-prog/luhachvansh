@@ -1002,10 +1002,13 @@ export class MemberStore extends Store {
     const keep = new Set(start), LIMIT = 1500;
     for (const id of start) for (let stack = [id]; stack.length && keep.size < LIMIT; )
       for (const parent of up.get(stack.pop()) || []) if (!keep.has(parent) && can(parent)) { keep.add(parent); stack.push(parent); }
+    // Ancestors already in `keep` must still be visited by the nearby-family walk.
+    // A separate visited set lets us cross a parent and descend to siblings/cousins.
+    const visited = new Set(start);
     let frontier = [...start];
     for (let depth = 0; depth < 3 && frontier.length && keep.size < LIMIT; depth++) {
       const next = [];
-      for (const id of frontier) for (const n of near.get(id) || []) if (!keep.has(n) && can(n) && keep.size < LIMIT) { keep.add(n); next.push(n); }
+      for (const id of frontier) for (const n of near.get(id) || []) if (!visited.has(n) && can(n) && keep.size < LIMIT) { visited.add(n); keep.add(n); next.push(n); }
       frontier = next;
     }
     const people = [...keep].map((id) => this.person(id)).filter(Boolean);

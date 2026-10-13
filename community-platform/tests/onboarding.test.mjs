@@ -251,10 +251,12 @@ test("the signed-in visual tree shows ancestors and the private family circle wi
     f.db.run("UPDATE proposals SET due=0");
     f.db.tick();
     const wife = f.db.one("SELECT person_id FROM proposals WHERE id=?", p).person_id;
+    f.db.run("INSERT INTO people(id,name,village,source,kind) VALUES('synthetic-sibling','Synthetic Sibling','गाँव-क','Synthetic family record','archive')");
+    f.db.run("INSERT INTO relationships(id,a,b,type,role,source) VALUES('synthetic-sibling-edge','f1','synthetic-sibling','parent','father','Synthetic family record')");
     const tree = f.db.memberTree(f.member, "hidden");
     const ids = tree.records.map((r) => r.id);
     assert.equal(tree.focus, "m1", "an invisible focus falls back to the member's own node");
-    for (const id of ["g1", "f1", "m1", wife]) assert.ok(ids.includes(id), id);
+    for (const id of ["g1", "f1", "m1", wife, "synthetic-sibling"]) assert.ok(ids.includes(id), id);
     for (const id of ["hidden", "kid"]) assert.equal(ids.includes(id), false, id);
     const w = tree.records.find((r) => r.id === wife);
     assert.equal(w.role, "daughter-in-law");

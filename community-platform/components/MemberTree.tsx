@@ -10,13 +10,13 @@ type Tree={records:PersonRecord[],focus:string,own:string[],limited:boolean};
 // no-store on every open and dropped on sign-out, so another account never sees a cached tree.
 export default function MemberTree({accountId,onOpen}:{accountId:string,onOpen:(p:{id:string,name:string,village:string})=>void}){
  const {language,tr}=useLanguage(),hi=language==='hi',say=(h:string,e:string)=>hi?h:e;
- const [tree,setTree]=useState<Tree|null>(null),[error,setError]=useState(''),[focus,setFocus]=useState('');
+ const [tree,setTree]=useState<Tree|null>(null),[error,setError]=useState(''),[focus,setFocus]=useState(''),[retry,setRetry]=useState(0);
  useEffect(()=>{let live=true;setTree(null);setError('');
   fetch('/api/members?action=tree',{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error);if(live){setTree(d);setFocus(d.focus);}}).catch(e=>live&&setError(tr(hiError(e.message))));
-  return()=>{live=false;};},[accountId]);
+  return()=>{live=false;};},[accountId,retry]);
  const records=useMemo(()=>(tree?.records||[]).map(p=>({...p,name:hi?p.name:(p.nameEnglish||p.name)})),[tree,hi]);
  const selected=tree?.records.find(p=>p.id===focus);
- if(error)return <section className="m-panel"><p role="alert">{error}</p></section>;
+ if(error)return <section className="m-panel"><p role="alert">{error}</p><button className="outline" onClick={()=>setRetry(r=>r+1)}>{say('फिर खोलें','Try again')}</button></section>;
  if(!tree)return <section className="m-panel" role="status">{say('आपका वंश-वृक्ष खुल रहा है…','Opening your family tree…')}</section>;
  return <section className="m-panel member-tree">
   <h2>{say('मेरा वंश-वृक्ष','My family tree')}</h2>
