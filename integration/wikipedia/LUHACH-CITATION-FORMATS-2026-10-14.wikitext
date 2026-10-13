@@ -1,0 +1,18 @@
+<!-- Citation formatting aid only. No article prose. Add a reference only beside a human-written statement it actually supports. -->
+
+<ref name="community-about">{{cite web |title=हमारे बारे में |url=https://luhachvansh.com/about |website=लुहाच परिवार |language=hi |access-date=14 October 2026}}</ref>
+
+<ref name="book-catalogue">{{cite web |title=LUHACH GOTRA KA ITIHAS |url=https://www.hindibook.com/index.php?Field=bookcode&String=9788194327080&format=fullpage&p=sr |website=Hindi Book Centre |access-date=14 October 2026}}</ref>
+
+<ref name="community-history">{{cite web |title=लुहाच वंश का इतिहास |url=https://luhachvansh.com/history |author=कर्नल कर्मबीर सिंह लुहाच |website=लुहाच परिवार |date=21 May 2025 |language=hi |access-date=14 October 2026}}</ref>
+
+<!-- Book metadata verified from the catalogue only. Use for further reading; do not cite unread pages to support historical statements. Publisher deliberately omitted because not verified. -->
+* {{cite book |author=Karmbir Singh Luhach |title=Luhach Gotra Ka Itihas |year=2024 |isbn=9788194327080 |language=hi}}
+
+== References ==
+{{reflist}}
+
+<!-- Proposed external links for editorial review. These are not independent references. The new open wiki may not qualify under WP:ELNO. -->
+== External links ==
+* [https://luhachvansh.com/ Luhach family community website]
+* [https://admirable-kitten-6793df.netlify.app/ Luhach Vansh community wiki]
