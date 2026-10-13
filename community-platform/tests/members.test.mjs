@@ -76,7 +76,7 @@ test("recovery copies are encrypted, owner-only, current, and assisted recovery 
   f.db.saveRecoveryCopy(f.member,f.user.recovery);
   f.db.requestRecovery('unknown','A test request with no account');
   assert.equal(f.db.one('SELECT COUNT(*) n FROM recovery_requests').n,0);
-  f.db.requestRecovery('member','Known family member from Test Village');
+  f.db.requestRecovery('Test Member','Known family member from Test Village');
   const r=f.db.memberState(f.admin).recoveryRequests[0];
   assert.equal(f.db.memberState(f.member).recoveryRequests.length,0);
   assert.throws(()=>f.db.issueRecovery(f.member,r.id,'Checked identity against known relative'));
@@ -90,6 +90,9 @@ test("recovery copies are encrypted, owner-only, current, and assisted recovery 
   assert.equal(f.db.recoveryCopies(f.admin).find(c=>c.username==='member').code,recovered.recovery);
   assert.throws(()=>f.db.issueRecovery(f.admin,r.id,'Another identity check'),/no longer/);
   assert.equal(f.db.one("SELECT detail FROM audit WHERE action='assisted_recovery_issued'").detail.includes(replacement.code),false);
+  await f.db.register({username:'duplicate',name:'Test Member',password,code:f.db.invite(f.admin,'Duplicate-name test').code,adult:true,consent:true});
+  f.db.requestRecovery('Test Member','Ambiguous name must not select a member');
+  assert.equal(f.db.one("SELECT COUNT(*) n FROM recovery_requests WHERE status='pending'").n,0);
  } finally {f.db.close();}
 });
 test("simple passwords work without composition or minimum-length rules, but empty passwords are rejected", async () => {
