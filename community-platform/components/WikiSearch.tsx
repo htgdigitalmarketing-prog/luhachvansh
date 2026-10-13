@@ -1,0 +1,10 @@
+'use client';
+import Link from 'next/link';
+import {useState} from 'react';
+import {Text,useLanguage} from './Language';
+import {searchWiki,type WikiEntry} from '../lib/wiki.mjs';
+const categories=[['all','सभी','All'],['roots','जड़ें','Roots'],['places','स्थान','Places'],['village','गाँव','Villages'],['family','परिवार','Family'],['community','समुदाय','Community'],['reference','स्रोत व सहयोग','Reference']];
+export default function WikiSearch({entries}:{entries:WikiEntry[]}){
+ const [query,setQuery]=useState(''),[category,setCategory]=useState('all');const {tr}=useLanguage();const results=searchWiki(entries,query,category);
+ return <section id="wiki-index" className="wiki-index"><h2><Text value="पृष्ठ खोजें" en="Find a page"/></h2><div className="wiki-filters"><label htmlFor="wiki-query"><Text value="विषय, गाँव या नाम की वर्तनी" en="Topic, village or name variant"/><input id="wiki-query" type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={tr('जैसे: नाँधा, Nandha, इतिहास','Try Nandha, history or a Hindi village name')}/></label><label htmlFor="wiki-category"><Text value="संग्रह" en="Collection"/><select id="wiki-category" value={category} onChange={e=>setCategory(e.target.value)}>{categories.map(([id,hi,en])=><option value={id} key={id}>{tr(hi,en)}</option>)}</select></label></div><p role="status" aria-live="polite"><Text value={`${results.length} पृष्ठ मिले`} en={`${results.length} pages found`}/></p><div className="wiki-grid">{results.map(e=><Link className="wiki-card" href={e.href} key={e.href}><span className="eyebrow"><Text value={e.category==='village'?'गाँव का लेख':'विकी विषय'} en={e.category==='village'?'Village entry':'Wiki topic'}/></span><h3><Text value={e.title.hi} en={e.title.en}/></h3><p><Text value={e.summary.hi} en={e.summary.en}/></p><span aria-hidden="true">↗</span></Link>)}</div>{!results.length&&<p><Text value="दूसरी वर्तनी आज़माएँ या सभी संग्रह चुनें।" en="Try another spelling or choose all collections."/></p>}</section>;
+}
