@@ -133,6 +133,7 @@ export default function Members() {
     [mode, setMode] = useState("signin"),
     [unusedLanguageFlag] = useState(true);
   const [error, setError] = useState(""),
+    [setupPrepared, setSetupPrepared] = useState(false),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
     [secret, setSecret] = useState<{ label: string; value: string } | null>(
@@ -466,7 +467,7 @@ export default function Members() {
                     "अपने सदस्य यूज़रनेम से लॉगिन करें।",
                   )
                 : mode === "setup"
-                  ? "इस कंप्यूटर में रखे निजी प्रशासक-स्थापना कोड से खाता बनाएँ। अपना पासवर्ड स्वयं चुनें।"
+                  ? t("Create your first administrator account. Choose a password you can remember.", "पहला प्रशासक खाता बनाएँ। अपनी पसंद का याद रहने वाला पासवर्ड चुनें।")
                   : mode === "register"
                     ? "प्रशासक से एक बार उपयोग वाला निमंत्रण प्राप्त करें।"
                     : "खाता बनाते समय सुरक्षित किया गया पुनर्प्राप्ति कोड इस्तेमाल करें।"}
@@ -512,7 +513,7 @@ export default function Members() {
                 />
               </label>
               {mode !== "signin" && (
-                <label>
+                <label hidden={mode === "setup" && setupPrepared} style={mode === "setup" && setupPrepared ? {display:"none"} : undefined}>
                   {mode === "recover"
                     ? "खाता पुनर्प्राप्ति कोड"
                     : mode === "setup"
@@ -524,9 +525,11 @@ export default function Members() {
                     required
                     autoComplete="off"
                     maxLength={200}
+                    onChange={e => { if (mode === "setup") setSetupPrepared(e.target.value.length >= 32); }}
                   />
                 </label>
               )}
+              {mode === "setup" && setupPrepared && <p className="m-muted">{hi ? "पहले प्रशासक की स्थापना तैयार है। अब अपना पासवर्ड चुनें।" : "Administrator setup is ready. Choose your password."}</p>}
               <label>
                 {mode === "recover"
                   ? t("नया पासवर्ड", "नया पासवर्ड")
@@ -538,11 +541,11 @@ export default function Members() {
                   autoComplete={
                     mode === "signin" ? "current-password" : "new-password"
                   }
-                  minLength={mode === "signin" ? 1 : 15}
+                  minLength={1}
                   maxLength={128}
                 />
                 {mode !== "signin" && (
-                  <small> <Text value="कम से कम 15 अक्षर रखें। याद रहने वाला लंबा वाक्य भी इस्तेमाल कर सकते हैं।"/> </small>
+                  <small>{hi ? "अपनी पसंद का याद रहने वाला पासवर्ड रखें।" : "Choose a password you can remember."}</small>
                 )}
               </label>
               {(mode === "register" || mode === "setup") && (
@@ -1232,7 +1235,7 @@ export default function Members() {
                           name="password"
                           type="password"
                           autoComplete="new-password"
-                          minLength={15}
+                          minLength={1}
                           maxLength={128}
                           required
                         />

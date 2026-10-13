@@ -64,6 +64,19 @@ const privateSettings = {
   phone: "555-test",
   city: "Test City",
 };
+test("simple passwords work without composition or minimum-length rules, but empty passwords are rejected", async () => {
+  const f = await fixture();
+  try {
+    const invite = f.db.invite(f.admin, "Simple password test");
+    await assert.rejects(f.db.register({username:"simple",name:"Test Member",code:invite.code,adult:true,consent:true,password:""}), /Enter a password/);
+    await f.db.register({username:"simple",name:"Test Member",code:invite.code,adult:true,consent:true,password:"1234"});
+    const login = await f.db.authenticate("simple", "1234");
+    assert.equal(f.db.actor(login.token).handle, "simple");
+    await assert.rejects(f.db.authenticate("simple", "wrong"));
+    const updated = await f.db.changePassword(f.db.actor(login.token).id,"1234","a");
+    assert.equal(f.db.actor(updated.token).handle,"simple");
+  } finally { f.db.close(); }
+});
 test("bilingual account introductions stay private even from reviewers and genealogy search", async () => {
   const f = await fixture();
   try {

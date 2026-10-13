@@ -38,9 +38,9 @@ async function derive(password, salt) {
 async function passwordHash(password, salt = randomBytes(16).toString("hex")) {
   need(
     typeof password === "string" &&
-      password.length >= 15 &&
+      password.length >= 1 &&
       password.length <= 128,
-    "Use a password of 15–128 characters. Spaces are welcome.",
+    "Enter a password.",
   );
   const key = await derive(password, salt);
   return `${salt}:${key.toString("hex")}`;

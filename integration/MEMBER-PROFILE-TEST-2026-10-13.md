@@ -11,3 +11,5 @@ Ajay and Dr. Shagun introductions are prepared in an ignored private draft, with
 Production build passed. Member/guard tests passed 20/20 after correcting a test-only audit column typo. Account closure clears introductions.
 
 Hosted verification: v8 Completed/Current on the isolated Node application. Owner setup is prepared for ajay.luhach; creation remains pending user password submission. Before enabling setup, a server-side copy of the 13.39 MiB member database was saved under the private before-profile-test-20261013 directory (the source WAL was 0 B).
+
+User-directed accessibility adjustment: removed the 15-character password minimum for registration, recovery and password changes. Nonempty passwords remain required; technical input size limits, salted scrypt hashes and persisted login throttling remain. A17-test member run confirms short passwords, rejection of empty passwords, rotation, privacy and authorization. Once the existing one-time setup code is prepared, its technical field is concealed; it is never automatically distributed to visitors.
