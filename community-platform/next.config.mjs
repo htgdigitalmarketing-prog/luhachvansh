@@ -1,5 +1,6 @@
 import {fileURLToPath} from 'node:url';
 export default { outputFileTracingRoot:fileURLToPath(new URL('.',import.meta.url)), distDir:process.env.LUHACH_DEV_DIST||'.next', poweredByHeader: false, serverExternalPackages: ['node:sqlite'], async redirects(){return [
+ ...['luhach-history-hi','luhach-viewer-hi'].flatMap(slug=>[['mp4','video'],['jpg','poster'],['vtt','captions']].map(([ext,kind])=>({source:'/media/reels/'+slug+'.'+ext,destination:'/api/reel-media?slug='+slug+'&kind='+kind,permanent:false}))),
  ...[['about','about'],['history','history'],['kuldevi','kuldevi'],['present','villages'],['memories','gallery'],['news','news'],['team','team'],['shaheed','shaheed'],['achievers/all','achievers']].map(([old,section])=>({source:'/'+old,destination:'/heritage/'+section,permanent:false})),
  {source:'/news_details/:id',destination:'/heritage/news/:id',permanent:false},
  {source:'/evolution',destination:'/vanshavali',permanent:false},

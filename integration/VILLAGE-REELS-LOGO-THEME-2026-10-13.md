@@ -11,3 +11,5 @@ The original community emblem was recovered unchanged from the developer's front
 Validation: completed render inventory, representative contact sheets and poster overview inspected; streaming/coverage tests and production build passed. Local video metadata reports 88.994 seconds for Gugaheri and actual playback advances. Local preview: http://127.0.0.1:3031/heritage/villages/106. No changes to the original live Laravel site or its database.
 
 Media archive retained locally and on test storage: reels-public-20261013.zip. GitHub contains the source, catalogue, tests and review records; working audio and private data are excluded.
+
+The endpoint's catalogue is bundled with the app rather than read from a temporary build directory: Hostinger relocates deployments and removes that directory. The original history/viewer media URLs redirect to the corrected narration, captions and posters. The read-only verification script checks all 48 asset sets, seeking, both original video URLs, and the matching reel block on every one of the 56 village articles.

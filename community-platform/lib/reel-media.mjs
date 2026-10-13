@@ -1,8 +1,10 @@
 import {dirname,resolve} from 'node:path';
 import {existsSync,statSync,createReadStream} from 'node:fs';
 import {Readable} from 'node:stream';
-import {readFileSync} from 'node:fs';
-const catalogue=()=>['reels.json','village-reels.json'].flatMap(f=>JSON.parse(readFileSync(new URL('../content/'+f,import.meta.url),'utf8')).reels);
+import reels from '../content/reels.json' with {type:'json'};
+import villages from '../content/village-reels.json' with {type:'json'};
+// Bundle the public allowlist: Hostinger relocates builds and removes the temporary source directory.
+const catalogue=()=>[...reels.reels,...villages.reels];
 export function reelMediaRoot(){return process.env.LUHACH_REEL_DIR||resolve(dirname(process.env.LUHACH_MEMBER_DB||resolve('data/members.sqlite')),'reels-public');}
 export function reelReady(slug){return existsSync(resolve(reelMediaRoot(),slug+'.mp4'));}
 export function reelResponse(request){
