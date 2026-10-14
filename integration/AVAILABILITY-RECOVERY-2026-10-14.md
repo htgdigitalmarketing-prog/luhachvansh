@@ -37,6 +37,26 @@ Dev later described Change domain and possible redeployment, but did not establi
 
 Implementation commit 78f5476 was pushed to origin and review. Human specialist Louise subsequently joined the chat, acknowledged both exact blockers and said she was checking them at 10:21 IST. Keep the existing hosted deployment flag unchanged; the main-host opt-in supplements its current strict storage/HTTPS configuration. Do not change LUHACH_DEPLOYMENT to an unimplemented production value. Retain the test hostname during transition: clients may have cached hPanel's 301 root-to-test bridge, so an immediate test-to-root redirect could cause a redirect loop.
 
+## Original Laravel verification and revised priority
+
+Ajay subsequently said the redirect is acceptable for now and the underlying problem must be repaired. Main-domain cutover is therefore deferred; keep the working bridge, original domain, email and backups unchanged while repairing Laravel and the failed Node upload.
+
+Fresh read-only verification:
+
+- Authenticated File Manager lists the original public_html Laravel directories app, bootstrap, config, database, frontend, public, resources, routes, storage, test, tests and vendor, plus artisan, index.php, composer files and retained public_html.zip/luhachnew.zip archives. Environment-file contents were not opened.
+- The local legacy-test-rollback.zip still has 401,301,484 bytes and SHA-256 0f752096efacab5253ab11fc0add3a3e68092c7192c865266c98edea0aad1411, matching the recorded 12 October capture. Public media archives and the limited legacy-content.sql capture also remain present.
+- The original SQL export header names u112235086_luhach, matching the username in the observed Laravel 1045 error. Exact-name search in the current hPanel MySQL database list returns No results found. This is evidence of a missing listing, not yet a server-confirmed deletion; do not claim the live database is intact or lost until Hostinger verifies it.
+- Database backup inventory at 13.10.2026 10:52 does not list that database. Selecting 12.10.2026 10:52 reveals u112235086_luhach (Custom). This original backup was selected only: Restore and Download were not clicked. Presence does not yet establish backup completeness or successful restoration.
+- Louise has received the exact database/user identifier, package validation, the updated no-cutover instruction, and screenshots of original files and the missing current database listing. She was also given the exact older backup and asked to check actual existence, grants, registration, backup integrity and activity history before a safe original-database repair. No empty DB creation, limited-export import, password reset or overwrite was performed.
+
+Additional evidence screenshots:
+
+- C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/screenshots/laravel-files-preserved-20261014.jpg
+- C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/screenshots/laravel-database-not-listed-20261014.jpg
+- C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/screenshots/laravel-original-db-backup-20261012.jpg
+
+Hostinger's current restoration guide says the database must first exist in the current MySQL list; if absent, it must be recreated with the same name before restoration: https://www.hostinger.com/support/4283700-how-to-restore-backups-at-hostinger/. Credential entry/reset requires the owner's secure involvement if Hostinger cannot restore the existing authentication internally; never expose a password or use content-only exports to stand in for the complete original DB.
+
 Next: reconcile the human response, resolve the resource/network challenge, attach the root to the existing Node app only via a preservation-safe operation, check any absolute SQLite path change, and independently verify root/www, health, public content and private-member privacy. Do not expose environment files to diagnose or reset credentials automatically.
 
 Screenshots (ignored local artifacts):
