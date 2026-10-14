@@ -2,8 +2,10 @@ import { Problem } from './store.mjs';
 import {isAbsolute} from 'node:path';
 export function localGuard(req, enabled, write=false, env=process.env){
  const host=req.headers.get('host')||'';
- const testHosts=['test.luhachvansh.com','darkseagreen-newt-136595.hostingersite.com'];
- if(env.LUHACH_DEPLOYMENT==='test' && testHosts.includes(host)){
+ const hostedHosts=['test.luhachvansh.com','darkseagreen-newt-136595.hostingersite.com'];
+ // Opt in to the authorized main-domain cutover; existing test deployments remain restricted.
+ if(env.LUHACH_PRIMARY_HOST==='luhachvansh.com')hostedHosts.push('luhachvansh.com','www.luhachvansh.com');
+ if(env.LUHACH_DEPLOYMENT==='test' && hostedHosts.includes(host)){
   if(!env.LUHACH_MEMBER_DB||!isAbsolute(env.LUHACH_MEMBER_DB))throw new Problem('Test storage is not configured.',503);
   if(req.headers.get('x-forwarded-proto')!=='https' && req.nextUrl?.protocol!=='https:')throw new Problem('HTTPS is required.',403);
   if(write&&req.headers.get('origin')!==`https://${host}`)throw new Problem('Same-origin request required',403);

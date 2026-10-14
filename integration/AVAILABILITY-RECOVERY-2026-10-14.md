@@ -19,9 +19,20 @@ Created hPanel redirects for HTTP and HTTPS luhachvansh.com/ to https://test.luh
 
 Intermittent navigation failures/offline fallback were still observed after successful rendering. Node health remained available in Chrome. Universal reachability, the father's connection, deep-link path preservation and stable www access must not be claimed as verified.
 
+Ajay subsequently confirmed that the main address redirects to test.luhachvansh.com and then renders. This confirms recovery for his reported connection; it does not independently verify every network.
+
 ## Support and remaining work
 
 Human specialist Dev responded through the existing Hostinger Agent chat: test.luhachvansh.com is accessible from their end, with a screenshot; their check did not reproduce the Laravel error because it checked the separate Node hostname. The distinction was corrected in a follow-up: Laravel error preceded the recovery redirect. The preservation-safe direct-root Node attachment question was restated explicitly. A note was submitted and read back requesting secure Laravel diagnosis separately and non-destructive root attachment to the existing Node app, preserving all files, databases and email/DNS. No ticket ID was provided. Avoid Delete Website/Subdomain; app slots are 10/10.
+
+Dev later described Change domain and possible redeployment, but did not establish how to free the hostname already held by PHP while preserving its data. Their first response confused the build root directory with the domain root; that distinction was corrected. No domain move was attempted on that incomplete guidance.
+
+## Direct-domain release prepared, not deployed
+
+- Member API guards now support an explicit LUHACH_PRIMARY_HOST=luhachvansh.com opt-in, permitting exactly the root and www hostnames in the existing hosted deployment mode. Existing deployments stay restricted until that setting is added. Absolute preserved storage, HTTPS, exact same-origin writes and secure cookies remain required; arbitrary lookalike/configured hosts remain refused.
+- All 103 tests passed, including the added main-domain origin/storage/HTTPS tests. An isolated production build using .next-cutover-check passed without replacing the running local preview build. Generated tsconfig changes were removed.
+- Source-only package: C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/community-node-v22-cutover.zip; 144 files, 9,438,910 bytes; SHA-256 0889bd5d1aca007c22acb83b753a77c721f843dbecd28a5abc6942a4f3dd8cca. package.json is at the ZIP root. Environment files, databases, build outputs and private runtime assets are excluded.
+- Hostinger's working Upload button opened the file chooser and the package was selected. hPanel then reported Something went wrong, accepted no package and kept Save and redeploy disabled. No deployment began, no environment change was saved, and current v20 remains the release. The specific upload failure and unresolved preservation requirement were escalated to support.
 
 Next: reconcile the human response, resolve the resource/network challenge, attach the root to the existing Node app only via a preservation-safe operation, check any absolute SQLite path change, and independently verify root/www, health, public content and private-member privacy. Do not expose environment files to diagnose or reset credentials automatically.
 

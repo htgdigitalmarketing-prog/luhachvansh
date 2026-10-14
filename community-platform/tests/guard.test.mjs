@@ -18,3 +18,22 @@ test('temporary staging member access requires test mode, isolated absolute stor
  assert.throws(()=>localGuard(req('luhachvansh.com'),'1',false,env),/disabled/);
  assert.throws(()=>localGuard(req(host+'.evil.org'),'1',false,env),/disabled/);
 });
+test('main-domain cutover is opt-in and retains HTTPS, storage and exact-origin protections',()=>{
+ const env={LUHACH_DEPLOYMENT:'test',LUHACH_PRIMARY_HOST:'luhachvansh.com',LUHACH_MEMBER_DB:'C:/preserved/members.sqlite'};
+ for(const host of ['luhachvansh.com','www.luhachvansh.com']){
+  const r=req(host,'https://'+host);r.headers.set('x-forwarded-proto','https');
+  assert.doesNotThrow(()=>localGuard(r,'0',true,env));
+  assert.throws(()=>localGuard(r,'0',true,{...env,LUHACH_PRIMARY_HOST:undefined}),/disabled/);
+  assert.throws(()=>localGuard(r,'0',true,{...env,LUHACH_DEPLOYMENT:undefined}),/disabled/);
+  assert.throws(()=>localGuard(r,'0',true,{...env,LUHACH_MEMBER_DB:'relative.sqlite'}),/storage/);
+  r.headers.set('origin','https://test.luhachvansh.com');
+  assert.throws(()=>localGuard(r,'0',true,env),/Same-origin/);
+  r.headers.set('x-forwarded-proto','http');
+  assert.throws(()=>localGuard(r,'0',false,env),/HTTPS/);
+ }
+ for(const host of ['luhachvansh.com.evil.org','evil.org']){
+  const r=req(host,'https://'+host);r.headers.set('x-forwarded-proto','https');
+  assert.throws(()=>localGuard(r,'0',true,env),/disabled/);
+ }
+ assert.throws(()=>localGuard(req('evil.org'),'0',false,{...env,LUHACH_PRIMARY_HOST:'evil.org'}),/disabled/);
+});
