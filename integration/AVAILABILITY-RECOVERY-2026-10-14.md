@@ -106,6 +106,10 @@ Following the reviewed guidance, a fresh hPanel **Enter phpMyAdmin** launch from
 
 **Current result:** working public Node bridge verified; owner-selected new database password persisted in original Laravel configuration; original `APP_KEY` preserved; encrypted laptop credential copy verified. **Original database restoration, source/count reconciliation and Laravel connection verification remain pending the provider's running job.** Keep the redirect unchanged and do not claim Laravel is repaired.
 
+### Fresh status check — 14.10.2026, 14:29 IST
+
+The fresh authenticated Restore History still lists `databases-u112235086_luhach-20261012052209` as **In progress**. The Node public health endpoint again reports storageReady/contentReady true, accountsPresent true and archivePeople 10061. Hostinger's latest response, labelled **Response reviewed by Marijus** at displayed 13:48, confirms that the full restore is still running and gives no completion estimate. No second restore or configuration change was made. Current screenshot: `C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/screenshots/laravel-restore-status-check-20261014.jpg`. This health check verifies Node availability, not the original Laravel connection.
+
 Evidence: `.local-integration/screenshots/hostinger-db-restore-job-escalation-20261014.jpg` and `.local-integration/screenshots/hostinger-ida-restore-review-20261014.jpg`. Report commit `ee03b90` previously recorded the accepted recovery and was pushed to origin and review; this section records the subsequent owner-save verification and provider review.
 
 Screenshots (ignored local artifacts):
