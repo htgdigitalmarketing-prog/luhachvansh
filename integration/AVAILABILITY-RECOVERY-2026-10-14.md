@@ -159,3 +159,13 @@ This supersedes the 1045 status above. Claude (fresh session, VIO claim #811) to
 6. **Root cause (as far as evidenced):** the MySQL user's stored password did not match `.env` DB_PASSWORD. Setting one fresh value in both places resolved 1045; no Hostinger account/host/plugin repair was needed.
 
 **Still open:** (a) public routing still 301s luhachvansh.com → test.luhachvansh.com (Node); cut-back to Laravel awaits Ajay's decision, then remove both hPanel redirects, purge CDN, cache-busted check from a fresh client, keep test host live for cached 301s; (b) the two temporary guarded every-minute verifier cron entries (generic PHP and PHP 7.4) still need removing; nothing else was added; (c) in-kernel rendering is not a real browser render of the public URL — verify after cut-back.
+
+### Public root returned to original Laravel — 14.10.2026 ~19:15 IST
+
+On Ajay's explicit instruction ("yes switch it back now"), Claude deleted both hPanel redirects (rollback record: `http://luhachvansh.com/` → `https://test.luhachvansh.com` and `https://luhachvansh.com/` → `https://test.luhachvansh.com`, both 301; recreate in hPanel → Domains → Redirects to roll back). The redirect list is now empty.
+
+Live verification at 13:45Z (cache-busted, fresh client): `https://luhachvansh.com/` 200, 58,797 B, title "लुहाच परिवार", `X-Powered-By: PHP/7.4.33`, Laravel `XSRF-TOKEN` and `laravel_session` cookies set, `x-hcdn-cache-status: DYNAMIC` (served live, not a CDN copy). `/history` 200 (1,771,406 B), `/team` 200, `/shaheed` 200; `www.` 200. `http://` 301 → `https://` (Force SSL, expected). Body size equals the 12.10 pre-cutover `production-before.html`. A fresh built-in browser rendered the original Hindi homepage (header, menu, slider, news ticker): `.local-integration/screenshots/laravel-live-root-restored-20261014-1915IST.jpg`. `test.luhachvansh.com` (Node) still 200 and stays up for clients holding the cached 301. No CDN purge was needed (responses DYNAMIC).
+
+Both temporary verifier cron jobs were deleted by Ajay (Claude's delete clicks are blocked by the session classifier). Remaining account cron jobs: pizi.in schedule:run and two app.heltog.com jobs, unchanged. The private `.recovery-check-20261014` directory with sanitized reports remains outside `public_html` and is inert (no job runs it; script expires 15.10 00:00 UTC).
+
+**Recovery complete.** Remaining optional items: delete `.recovery-check-20261014` once evidence is no longer wanted; browsers that cached the old 301 may keep landing on the test host until their cache clears.
