@@ -4,7 +4,7 @@
 
 ## Authorization and scope
 
-Ajay requested restoration of luhachvansh.com, authorized contacting Hostinger support, and subsequently authorized serving the existing Node 24 site while Laravel is repaired. Preserve Laravel/public_html, production MySQL, private SQLite/media/key files and recovery copies. No reseeding, database replacement, password reset or destructive domain removal.
+Ajay requested restoration of luhachvansh.com, authorized contacting Hostinger support, and subsequently authorized serving the existing Node 24 site while Laravel is repaired. Preserve Laravel/public_html, production MySQL, private SQLite/media/key files and recovery copies. No reseeding, unrelated database replacement, unilateral password reset or destructive domain removal. The later owner-authorized recreation and full-backup restoration of the already deleted original database, with private owner entry of a replacement password, are recorded below.
 
 ## Fresh evidence
 
@@ -77,6 +77,22 @@ Prepared the MySQL creation form for database suffix luhach and username suffix 
 Prepared-form screenshot: C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/screenshots/laravel-db-recreation-prepared-20261014.jpg. Hostinger specialist Louise received the confirmed removal sequence and exact older backup; original files/missing-list screenshots were verified as loaded attachments in the conversation.
 
 Next: reconcile the human response, resolve the resource/network challenge, attach the root to the existing Node app only via a preservation-safe operation, check any absolute SQLite path change, and independently verify root/www, health, public content and private-member privacy. Do not expose environment files to diagnose or reset credentials automatically.
+
+## Original database recovery started — 14.10.2026
+
+This section supersedes earlier pending-creation/selection-only status; the original removal finding remains unchanged.
+
+- Louise confirmed at displayed 11:29 that the original DB was removed on 13 October and the 12 October 10:52 backup contains it. The restoration reply was sent and read back at displayed 11:32: recover the full original DB, check for any newer recoverable pre-deletion copy first, preserve Laravel and Node, and keep the public root-to-test redirect unchanged. The inspected log does not identify an actor.
+- hPanel rejected the original retained password under its leaked-password check. The owner then privately entered a new unique database password and submitted creation. Fresh exact-name hPanel search verified both database and user `u112235086_luhach`, created 14.10.2026, assigned to `luhachvansh.com`, showing 1 MB. No password value was printed or transmitted in support/chat.
+- The owner requested Chrome Password Manager and a laptop copy. Browser security policy blocked opening Chrome's internal password-manager page; no workaround was attempted. Ignored local Windows DPAPI save/copy helpers were prepared and their syntax/encryption availability checked. The completed Hostinger password field was empty, so no automatic credential save occurred. On the owner's subsequent completion reply, the expected encrypted local vault file was still absent. Chrome saving is owner-reported, not independently verified; local encrypted saving remains unverified.
+- Louise's displayed 12:02 instructions specified creating the original DB/user with a strong password, restoring the 12 October 10:52 DB backup, updating only `DB_PASSWORD` in the Laravel `.env`, and preserving `APP_KEY`. She closed the chat at displayed 12:24 with a handoff summary. These are hPanel-displayed times, not independently converted timestamps.
+- The backup tab temporarily displayed a different account's invalid website/no-backups state. Existing Active collaborator access to the hosting account was resumed through Account Sharing > Manage services, after which the original daily backup inventory returned. No new access was granted and no backup was deleted.
+- Before restoration, phpMyAdmin independently showed **No tables found in database** for the newly recreated `u112235086_luhach`. This established that the replacement target contained no new tables/records to overwrite. Evidence: `.local-integration/screenshots/laravel-recreated-db-empty-20261014.jpg`.
+- Selected Database backup, `2026-10-12 10:52`, `u112235086_luhach (Custom)`. The confirmation named that exact original DB. Started restoration into the verified empty target; hPanel's progress display reached 99%. A refreshed Restore History independently lists `databases-u112235086_luhach-20261012052209`, backup date 12.10.2026, restoration date 14.10.2026, status **In progress**. This is an accepted server recovery job, not verified success. No files restore, limited SQL import, reseeding, domain move, Node/private-storage change or public-redirect change occurred.
+- The original `public_html/.env` editor was opened for the owner's private `DB_PASSWORD` update, without returning its contents or secrets to the model. Owner entry and Save confirmation are pending. No agent credential entry, `APP_KEY` change or Laravel-success claim has been made.
+- During restoration, Chrome followed `https://luhachvansh.com/` to `https://test.luhachvansh.com/`. A provider browser-check page briefly appeared, then the Hindi Node homepage rendered. Public Node `/api/health` again reported storageReady/contentReady true, archivePeople 10061, village 56/about 2/history 1/news 5, accountsPresent/recoveryKey true; memberMediaFolder false persists. A separate unauthenticated command-line root request returned 403, so universal network/client reachability remains unverified. Screenshot: `.local-integration/screenshots/node-redirect-during-laravel-restore-20261014.jpg`.
+
+Next: wait for restoration completion and verify Restore History/table metadata, then reconcile the owner's saved Laravel `DB_PASSWORD` update and check any configuration cache. Verify Laravel without removing the working public redirect. Evidence: `.local-integration/screenshots/laravel-original-db-restore-progress-20261014.jpg`.
 
 Screenshots (ignored local artifacts):
 
