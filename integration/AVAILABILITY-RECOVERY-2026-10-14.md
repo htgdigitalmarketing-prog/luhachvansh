@@ -1,5 +1,7 @@
 # Availability recovery — 14.10.2026
 
+**Controlling finding:** authenticated Hostinger Activity Log records removal of the original database u112235086_luhach on 13.10.2026, immediately after removal of the old test subdomain. Laravel files remain; the original live MySQL database was not preserved. This predates the 14 October recovery redirects. An original 12 October database backup is available. Do not characterize the redirect as repair of Laravel or say the live database remains intact.
+
 ## Authorization and scope
 
 Ajay requested restoration of luhachvansh.com, authorized contacting Hostinger support, and subsequently authorized serving the existing Node 24 site while Laravel is repaired. Preserve Laravel/public_html, production MySQL, private SQLite/media/key files and recovery copies. No reseeding, database replacement, password reset or destructive domain removal.
@@ -56,6 +58,23 @@ Additional evidence screenshots:
 - C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/screenshots/laravel-original-db-backup-20261012.jpg
 
 Hostinger's current restoration guide says the database must first exist in the current MySQL list; if absent, it must be recreated with the same name before restoration: https://www.hostinger.com/support/4283700-how-to-restore-backups-at-hostinger/. Credential entry/reset requires the owner's secure involvement if Hostinger cannot restore the existing authentication internally; never expose a password or use content-only exports to stand in for the complete original DB.
+
+## Confirmed deletion and credential handoff
+
+Authenticated Activity Log, Date/Action/Status columns (timestamps exactly as displayed; their timezone has not been independently confirmed):
+
+- 2026-10-13 11:26:52 — Subdomain test was removed — Success.
+- 2026-10-13 11:26:58 — Database u112235086_luhach was removed — Success.
+- 2026-10-13 11:33:31 — Website darkseagreen-newt-136595.hostingersite.com domain was changed to test.luhachvansh.com — Success.
+- 2026-10-14 09:57:56 and 09:59:07 — Redirect on luhachvansh.com was created — Success.
+
+The log does not identify the responsible person in the inspected columns. Do not infer an actor. Evidence captured as metadata only in .local-integration/laravel-deletion-evidence-20261014.json. The earlier unverified reassurance that MySQL remained intact was explicitly corrected to Ajay.
+
+The missing original DB must be recovered from the original server backup, with original user/authentication and preservation checks. Before recovery, Hostinger was asked to inspect backup integrity and whether a later complete pre-deletion backup exists. No Restore/Download or database creation was performed.
+
+Prepared the MySQL creation form for database suffix luhach and username suffix luhach (full original identity u112235086_luhach); password left untouched and Create remains disabled. Asked Ajay to either perform the existing DB_PASSWORD entry/submission privately under the browser-tool credential handoff rule, or leave credential recovery with Hostinger. Do not inspect that form while the owner is entering credentials; wait for completion confirmation. A statement that he will do it is not confirmation it has been completed. After successful creation/registration, verify target identity, restore only the original chosen DB backup into that empty target, and verify original Laravel without changing the public redirect or Node private state. If Hostinger finds an existing/orphaned DB, stop recreation and repair registration/grants instead of overwriting it.
+
+Prepared-form screenshot: C:/Users/Admin/Projects/luhachvansh-integration/.local-integration/screenshots/laravel-db-recreation-prepared-20261014.jpg. Hostinger specialist Louise received the confirmed removal sequence and exact older backup; original files/missing-list screenshots were verified as loaded attachments in the conversation.
 
 Next: reconcile the human response, resolve the resource/network challenge, attach the root to the existing Node app only via a preservation-safe operation, check any absolute SQLite path change, and independently verify root/www, health, public content and private-member privacy. Do not expose environment files to diagnose or reset credentials automatically.
 
